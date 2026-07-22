@@ -313,7 +313,7 @@ class App{
     },key=[fingerprint(this.state.snapshot),JSON.stringify(strategic)].join('|');
     if(key!==this._v15CacheKey){
       try{this._v15Cache=engine.decide({catalog:this.catalog,snapshot:this.state.snapshot||{},settings,locks:this.state.locks||[]});}
-      catch(error){this._v15Cache={version:'16.0.0',authority:true,state:'SYNC_BLOCKED',label:'판단 엔진 점검 필요',reason:String(error&&error.message||error),action:null,alternatives:[],unknowns:['판단 엔진 오류']};}
+      catch(error){this._v15Cache={version:'16.4.0',authority:true,state:'SYNC_BLOCKED',label:'판단 엔진 점검 필요',reason:String(error&&error.message||error),action:null,alternatives:[],unknowns:['판단 엔진 오류']};}
       this._v15CacheKey=key;
     }
     const base=this._v15Cache;if(!base)return null;
