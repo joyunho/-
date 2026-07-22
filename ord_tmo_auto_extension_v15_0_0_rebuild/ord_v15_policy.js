@@ -6,7 +6,7 @@ if(root)root.ORDV15Policy=api;
 })(typeof window!=='undefined'?window:globalThis,function(C,M){
 'use strict';
 
-const VERSION='17.3.0';
+const VERSION='17.4.0';
 const ROUTES=Object.freeze({
   physical:Object.freeze({key:'physical',mode:'physical',label:'물딜 1상위',groups:[['main'],['armor','stunBase'],['slow','bossFrenzy'],['stunFull']],priority:'상위 → 상시 방깎·최소 0.5스턴 → 이감·광보잡 → 1.5스턴'}),
   dual:Object.freeze({key:'dual',mode:'magic',label:'마딜 2상위·토키',groups:[['main','stunBase'],['slow'],['stunFull'],['bossFrenzy','toki']],priority:'상위 2기·최소 0.5스턴 → 이감 → 1.5스턴 → 광보잡·토키'}),
@@ -55,9 +55,25 @@ function groupRows(route,role,checkpoint){
   // 광보잡·보잡·암브·보조딜·토키) may not sit behind partial numeric pools.
   const binaryOpen=rows=>rows.some(row=>row.required!==false&&!row.waived&&num(row.target)>0&&num(row.target)<=1&&num(row.current)<=0&&num(row.gap)>0);
   const bossPhase=num(checkpoint&&checkpoint.dueRound)>=40;
-  const head=groups.slice(0,1),tail=groups.slice(1).map((rows,offset)=>({rows,offset,rel:relativeGap(rows),binary:binaryOpen(rows)}));
+  // v17.4: two straight round-55 boss deaths (도플라밍고) shipped with the
+  // boss-power pool (단일·끝딜 환산 1/3 → 2.5/3, 1.5스턴 0.4) still open while
+  // wisps kept funding partial survival fragments (이감 7%, 스턴 조각).  The
+  // extras group holding singleEndExpected sits last in static order, so from
+  // the round-50 boss window on, groups with an open boss-power role float
+  // above the rest — but only while no survival group is in crisis: if any
+  // non-boss group is still wide open (relative gap >30% — e.g. the r50
+  // replay's 이감 25/102) the float stays off for the whole state, because
+  // lines kill you before the boss does.  The gate is state-level, not
+  // pairwise, so the ordering stays a coherent total order inside the search.
+  const BOSS_POWER_KEYS=new Set(['single','end','singleEndExpected','attack','toki','stunFull']);
+  const bossPowerOpen=rows=>rows.some(row=>row.required!==false&&!row.waived&&BOSS_POWER_KEYS.has(row.key)&&num(row.gap)>0);
+  const bossWindow=num(checkpoint&&checkpoint.dueRound)>=50;
+  const head=groups.slice(0,1),tail=groups.slice(1).map((rows,offset)=>({rows,offset,rel:relativeGap(rows),binary:binaryOpen(rows),bossPowerRows:bossPowerOpen(rows)}));
+  const survivalCrisis=tail.some(item=>!item.bossPowerRows&&item.rel>.3);
+  for(const item of tail)item.bossPower=bossWindow&&!survivalCrisis&&item.bossPowerRows;
   tail.sort((a,b)=>{
     if(bossPhase&&a.binary!==b.binary)return a.binary?-1:1;
+    if(a.bossPower!==b.bossPower)return a.bossPower?-1:1;
     const aNearlyDone=a.rel<=.1,bNearlyDone=b.rel<=.1;
     if(aNearlyDone!==bNearlyDone&&Math.max(a.rel,b.rel)>=.3)return aNearlyDone?1:-1;
     return a.offset-b.offset;

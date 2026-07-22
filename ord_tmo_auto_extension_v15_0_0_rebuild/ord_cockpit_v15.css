@@ -609,3 +609,7 @@
 /* Clear-value audit line on upper candidate cards (v17.3). */
 .v151-clear-line{display:block;overflow:hidden;color:#DFC47F;font-size:9px;font-weight:800;text-overflow:ellipsis;white-space:nowrap}
 .v151-nearest-badge{display:inline-block;margin-left:4px;padding:0 4px;border:1px solid #6E86B8;border-radius:6px;color:#9FB6E4;font-size:8px;font-style:normal;font-weight:800;vertical-align:1px}
+.v151-clear-why{display:block;color:#9FB6D4;font-size:9px;line-height:1.35;white-space:normal}
+.v151-boss-warn{display:flex;align-items:center;gap:7px;margin-top:7px;border:1px solid rgba(239,107,107,.62);border-radius:11px;padding:7px 10px;background:rgba(92,24,36,.28);color:#ffc1bd;font-size:11px;line-height:1.35}
+.v151-boss-warn i{font-style:normal}
+.v151-boss-warn b{color:#ffd9d6}

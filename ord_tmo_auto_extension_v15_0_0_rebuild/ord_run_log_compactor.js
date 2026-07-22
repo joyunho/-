@@ -227,7 +227,11 @@ function compactDirectionBoard(source){
 function compactUpper(plan,settings){const candidate=plan&&plan.upper||plan&&plan.mainUpper||(settings&&settings.upperPreviewId?{id:settings.upperPreviewId}:null);return unitRef(candidate);}
 function compactV15RouteCandidate(row,index){
   row=row||{};const ref=unitRef(row),projection=row.projectedSupport||{},tiers=row.tiers||{},deadEnds=projection.deadEnds||[];
-  return{rank:index+1,id:ref.id,name:ref.name,route:text(row.routeKey,32),routeLabel:text(row.routeLabel,100),feasible:bool(row.feasible),locked:bool(row.locked),completion:rounded(row.completion),wispCost:rounded(row.wispCost),wispAfter:finite(row.wispAfter)==null?null:rounded(row.wispAfter),wispGap:rounded(row.wispGap),tiers:Object.fromEntries(TIERS.map(tier=>[tier,rounded(tiers[tier])])),exactPrefix:projection.exactPrefix===true,prefix:(projection.steps||[]).slice(0,3).map((step,stepIndex)=>({order:stepIndex+1,id:id(step.id),name:text(step.name,100),kind:text(step.kind,24),wispCost:rounded(step.wispCost)})),deadEnds:deadEnds.slice(0,8).map(item=>text(item&&item.label,100)),futureDropsCredited:projection.futureDropsCredited===true,fixedFinalParty:projection.fixedFinalParty===true,reason:text(row.reason,220)};
+  // v17.4: 클리어 가치 부분점수를 기록에 남긴다 — 두 번째 55라 보스 사망
+  // 로그에서 순위 근거를 사후 감사할 수 없었다.
+  const value=row.clearValue||null;
+  const clearValue=value?{value:rounded(value.value),story:rounded(value.story),dpsCover:rounded(value.dpsCover),line:rounded(value.line),rareUtil:rounded(value.rareUtil),utility:rounded(value.utility),roundsToGo:rounded(value.roundsToGo),deadlineFactor:rounded(value.deadlineFactor)}:null;
+  return{rank:index+1,id:ref.id,name:ref.name,route:text(row.routeKey,32),routeLabel:text(row.routeLabel,100),feasible:bool(row.feasible),locked:bool(row.locked),nearestBuild:row.nearestBuild===true,clearValue,completion:rounded(row.completion),wispCost:rounded(row.wispCost),wispAfter:finite(row.wispAfter)==null?null:rounded(row.wispAfter),wispGap:rounded(row.wispGap),tiers:Object.fromEntries(TIERS.map(tier=>[tier,rounded(tiers[tier])])),exactPrefix:projection.exactPrefix===true,prefix:(projection.steps||[]).slice(0,3).map((step,stepIndex)=>({order:stepIndex+1,id:id(step.id),name:text(step.name,100),kind:text(step.kind,24),wispCost:rounded(step.wispCost)})),deadEnds:deadEnds.slice(0,8).map(item=>text(item&&item.label,100)),futureDropsCredited:projection.futureDropsCredited===true,fixedFinalParty:projection.fixedFinalParty===true,reason:text(row.reason,220)};
 }
 function compactV15(source,state){
   source=source||{};const action=source.action||{},proposed=source.action||source.blockedAction||{},assessment=source.assessment||{},rare=source.rare||{},best=source.bestPath||{},checkpoint=assessment.checkpoint||{},compactProposed=proposed&&proposed.id?Object.assign(compactAction(proposed.row||proposed,state,0),{executable:!!(source.action&&source.action.id),stopCondition:text(proposed.stopCondition,180),wispAfter:finite(proposed.wispAfter)==null?null:rounded(proposed.wispAfter),result:text(proposed.result,40),deltas:(proposed.deltas||[]).slice(0,10).map(compactRequirementRow)}):null;
@@ -252,6 +256,6 @@ return{
   VERSION,SNAPSHOT_SCHEMA,DECISION_SCHEMA,TIERS,LIMITS,
   compactSnapshot,applySnapshotRecord,reconstructSnapshots,compactDecision,compactDirectionBoard,compactV15,
   stableStringify,stableDigest,dedupe,
-  _test:{text,numericMap,baselineOf,mapDelta,unitRef,groupTier,tierCountsFromConsumed,compactCompletion,compactAction,compactDeficits,compactTimeline,compactRare,currentHand}
+  _test:{text,numericMap,baselineOf,mapDelta,unitRef,groupTier,tierCountsFromConsumed,compactCompletion,compactAction,compactDeficits,compactTimeline,compactRare,currentHand,compactV15RouteCandidate}
 };
 });

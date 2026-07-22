@@ -322,7 +322,7 @@ class App{
     },key=[fingerprint(this.state.snapshot),JSON.stringify(strategic)].join('|');
     if(key!==this._v15CacheKey){
       try{this._v15Cache=engine.decide({catalog:this.catalog,snapshot:this.state.snapshot||{},settings,locks:this.state.locks||[]});}
-      catch(error){this._v15Cache={version:'17.3.0',authority:true,state:'SYNC_BLOCKED',label:'판단 엔진 점검 필요',reason:String(error&&error.message||error),action:null,alternatives:[],unknowns:['판단 엔진 오류']};}
+      catch(error){this._v15Cache={version:'17.4.0',authority:true,state:'SYNC_BLOCKED',label:'판단 엔진 점검 필요',reason:String(error&&error.message||error),action:null,alternatives:[],unknowns:['판단 엔진 오류']};}
       this._v15CacheKey=key;
     }
     const base=this._v15Cache;if(!base)return null;
@@ -668,6 +668,21 @@ class App{
     if(status==='ROUTE_CHOICE')return`<div class="v151-action choice"><span class="v151-state">상위 선택 필요</span><b class="v151-action-title">${C.esc(decision.label||'메인 상위 방향 선택')}</b><p>${C.esc(decision.reason||'아래 상위 정보에서 현재 패 후보를 비교하세요.')}</p><span class="v151-jump-note">⑦ 상위 정보에서 후보를 확정하세요.</span></div>`;
     const shown=decision.action||decision.blockedAction||null,reroll=decision.rare&&decision.rare.safeReroll,unit=shown&&shown.unit||reroll&&reroll.unit||null,target=status==='REROLL_ONE'&&reroll?`${reroll.name} 1장 리롤`:shown&&shown.name||decision.label||'현재 패 소비 보류',waivedKeys=new Set(((decision.assessment||{}).requirements||[]).filter(row=>row.waived).map(row=>row.key)),deltas=(shown&&shown.deltas||[]).filter(row=>!waivedKeys.has(row.key)&&(Math.abs(C.num(row.delta))>.001||row.closed)).slice(0,3),cost=shown?C.num(shown.wispCost):0,after=shown&&shown.wispAfter!=null?C.num(shown.wispAfter):C.num(state.wisp),button=status==='ACT_NOW'&&decision.action?`<button class="primary" data-act="mark-made" data-step="0" data-id="${C.esc(decision.action.id)}">제작함 · TMO 확인</button>`:status==='REROLL_ONE'&&reroll?`<button class="primary danger" data-act="reroll-confirmed" data-id="${C.esc(reroll.id)}">1장 리롤함</button>`:status==='SYNC_BLOCKED'?`<button data-act="connection">TMO 다시 읽기</button>${this.state.pendingTransaction?'<button data-act="dismiss-transaction">거래 취소 · TMO 현재값 사용</button>':''}`:'<button disabled>지금은 재료 보존</button>',stop=shown&&shown.stopCondition?shown.stopCondition:status==='PREPARE'?'재료나 선위가 달라지면 실행하지 않습니다.':'패가 바뀌면 먼저 다시 읽습니다.';
     return`<div class="v151-action ${C.esc(status.toLowerCase())}" data-state="${C.esc(status)}"><div class="v151-action-main">${unit&&unit.image?`<img src="${C.esc(unit.image)}" alt="">`:'<i>→</i>'}<div><span class="v151-state">${C.esc({ACT_NOW:'지금 실행',PREPARE:'재료 보호',HOLD:'소비 보류',REROLL_ONE:'안전 리롤',SYNC_BLOCKED:'확인 대기'}[status]||'다음 판단')}</span><b class="v151-action-title">${C.esc(target)}${this.v151StoryTag(unit)}</b><p>${C.esc(decision.reason||'현재 패에서 안전한 다음 행동을 기다립니다.')}</p></div>${shown?`<div class="v151-cost"><small>선위</small><b>${cost}</b><span>${status==='PREPARE'?'필요':`후 ${after}`}</span></div>`:''}</div>${deltas.length?`<div class="v151-deltas">${deltas.map(row=>`<span>${C.esc(row.label)} <b>${fmt(row.before)}→${fmt(row.after)}</b></span>`).join('')}</div>`:''}${decision.upperReserve?`<div class="v151-upper-guard"><i>🔒</i>확정 상위 <b>${C.esc(decision.upperReserve.name)}</b> 트리 재료 ${C.num(decision.upperReserve.reservedUnits)}개 잠금 · 선위 ${C.num(decision.upperReserve.wispCost)} 필요(부족 ${C.num(decision.upperReserve.wispShort)}) — 잠긴 재료를 빼고 추천 중</div>`:''}${(()=>{
+      // v17.4: 55라 도플라밍고 2연속 사망 — 생존 조각은 닫히는데 보스
+      // 화력 역할(단일·끝딜·1.5스턴·토키)이 열린 채 보스전에 들어가는
+      // 것을 라운드 중에 경고한다.  46라부터 다음 보스와 열린 화력
+      // 결손을 빨간 띠로 상시 표시.
+      const roundNow=this.actualRound();
+      if(roundNow<46)return'';
+      const bossKeys=new Set(['single','end','singleEndExpected','attack','toki','stunFull']);
+      const openBoss=((decision.assessment||{}).requirements||[]).filter(row=>row.required!==false&&!row.waived&&bossKeys.has(row.key)&&C.num(row.gap)>0);
+      if(!openBoss.length)return'';
+      const nextBoss=[50,55,60,65].find(r=>r>=roundNow);
+      if(!nextBoss)return'';
+      const preview=C.bossPreview?C.bossPreview(nextBoss,this.state.gorosei):null;
+      const gaps=openBoss.slice(0,3).map(row=>`${row.label} ${fmt(row.gap)} 부족`).join(' · ');
+      return`<div class="v151-boss-warn"><i>⚠</i><b>${nextBoss}라 ${C.esc(preview&&preview.boss||'보스')}까지 ${nextBoss-roundNow}라</b> — ${C.esc(gaps)} · 보스 화력 역할을 생존 조각보다 먼저 닫으세요</div>`;
+    })()}${(()=>{
       // v17.3(사용자 요청): 재료 팝업을 열지 않아도 "부족 최하위 재료 =
       // 선택위습 N"과 "바로 필요한 조합 재료"가 카드에 바로 보인다.
       // 대안 목록은 이 패널에서 제거(2번 패널이 대신 담당).
@@ -787,6 +802,35 @@ class App{
     return`<label class="v151-gorosei-select"><span>이번 판 오로성</span><select data-opt="gorosei">${Object.values(C.GOROSEI).map(item=>`<option value="${item.key}" ${selected.key===item.key?'selected':''}>${C.esc(item.name)}</option>`).join('')}</select></label><div class="v151-gorosei-values"><span><small>이감 목표·상한</small><b>${slow}</b></span><span><small>물딜 방깎 실전·풀</small><b>${C.num(selected.armorSoft)}·${C.num(selected.armorSafe)}</b></span><span><small>스턴 운용·안정</small><b>1.0·${fmtStun(selected.stun)}</b></span></div>${bossHtml}`;
   }
 
+  // v17.4(사용자 요청): 후보 순위의 내부 판단 이유를 문장으로.  각 축의
+  // 가중 기여(스토리 .3 · 화력 .3 · 라인 .15 · 희귀 .12 · 유틸 .13)에서
+  // 상위 2개를 강점으로, 최하 축을 약점으로 뽑아 수치 근거와 함께 쓴다.
+  v151ClearWhy(row){
+    const value=row.clearValue,unit=row.unit;
+    if(!value||!unit)return'';
+    const grade=C.storyLeagueGrade?C.storyLeagueGrade(unit):null;
+    const kit=C.roleProfile(unit);
+    const strategy=C.upperStrategy?C.upperStrategy(unit):{};
+    const kitBits=[];
+    if(C.num(kit.stun)>0)kitBits.push(`스턴${Math.round(C.num(kit.stun)*100)/100}`);
+    const slowTotal=C.num(kit.slow)+C.num(kit.triggerSlow);if(slowTotal>0)kitBits.push(`이감${Math.round(slowTotal)}`);
+    const armorTotal=C.num(kit.armor)+C.num(kit.triggerArmor);if(armorTotal>0)kitBits.push(`깍${Math.round(armorTotal)}`);
+    const dpsPct=Math.round(C.num(value.dpsCover)*100);
+    const axes=[
+      {key:'story',weight:.3,score:C.num(value.story),strong:grade&&grade.leagueRanked?`스토리 ${grade.leagueTier}리그 ${grade.leagueRank}위/${grade.leagueSize}`:`스토리 ${grade?grade.tier:'?'}(${grade&&grade.measured?'실측':'추정'})`,weak:grade&&grade.leagueRanked?`스토리 ${grade.leagueTier}리그 ${grade.leagueRank}위 그침`:`스토리 ${grade?grade.tier:'?'} 추정(순위 외)`},
+      {key:'dps',weight:.3,score:C.num(value.dpsCover),strong:`60라 보스 요구 DPS의 ${dpsPct}%를 정적 하한으로 충족`,weak:`화력 하한 ${dpsPct}%뿐(수동스킬 미집계) — 단일·끝딜 보강 필수`},
+      {key:'line',weight:.15,score:C.num(value.line),strong:C.num(value.line)>=1?'라인 자립(보조딜 부담 없음)':'라인 보조딜 확보됨',weak:C.num(value.line)<=.2?'라인딜 약함 · 보조딜 미확보':'라인 자립도 미확인'},
+      {key:'rare',weight:.12,score:C.num(value.rareUtil),strong:`보유 희귀 ${C.num(row.tiers&&row.tiers.rare)}/${C.num(row.tierAvailable&&row.tierAvailable.rare)}장 활용`,weak:`보유 희귀 ${C.num(row.tiers&&row.tiers.rare)}/${C.num(row.tierAvailable&&row.tierAvailable.rare)}장만 사용`},
+      {key:'util',weight:.13,score:C.num(value.utility),strong:kitBits.length?`유틸 ${kitBits.join('·')}`:'유틸 킷',weak:'유틸(스턴·이감·깍) 없음'}
+    ].map(axis=>Object.assign(axis,{contribution:axis.weight*axis.score}));
+    const byContribution=axes.slice().sort((a,b)=>b.contribution-a.contribution);
+    const strengths=byContribution.slice(0,2).filter(axis=>axis.score>.05).map(axis=>axis.strong);
+    const weakest=byContribution[byContribution.length-1];
+    const eta=row.feasible?'지금 완성 가능':`~${C.num(value.roundsToGo)}라 뒤 완성${C.num(value.deadlineFactor)<1?` · 마감 할인 ×${value.deadlineFactor}`:''}`;
+    const lineNote=strategy.lineSelf==='support'&&C.num(value.line)<=.2?' · 보조딜러 필요':'';
+    return`<small class="v151-clear-why">왜: ${C.esc(strengths.join(' · ')||'상대 우위 없음')}${weakest&&weakest.score<.35?` — 약점: ${C.esc(weakest.weak)}`:''} · ${C.esc(eta)}${lineNote}</small>`;
+  }
+
   renderV151UpperInfo(state,plan){
     const decision=plan.v15Decision||{},lock=this.upperLock(),upper=lock&&state.db.byId.get(lock.id)||plan.upper||null,candidates=(decision.routeCandidates||[]).slice(0,6),canConfirm=this.actualRound()>=25;
     const upperStrategyInfo=upper&&C.upperStrategy?C.upperStrategy(upper):null,lineBadge=upperStrategyInfo&&upperStrategyInfo.lineSelf==='self'?'<i class="v151-line-badge self">라인 자립</i>':upperStrategyInfo&&upperStrategyInfo.lineSelf==='support'?'<i class="v151-line-badge support">보조딜 필요</i>':'';
@@ -817,7 +861,8 @@ class App{
       // 있어야 가중치를 보정할 수 있다.
       const value=row.clearValue,valueLine=value?`<small class="v151-clear-line">가치 ${Math.round(C.num(value.value)*100)} · DPS ${Math.round(C.num(value.dpsCover)*100)}% · 스토리 ${Math.round(C.num(value.story)*100)} · 라인 ${Math.round(C.num(value.line)*100)} · 희귀활용 ${Math.round(C.num(value.rareUtil)*100)}%${value.roundsToGo?` · ~${C.num(value.roundsToGo)}라 뒤`:' · 지금'}</small>`:'';
       const nearestBadge=row.nearestBuild?'<i class="v151-nearest-badge">최단 완성</i>':'';
-      return`<article class="${index===0?'best':''} ${selected?'selected':''}"><span><b>${index+1}. ${C.esc(row.name)}${nearestBadge}</b><small>${C.esc(row.routeLabel||'')} · TMO ${fmt(row.completion)}% · ${C.esc(status)}</small>${valueLine}</span><button data-act="detail" data-id="${C.esc(row.id)}">재료</button><button class="primary" data-act="choose-direction" data-key="${C.esc(row.routeKey)}" data-id="${C.esc(row.id)}" ${canConfirm?'':'disabled'}>${canConfirm?(selected?'유지':'확정'):'25라'}</button></article>`;}).join('');
+      const whyLine=this.v151ClearWhy(row);
+      return`<article class="${index===0?'best':''} ${selected?'selected':''}"><span><b>${index+1}. ${C.esc(row.name)}${nearestBadge}</b><small>${C.esc(row.routeLabel||'')} · TMO ${fmt(row.completion)}% · ${C.esc(status)}</small>${valueLine}${whyLine}</span><button data-act="detail" data-id="${C.esc(row.id)}">재료</button><button class="primary" data-act="choose-direction" data-key="${C.esc(row.routeKey)}" data-id="${C.esc(row.id)}" ${canConfirm?'':'disabled'}>${canConfirm?(selected?'유지':'확정'):'25라'}</button></article>`;}).join('');
     const strategicKeys=new Set(['single','end','toki','singleEndExpected','magicSupport','attack']),strategic=(decision.assessment&&decision.assessment.requirements||[]).filter(row=>strategicKeys.has(row.key)),needs=upper&&strategic.length?`<div class="v151-upper-needs"><small>이 상위의 조합 필수 역할</small>${strategic.map(row=>`<span class="${C.num(row.gap)<=0?'ok':'gap'}"><b>${C.esc(row.label)}</b><i>${fmt(row.current)}/${fmt(row.target)}</i>${C.num(row.gap)>0?`<em>부족 ${fmt(row.gap)}</em>`:'<em>확보</em>'}</span>`).join('')}</div>`:'';
     return`${main}${dpsLine}${needs}${cards?`<div class="v151-upper-candidates">${cards}</div>`:`<div class="v151-upper-note">${upper?'확정 상위 중심으로 다음 행동을 계속 계산합니다. 패가 바뀔 때마다 아래 필수 역할 충족을 다시 검사합니다.':'상위 선택 단계가 되면 최대 6개 후보가 여기에 표시됩니다.'}</div>`}`;
   }
