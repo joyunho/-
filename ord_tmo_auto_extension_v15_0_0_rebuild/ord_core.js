@@ -1,7 +1,7 @@
 (function(global){
 'use strict';
 
-const VERSION='17.0.0';
+const VERSION='17.1.0';
 const WISP_ID='810e';
 const SUPER_KUMA_ID='unit_1767884940750_9880';
 const MAX_WISP_COST=23;
@@ -194,6 +194,26 @@ function bossRawDpsNeed(preview,armorReduce,atkType){
   if(!preview||preview.bossArmor==null)return null;
   const typeMod=num(ATTACK_TYPE_VS_BOSS[atkType]!=null?ATTACK_TYPE_VS_BOSS[atkType]:1);
   return Math.round(num(preview.dpsNeed)/(armorMultiplier(num(preview.bossArmor)-num(armorReduce))*typeMod));
+}
+// v17.1: 정규화 스킬 프로필 다이제스트 접근자 (사용자 제공 63 프로필).
+// allowKillVerdict=false — 액션 AST 정규화 전에는 표시·참고용으로만 쓴다.
+function upperSkillProfile(unit){
+  const table=(typeof window!=='undefined'?window:globalThis).ORD_UPPER_SKILLS;
+  if(!table||!table.byTmo||!unit)return null;
+  if(table.byTmo[unit.id])return table.byTmo[unit.id];
+  for(const code of unit.codes||[])if(table.byTmo[code])return table.byTmo[code];
+  return null;
+}
+// 평타 한정 보스 타임라인 참고치.  스킬 데미지 훅은 AST 정규화가 끝나면
+// 이 함수의 options.skillDps 자리로 들어온다 — 그 전에는 킬 판정 금지.
+function simulateBossFlat(unit,level,options){
+  options=options||{};
+  const preview=bossPreview(options.round||50,options.gorosei);
+  if(!preview||preview.bossArmor==null)return null;
+  const combat=upperBossDps(unit,level,{bossArmor:preview.bossArmor,armorReduce:options.armorReduce,speedBuffPct:options.speedBuffPct});
+  if(!combat)return null;
+  const netDps=combat.effective+num(options.skillDps)-num(preview.regen),dealt=Math.max(0,netDps)*preview.time,remaining=Math.max(0,num(preview.hp)-dealt);
+  return{basis:'flat-attack-only',verdictAllowed:false,round:preview.round,boss:preview.boss,windowSec:preview.time,hp:num(preview.hp),regen:num(preview.regen),effectiveDps:combat.effective,netDps,dealt:Math.min(dealt,num(preview.hp)),remaining,remainingRatio:num(preview.hp)?round2(100*remaining/num(preview.hp)):0};
 }
 
 // 조합 후 ID가 바뀌는 상위는 한 경로로 취급합니다. 뒤쪽 ID일수록 실제 활성 형태입니다.
@@ -1109,5 +1129,5 @@ function snapshotHealth(snapshot,now){
 }
 function debugFixture(){return{VERSION,roleProfile,magicFinishProfile,evaluateMagicSingleEnd,skillFacts,upperStrategy,upperPairSynergy,storyGrade,storyLeagueKey,storyLeagueTier,storyLeagueGrade,storyLeagueRows,recipeSolve,predictCompletionWithAddedMaterial,specialPrerequisiteStatus,currentSpec,controlEnvelope,controlState,clearProfileDetails,deficits,recommendationPlan,gameFlow,progressionCounts,normalizePostLegendRoute,selectCompatibleQueue,rareTargetsForRound,rareInventoryFor,rarePressureForInventory,rareSpendForSolve,rowScore,roundClock,snapshotHealth};}
 
-global.ORDCore={VERSION,WISP_ID,SUPER_KUMA_ID,SPECIAL_IDS,COMMON_COLORS,GOROSEI,CONTROL_ENVELOPE,CONTROL_PROFILES,BOSS_META,bossPreview,UPPER_LINE_PROFILE,DEFENSE_ARMOR,armorMultiplier,ATTACK_TYPE_VS_BOSS,upperCombatFor,upperRawDps,upperBossDps,bossRawDpsNeed,STUN_RESEARCH,STORY_RARE_BENCHMARKS,STORY_RARE_RANKS,STORY_RESEARCHED,STORY_LEAGUES,STORY_GRADE_TIERS,UPPER_VARIANT_FAMILIES,POST_LEGEND_ROUTES,MAX_WISP_COST,PREFERRED_WISP_COST,num,esc,cleanName,canonicalAbility,groupName,nameOf,displayNameOf,tierKey,isRare,isCommon,isUncommon,isSpecialTier,isUpper,isLegendish,isChanged,isWarped,isShip,isSeraph,isTranscend,requiresWarpedCraft,familyOf,canonicalUpperId,activeUpperVariant,upperPairSynergy,descriptionPartnerSynergy,roleProfile,magicFinishProfile,evaluateMagicSingleEnd,skillFacts,upperStrategy,stunResearch,stunCaptureRate,storyGrade,storyLeagueKey,storyLeagueTier,storyLeagueGrade,storyLeagueRows,buildDb,mergeLiveCatalog,normalizeState,recipeSolve,predictCompletionWithAddedMaterial,reserveTargets,specialPrerequisiteStatus,materialName,mapText,commonTop,completionPercent,ownedUnits,ownedDisplayUnits,isRoleBearingUnit,currentSpec,finalGradeSpec,applyBuildStep,controlEnvelope,controlState,clearProfileDetails,deficits,roleContribution,upperMemoFor,synergyRankFor,mainUpper,inferMode,candidateRow,recommendationPlan,gameFlow,normalizePostLegendRoute,milestonePurpose,phaseForRound,roundClock,rareResolution,rareTargetsForRound,rareInventoryFor,rarePressureForInventory,rareSpendForSolve,upperProfileData,statusForRow,summarizeRoles,snapshotHealth,debugFixture};
+global.ORDCore={VERSION,WISP_ID,SUPER_KUMA_ID,SPECIAL_IDS,COMMON_COLORS,GOROSEI,CONTROL_ENVELOPE,CONTROL_PROFILES,BOSS_META,bossPreview,UPPER_LINE_PROFILE,DEFENSE_ARMOR,armorMultiplier,ATTACK_TYPE_VS_BOSS,upperCombatFor,upperRawDps,upperBossDps,bossRawDpsNeed,upperSkillProfile,simulateBossFlat,STUN_RESEARCH,STORY_RARE_BENCHMARKS,STORY_RARE_RANKS,STORY_RESEARCHED,STORY_LEAGUES,STORY_GRADE_TIERS,UPPER_VARIANT_FAMILIES,POST_LEGEND_ROUTES,MAX_WISP_COST,PREFERRED_WISP_COST,num,esc,cleanName,canonicalAbility,groupName,nameOf,displayNameOf,tierKey,isRare,isCommon,isUncommon,isSpecialTier,isUpper,isLegendish,isChanged,isWarped,isShip,isSeraph,isTranscend,requiresWarpedCraft,familyOf,canonicalUpperId,activeUpperVariant,upperPairSynergy,descriptionPartnerSynergy,roleProfile,magicFinishProfile,evaluateMagicSingleEnd,skillFacts,upperStrategy,stunResearch,stunCaptureRate,storyGrade,storyLeagueKey,storyLeagueTier,storyLeagueGrade,storyLeagueRows,buildDb,mergeLiveCatalog,normalizeState,recipeSolve,predictCompletionWithAddedMaterial,reserveTargets,specialPrerequisiteStatus,materialName,mapText,commonTop,completionPercent,ownedUnits,ownedDisplayUnits,isRoleBearingUnit,currentSpec,finalGradeSpec,applyBuildStep,controlEnvelope,controlState,clearProfileDetails,deficits,roleContribution,upperMemoFor,synergyRankFor,mainUpper,inferMode,candidateRow,recommendationPlan,gameFlow,normalizePostLegendRoute,milestonePurpose,phaseForRound,roundClock,rareResolution,rareTargetsForRound,rareInventoryFor,rarePressureForInventory,rareSpendForSolve,upperProfileData,statusForRow,summarizeRoles,snapshotHealth,debugFixture};
 })(window);
