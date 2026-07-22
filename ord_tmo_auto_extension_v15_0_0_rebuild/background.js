@@ -1,6 +1,6 @@
 'use strict';
 
-// v17.2.0 local decision runtime. The v13 parser identifier is retained for
+// v17.3.0 local decision runtime. The v13 parser identifier is retained for
 // stored-snapshot and connector protocol compatibility.
 const PARSER = 'ord-tmo-parser-v13-adapter';
 const SUPPORTED_HELPER_IDS = new Set(['32172', '34366']);

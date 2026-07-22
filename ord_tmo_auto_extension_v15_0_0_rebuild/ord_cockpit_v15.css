@@ -485,6 +485,13 @@
 .v151-line-badge{display:inline-block;margin-left:5px;border-radius:6px;padding:1px 5px;font-size:9px;font-style:normal;font-weight:900;vertical-align:middle}
 .v151-line-badge.self{border:1px solid rgba(126,211,140,.4);background:rgba(126,211,140,.1);color:#9FE8AC}
 .v151-line-badge.support{border:1px solid rgba(240,153,120,.4);background:rgba(240,153,120,.1);color:#FFB99A}
+/* Panel-1 inline materials: direct recipe rows + lowest missing = wisp. */
+.v151-mats{display:grid;flex:0 0 auto;gap:4px;border-top:1px dashed #2A4059;padding-top:6px}
+.v151-mats>div{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.v151-mats small{flex:1 1 100%;color:#8CA2BE;font-size:9px;font-weight:900}
+.v151-mats em{border:1px solid #274561;border-radius:7px;padding:2px 6px;background:#0A1A2E;color:#CFE1F5;font-size:9.5px;font-style:normal}
+.v151-mats em.ok{border-color:rgba(126,211,140,.4);color:#9FE8AC}
+.v151-mats em.gap{border-color:rgba(240,153,120,.4);color:#FFB99A}
 /* Reroll guidance: rares with no use in the committed upper/support paths. */
 .v151-reroll-hint{display:grid;flex:0 0 auto;gap:4px;border-top:1px dashed #4A2E3A;padding-top:6px}
 .v151-reroll-hint>small{color:#D89AA6;font-size:9.5px;font-weight:900;letter-spacing:.03em}
@@ -599,3 +606,6 @@
   .v151-run{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"round record" "actions actions";min-height:104px}.v151-sync{display:none}.v151-run-actions{display:grid;grid-template-columns:repeat(5,1fr);width:100%}
   .v151-build-list,.v151-upper-candidates{grid-template-columns:1fr}.v151-action-title{font-size:15px}.v151-action-main{grid-template-columns:40px minmax(0,1fr) auto}
 }
+/* Clear-value audit line on upper candidate cards (v17.3). */
+.v151-clear-line{display:block;overflow:hidden;color:#DFC47F;font-size:9px;font-weight:800;text-overflow:ellipsis;white-space:nowrap}
+.v151-nearest-badge{display:inline-block;margin-left:4px;padding:0 4px;border:1px solid #6E86B8;border-radius:6px;color:#9FB6E4;font-size:8px;font-style:normal;font-weight:800;vertical-align:1px}

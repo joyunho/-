@@ -6,7 +6,7 @@ if(root)root.ORDV15Engine=api;
 })(typeof window!=='undefined'?window:globalThis,function(C,M,L,P){
 'use strict';
 
-const VERSION='17.2.0';
+const VERSION='17.3.0';
 const MAX_CANDIDATES=36;
 const BEAM_WIDTH=6;
 const HORIZON=2;
@@ -280,12 +280,71 @@ function projectUpperRouteRow(model,row,route){
   return Object.assign({},row,{tiers,wispCost:wispUsed,wispAfter:exact?projection.remainingWisp:null,projectedAssessment:assessment,materialOverlap:overlap,rankVector,reason,projectedSupport:{basis:projection.basis,exactPrefix:exact,steps:stepSummary,supportSteps:support,tiers:exact?projection.tiers:{rare:0,special:0,uncommon:0,common:0},wispUsed:exact?num(projection.wispUsed):0,remainingWisp:projection.remainingWisp,requiredUpperWisp:num(projection.requiredUpperWisp),wispDebt:num(projection.wispDebt),deadEnds:projection.deadEnds||[],affordableCount:num(projection.affordableCount),futureDropsCredited:false,fixedFinalParty:false,combat:'unmeasured'}});
 }
 function upperProjectionShortlist(rows,route){const sorted=(rows||[]).slice().sort(routeCandidateCompare),picked=sorted.slice(0,UPPER_PROJECTION_SHORTLIST),seen=new Set(picked.map(row=>C.canonicalUpperId(row.id)));for(const key of [...new Set((route.groups||[]).flat())]){const best=sorted.filter(row=>num(C.roleContribution(row.unit,route.mode)[key])>0).sort((left,right)=>num(C.roleContribution(right.unit,route.mode)[key])-num(C.roleContribution(left.unit,route.mode)[key])||routeCandidateCompare(left,right))[0];if(best&&!seen.has(C.canonicalUpperId(best.id))){seen.add(C.canonicalUpperId(best.id));picked.push(best);}if(picked.length>=UPPER_PROJECTION_CAP)break;}return picked.slice(0,UPPER_PROJECTION_CAP);}
+// v17.3: 종착점 클리어 가치 — "지금 가까운 상위"가 아니라 "클리어에
+// 유리한 상위"가 앞서도록 하는 현재주의 교정.  근거는 전부 실측 데이터:
+// 스토리 실측 랭크, 평타+스킬 하한 DPS의 60라 필요치 대비, 라인 자립도
+// (보유 조합의 보조딜로 상쇄), 보유 희귀 활용률.  50라 준비 창을 넘기는
+// 도달 시점은 강하게 할인한다 — 시간이 없을 때만 현재주의가 옳다.
+function clearValueScore(model,row){
+  const unit=row.unit;
+  const grade=C.storyLeagueGrade?C.storyLeagueGrade(unit):null;
+  const story=grade&&num(grade.maxRank)>0?1-(num(grade.rank)-1)/Math.max(1,num(grade.maxRank)):num(C.storyGrade(unit).score)/100;
+  const preview=C.bossPreview?C.bossPreview(60,model.settings.gorosei):null;
+  let dpsCover=0;
+  if(preview&&preview.bossArmor!=null&&C.upperBossDps){
+    const level=Math.max(1,num(model.settings.upperResearchLevel)||1);
+    const combat=C.upperBossDps(unit,level,{bossArmor:preview.bossArmor,armorReduce:180});
+    const proc=C.upperSkillProcDps?C.upperSkillProcDps(unit,level,{bossArmor:preview.bossArmor,armorReduce:180}):null;
+    if(combat)dpsCover=Math.min(1.2,(combat.effective+(proc?proc.dps:0))/Math.max(1,num(preview.dpsNeed)));
+  }
+  const strategy=C.upperStrategy(unit);
+  let line=.5;
+  if(strategy.lineSelf==='self')line=1;
+  else if(strategy.lineSelf==='support')line=ownedFinals(model,model.effective.counts).some(owned=>C.roleProfile(owned).supportDamage)?.6:.2;
+  const rareUtil=num(row.tierAvailable&&row.tierAvailable.rare)>0?Math.min(1,num(row.tiers&&row.tiers.rare)/num(row.tierAvailable.rare)):0;
+  // 유틸 킷(스턴·이감·방깎)은 DPS 하한에 잡히지 않는 실전 가치다 —
+  // 핸콕 영원류 유틸 상위가 저평가되지 않게 별도 축으로 넣는다.
+  const kit=C.roleProfile(unit),utility=Math.min(1,.4*Math.min(1,num(kit.stun)/1.5)+.3*Math.min(1,(num(kit.slow)+num(kit.triggerSlow))/60)+.3*Math.min(1,(num(kit.armor)+num(kit.triggerArmor))/60));
+  // 선위 부족 → 예상 라운드: 드랍이 트리 재료를 직접 채우므로 순수 선위
+  // 구매 가정보다 훨씬 빠르다.  실측 로그 기준(예: 크로커다일 r33 선택 →
+  // r38 완성, 선위환산 ~20/5라) 라운드당 4선위 환산으로 본다.
+  const roundsToGo=row.feasible?0:Math.ceil(num(row.wispGap)/4);
+  const eta=model.round.value+roundsToGo;
+  const deadlineFactor=eta<=47?1:eta<=52?.6:eta<=58?.35:.15;
+  const value=(.3*story+.3*dpsCover+.15*line+.12*rareUtil+.13*utility)*deadlineFactor;
+  return{value:round(value,4),story:round(story,3),dpsCover:round(dpsCover,3),line:round(line,2),rareUtil:round(rareUtil,3),utility:round(utility,3),roundsToGo,deadlineFactor};
+}
+function clearValueCompare(left,right){
+  const delta=num(right.clearValue&&right.clearValue.value)-num(left.clearValue&&left.clearValue.value);
+  if(Math.abs(delta)>1e-9)return delta;
+  return routeCandidateCompare(left,right);
+}
 function upperRouteCandidates(model,locks){
   const lock=lockedUpper(locks);if(lock&&!P.resolveRoute(model.intent,model.settings))return lockedMagicRouteRows(model,lock);
   const options=routeOptions(model),byRoute=[];
-  for(const route of options){const canonical=new Map();for(const unit of model.knowledge.db.uppers){if(!routeFamilyOk(unit,route))continue;const row=upperRouteRow(model,unit,route);if(!row)continue;const key=C.canonicalUpperId(unit.id),prior=canonical.get(key);if(!prior||routeCandidateCompare(row,prior)<0)canonical.set(key,row);}const direct=upperProjectionShortlist([...canonical.values()],route),rows=direct.map(row=>projectUpperRouteRow(model,row,route)).sort(routeCandidateCompare);byRoute.push({route,rows});}
-  if(byRoute.length===1)return byRoute[0].rows.slice(0,ROUTE_CANDIDATE_LIMIT);
-  const selected=[],seen=new Set(),quota=Math.max(1,Math.floor(ROUTE_CANDIDATE_LIMIT/byRoute.length));for(const lane of byRoute)for(const row of lane.rows.slice(0,quota)){selected.push(row);seen.add(`${row.routeKey}:${C.canonicalUpperId(row.id)}`);}const rest=byRoute.flatMap(lane=>lane.rows).filter(row=>!seen.has(`${row.routeKey}:${C.canonicalUpperId(row.id)}`)).sort(routeCandidateCompare);return selected.concat(rest).slice(0,ROUTE_CANDIDATE_LIMIT);
+  const gapOf=row=>row.feasible?0:num(row.wispGap);
+  const nearestOf=list=>list.reduce((best,row)=>!best||gapOf(row)<gapOf(best)-1e-9||Math.abs(gapOf(row)-gapOf(best))<=1e-9&&clearValueCompare(row,best)<0?row:best,null);
+  for(const route of options){const canonical=new Map();for(const unit of model.knowledge.db.uppers){if(!routeFamilyOk(unit,route))continue;const row=upperRouteRow(model,unit,route);if(!row)continue;row.clearValue=clearValueScore(model,row);const key=C.canonicalUpperId(unit.id),prior=canonical.get(key);if(!prior||clearValueCompare(row,prior)<0)canonical.set(key,row);}
+    // 숏리스트도 클리어 가치 순으로 뽑는다 — 도달 거리 순 숏리스트는
+    // 멀지만 좋은 상위(예: 핸콕 영원)를 투영 전에 잘라버린다.
+    const ranked=[...canonical.values()].sort(clearValueCompare);
+    const shortlist=ranked.slice(0,UPPER_PROJECTION_CAP);
+    // 단, 지금 패에서 가장 빨리 완성되는 상위(현재주의 선택지)는 가치가
+    // 낮아도 투영에 태운다 — 최종 화면에서 가치 비교의 기준점이 된다.
+    const laneNearest=nearestOf(ranked);
+    if(laneNearest&&!shortlist.includes(laneNearest))shortlist.push(laneNearest);
+    const rows=shortlist.map(row=>projectUpperRouteRow(model,row,route));
+    for(const row of rows)if(!row.clearValue)row.clearValue=clearValueScore(model,row);
+    rows.sort(clearValueCompare);byRoute.push({route,rows});}
+  const dedupe=list=>{const seenCanonical=new Map();const out=[];for(const row of list){const key=C.canonicalUpperId(row.id);const prior=seenCanonical.get(key);if(prior==null){seenCanonical.set(key,out.length);out.push(row);}else if(clearValueCompare(row,out[prior])<0)out[prior]=row;}return out;};
+  // 최종 목록: 클리어 가치 순 + "최단 완성" 앵커 보장.  친구 사례(흰수염
+  // 불멸 vs 핸콕 영원)처럼 눈앞의 쉬운 선택이 목록에서 사라지면 사용자는
+  // 가치 차이를 볼 수 없다 — 순위는 가치가 정하고, 자리는 하나 보장한다.
+  const pool=dedupe(byRoute.flatMap(lane=>lane.rows).sort(clearValueCompare));
+  const picked=pool.slice(0,ROUTE_CANDIDATE_LIMIT);
+  const nearest=nearestOf(pool);
+  if(nearest){nearest.nearestBuild=true;if(!picked.includes(nearest)){if(picked.length>=ROUTE_CANDIDATE_LIMIT)picked[picked.length-1]=nearest;else picked.push(nearest);}}
+  return picked;
 }
 function liveRareProtection(model,counts,route,locks,rareId){
   if(num(counts[rareId])<=0)return[];const settings=Object.assign({},model.settings,{magicRoute:route.key,_resolvedMagicRoute:route.key}),before=M.roleState(model,counts,route.mode,settings,locks,false),afterCounts=clone(counts);afterCounts[rareId]=Math.max(0,num(afterCounts[rareId])-1);const after=M.roleState(model,afterCounts,route.mode,settings,locks,false),beforeMap=new Map((before.deficits.requirements||[]).map(row=>[row.key,row])),labels=[];for(const group of route.groups)for(const key of group){const left=beforeMap.get(key),right=(after.deficits.requirements||[]).find(row=>row.key===key);if(left&&right&&num(right.gap)>num(left.gap)+1e-9)labels.push(left.label);}return[...new Set(labels)];
@@ -346,5 +405,5 @@ function buildDecision(input){
   return finalize({state,label:state==='ACT_NOW'?'지금 제작':state==='REROLL_ONE'?'희귀 1장 리롤 후 재계산':'현재 패 소비 보류',reason:state==='ACT_NOW'?reason:state==='REROLL_ONE'?`${rare.safeReroll.name} 1장만 리롤하고 즉시 다시 읽으세요.`:'후속 필수 역할 경로를 보존하는 확정 제작을 찾지 못했습니다.',action:state==='ACT_NOW'?action:null,blockedAction:state==='ACT_NOW'?null:action,assessment:searched.initialAssessment,afterAction:firstAssessment,bestPath:{steps:action.path,assessment:best.assessment,remainingWisp:best.reserve.remaining,deadEnds:best.coverage.deadEnds},rare,recovery:state==='ACT_NOW'?null:recoveryPlan(searchModel,route,locks,searched.initialAssessment),upperReserve,alternatives,unknowns:searched.initialAssessment.unknowns,search:{candidateCount:searched.basePool.length,unfilteredCandidateCount:searched.rawPool.length,pathCount:searched.paths.length,horizon:HORIZON,beamWidth:BEAM_WIDTH,budgetGuard:compactGuard},evidence:{observed:M.observedEvidence(model),ledger:'exact-sequential',futureDropsCredited:false,clearClaim:false,freeNonRegressiveRepair:freeRepair}});
 }
 
-return{VERSION,AUTHORITY,decide:buildDecision,_test:{allCandidates,combatRareCandidates,actionUniverse,recoveryPlan,intentFamilyOk,familyIntent,potentialScore,candidatePool,protectCriticalBudget,futureCoverage,nodeRank,compareNodes,search,rareDisposition,liveRareProtection,completionDecision,requirementDeltas,freeNonRegressiveRepair,resourceTotals,makeRow,upperAllowed,recipeProfile,pairMaterialOverlap,introducesLineageConflict,upperRouteCandidates,routeCandidateCompare,routeOptions,expand}};
+return{VERSION,AUTHORITY,decide:buildDecision,_test:{allCandidates,combatRareCandidates,actionUniverse,recoveryPlan,intentFamilyOk,familyIntent,potentialScore,candidatePool,protectCriticalBudget,futureCoverage,nodeRank,compareNodes,search,rareDisposition,liveRareProtection,completionDecision,requirementDeltas,freeNonRegressiveRepair,resourceTotals,makeRow,upperAllowed,recipeProfile,pairMaterialOverlap,introducesLineageConflict,upperRouteCandidates,upperRouteRow,routeCandidateCompare,clearValueScore,clearValueCompare,routeOptions,expand}};
 });

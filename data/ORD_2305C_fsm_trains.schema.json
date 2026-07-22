@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ORD_2305C_fsm_trains.schema.json",
+  "title": "ORD 2.305C normalized JASS FSM train digest",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "map",
+    "sourceActionAst",
+    "runtimeSemantics",
+    "counts",
+    "trains",
+    "profileIndex",
+    "integrationContract",
+    "validation"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "ord-fsm-train-digest/1.0"},
+    "sourceActionAst": {
+      "type": "object",
+      "required": ["file", "sha256", "numericAuthority"],
+      "properties": {
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "numericAuthority": {"const": "verified_jass_only"}
+      }
+    },
+    "trains": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/train"}
+    },
+    "profileIndex": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {"type": "string", "pattern": "^fsm\\."},
+        "uniqueItems": true
+      }
+    },
+    "validation": {"type": "object"}
+  },
+  "$defs": {
+    "expression": {
+      "type": ["object", "null"],
+      "properties": {"node": {"type": "string"}}
+    },
+    "condition": {
+      "type": "object",
+      "required": ["truth", "expression"],
+      "properties": {
+        "truth": {"type": "boolean"},
+        "expression": {"$ref": "#/$defs/expression"},
+        "sourceLine": {"type": ["integer", "null"]},
+        "randomGate": {"type": "object"}
+      }
+    },
+    "timerTransition": {
+      "type": "object",
+      "required": [
+        "transitionRef",
+        "operation",
+        "fromStates",
+        "toState",
+        "delaySecondsExpression",
+        "conditions",
+        "staticPathClassification"
+      ],
+      "properties": {
+        "transitionRef": {"type": "string"},
+        "operation": {"enum": ["BDw", "BDx", "BDz"]},
+        "fromStates": {"type": "array", "items": {"type": "integer"}},
+        "delaySecondsExpression": {"$ref": "#/$defs/expression"},
+        "conditions": {"type": "array", "items": {"$ref": "#/$defs/condition"}}
+      }
+    },
+    "damageTerm": {
+      "type": "object",
+      "required": [
+        "actionRef",
+        "function",
+        "targeting",
+        "amountExpectedExpression",
+        "conditions",
+        "guardRandomProbability",
+        "timingBinding",
+        "primaryTargetPolicy"
+      ],
+      "properties": {
+        "guardRandomProbability": {"type": "number", "minimum": 0, "maximum": 1},
+        "amountExpectedExpression": {"$ref": "#/$defs/expression"},
+        "conditions": {"type": "array", "items": {"$ref": "#/$defs/condition"}},
+        "timingBinding": {"type": "object", "required": ["kind"]}
+      }
+    },
+    "timelineVariant": {
+      "type": "object",
+      "required": [
+        "variantId",
+        "pathProbabilityFromInternalRng",
+        "invocations",
+        "damageEvents",
+        "damageExecutionCount",
+        "terminationKind"
+      ],
+      "properties": {
+        "pathProbabilityFromInternalRng": {"type": "number", "minimum": 0, "maximum": 1},
+        "damageExecutionCount": {"type": "integer", "minimum": 0},
+        "firstDamageAtSeconds": {"type": ["number", "null"]},
+        "lastDamageAtSeconds": {"type": ["number", "null"]},
+        "terminationAtSeconds": {"type": "number"}
+      }
+    },
+    "train": {
+      "type": "object",
+      "required": [
+        "trainId",
+        "function",
+        "owners",
+        "initialState",
+        "timingKind",
+        "activation",
+        "stateMachine",
+        "damage",
+        "timeline",
+        "skillDpsHook"
+      ],
+      "properties": {
+        "trainId": {"type": "string", "pattern": "^fsm\\."},
+        "function": {"type": "string"},
+        "owners": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["profileId", "displayName", "classification"]
+          }
+        },
+        "initialState": {"type": "integer"},
+        "timingKind": {"enum": ["instant_fsm", "delayed_train", "event_race_or_delayed"]},
+        "activation": {
+          "type": "object",
+          "required": ["status", "alternatives", "registrationProvenance", "entryPointPaths", "aggregation"]
+        },
+        "stateMachine": {
+          "type": "object",
+          "required": [
+            "states",
+            "timerTransitions",
+            "eventTransitions",
+            "explicitTerminations",
+            "implicitTerminationRule",
+            "childTrainRefs"
+          ],
+          "properties": {
+            "timerTransitions": {
+              "type": "array",
+              "items": {"$ref": "#/$defs/timerTransition"}
+            }
+          }
+        },
+        "damage": {
+          "type": "object",
+          "required": [
+            "actionRefs",
+            "terms",
+            "perPrimaryTargetExpectedDamagePerActivationAst"
+          ],
+          "properties": {
+            "actionRefs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "terms": {"type": "array", "items": {"$ref": "#/$defs/damageTerm"}},
+            "perPrimaryTargetExpectedDamagePerActivationAst": {"$ref": "#/$defs/expression"}
+          }
+        },
+        "timeline": {
+          "type": "object",
+          "required": ["status", "variants", "analysisTruncated"],
+          "properties": {
+            "status": {
+              "enum": ["exact_static", "branched_static", "event_or_runtime_dependent"]
+            },
+            "variants": {"type": "array", "items": {"$ref": "#/$defs/timelineVariant"}},
+            "analysisTruncated": {"type": "boolean"}
+          }
+        },
+        "skillDpsHook": {
+          "type": "object",
+          "required": ["status", "formula", "forbiddenDenominator"]
+        }
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 (function(global){
 'use strict';
 
-const VERSION='17.2.0';
+const VERSION='17.3.0';
 const WISP_ID='810e';
 const SUPER_KUMA_ID='unit_1767884940750_9880';
 const MAX_WISP_COST=23;
@@ -220,8 +220,17 @@ function upperSkillProcDps(unit,level,options){
   const derived=table.byProfile[profileId],strict=derived.perAttack&&derived.perAttack.strict||{affected:0,universal:0};
   const attacksPerSec=rawInfo.speedMultiplier/Math.max(.01,num(rawInfo.row.bat));
   const armorMult=options.bossArmor!=null?armorMultiplier(num(options.bossArmor)-num(options.armorReduce)):1;
-  const dps=num(strict.universal)*attacksPerSec+num(strict.affected)*attacksPerSec*armorMult;
-  return{profileId,perAttackStrict:num(strict.affected)+num(strict.universal),dps,attacksPerSec,basis:'static-lower-bound-attack-proc-only',coverage:derived.coverage||null};
+  let dps=num(strict.universal)*attacksPerSec+num(strict.affected)*attacksPerSec*armorMult;
+  // v17.3: RNG 게이트 공격유발 FSM 트레인 하한.  BD1 재진입 의미론에
+  // 따라 발동률은 1/활성 지속시간을 넘지 않는다.
+  let trainDps=0;
+  const trainSlot=table.trainsByProfile&&table.trainsByProfile[profileId];
+  for(const train of trainSlot&&trainSlot.trains||[]){
+    const rate=Math.min(attacksPerSec*num(train.p),num(train.dur)>0?1/num(train.dur):attacksPerSec*num(train.p));
+    trainDps+=(num(train.e&&train.e.universal)+num(train.e&&train.e.affected)*armorMult)*rate;
+  }
+  dps+=trainDps;
+  return{profileId,perAttackStrict:num(strict.affected)+num(strict.universal),dps,trainDps,attacksPerSec,basis:'static-lower-bound-attack-proc-and-rng-trains',coverage:derived.coverage||null};
 }
 // 평타 한정 보스 타임라인 참고치.  options.skillDps에 upperSkillProcDps의
 // 하한을 넣을 수 있다 — 그래도 킬 판정은 내리지 않는다.
