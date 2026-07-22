@@ -6,7 +6,7 @@ if(root)root.ORDV15Policy=api;
 })(typeof window!=='undefined'?window:globalThis,function(C,M){
 'use strict';
 
-const VERSION='16.8.0';
+const VERSION='16.9.0';
 const ROUTES=Object.freeze({
   physical:Object.freeze({key:'physical',mode:'physical',label:'물딜 1상위',groups:[['main'],['armor','stunBase'],['slow','bossFrenzy'],['stunFull']],priority:'상위 → 상시 방깎·최소 0.5스턴 → 이감·광보잡 → 1.5스턴'}),
   dual:Object.freeze({key:'dual',mode:'magic',label:'마딜 2상위·토키',groups:[['main','stunBase'],['slow'],['stunFull'],['bossFrenzy','toki']],priority:'상위 2기·최소 0.5스턴 → 이감 → 1.5스턴 → 광보잡·토키'}),
@@ -75,7 +75,9 @@ function evaluate(model,counts,routeInput,options){
   // Durability is enforced by the regression guards instead: any craft that
   // consumes a combat Rare visibly reopens the gap it was covering.
   const role=M.roleState(model,stock,mode,Object.assign({},model.settings,{magicRoute:route.key,_resolvedMagicRoute:route.key}),options&&options.locks||[],false),groups=groupRows(route,role,checkpoint),activeCount=Math.min(groups.length,checkpoint.activeGroups),active=groups.slice(0,activeCount),structureRows=[
-    {key:'equivalent',label:'전설 환산',current:summary.legendEquivalent,target:checkpoint.equivalent,gap:Math.max(0,checkpoint.equivalent-summary.legendEquivalent)},
+    // v16.9: 4/6/9 환산은 공개 검증된 보스킬 최소치가 아니라 경제 진행
+    // 경고선이다(사용자 검증 지침).  라벨로 이 성격을 드러낸다.
+    {key:'equivalent',label:'전설 환산(경제선)',current:summary.legendEquivalent,target:checkpoint.equivalent,gap:Math.max(0,checkpoint.equivalent-summary.legendEquivalent)},
     {key:'upperCount',label:'상위',current:summary.upperCount,target:checkpoint.upper,gap:Math.max(0,checkpoint.upper-summary.upperCount)},
     {key:'nonUpperFinal',label:'비상위 전설급',current:summary.nonUpperFinalCount,target:checkpoint.nonUpper,gap:Math.max(0,checkpoint.nonUpper-summary.nonUpperFinalCount)}
   ],rareMinimumGap=Math.max(0,num(checkpoint.rareMinimum)-rare),rareExcess=Number.isFinite(checkpoint.rareMaximum)?Math.max(0,rare-num(checkpoint.rareMaximum)):0,structureMisses=structureRows.filter(row=>row.gap>0).length+(rareMinimumGap>0?1:0),activeMisses=active.reduce((total,group)=>total+group.missed,0),checkpointVector=[structureMisses,round(structureRows[0].gap),round(structureRows[1].gap),round(structureRows[2].gap),rareMinimumGap].concat(groupVector(groups,activeCount),[rareExcess]),fullVector=groupVector(groups,groups.length),blockers=structureRows.filter(row=>row.gap>0).map(row=>`${row.label} +${round(row.gap)}`).concat(rareMinimumGap>0?[`희귀 +${rareMinimumGap}`]:[],active.flatMap(group=>group.rows.filter(row=>num(row.gap)>0&&!row.waived).map(row=>`${row.label} +${round(row.gap)}`)),rareExcess>0?[`미사용 희귀 ${rareExcess}장`]:[]),structuralPass=structureMisses===0&&rareMinimumGap<=0&&activeMisses===0&&rareExcess<=0;

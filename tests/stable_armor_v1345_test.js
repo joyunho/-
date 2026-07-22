@@ -12,14 +12,14 @@ const baseSpec={main:1,stun:.5,slow:102,triggerSlow:0,armor:172,triggerArmor:15,
 const unsafe=C.clearProfileDetails(baseSpec,'physical',{gorosei:'none'}),unsafeArmor=unsafe.requirements.find(row=>row.key==='armor');
 assert.strictEqual(unsafeArmor.current,172,'발동 방깎이 상시 방깎 현재값에 합산되었습니다.');
 assert.strictEqual(unsafeArmor.target-unsafeArmor.current,8,'상시 172는 운영 하한 180에 8 부족이어야 합니다.');
-assert.deepStrictEqual([unsafe.armorTarget,unsafe.armorIdeal],[180,210]);
+assert.deepStrictEqual([unsafe.armorTarget,unsafe.armorIdeal],[180,211]);
 assert.strictEqual(unsafe.armorExpected,181.75);
 assert.strictEqual(unsafe.armorMaximum,187);
 assert.strictEqual(unsafe.armorConditionalOnly,true,'기대값만 180을 넘는 조합은 발동 의존으로 표시해야 합니다.');
 
 const safe=C.clearProfileDetails(Object.assign({},baseSpec,{armor:180,triggerArmor:0}),'physical',{gorosei:'none'}),safeArmor=safe.requirements.find(row=>row.key==='armor');
 assert.strictEqual(safeArmor.target-safeArmor.current,0,'상시 180은 일반 물딜 운영 하한을 충족해야 합니다.');
-assert.strictEqual(safe.armorIdeal,210,'210은 필수가 아닌 완성 보강 목표로 남아야 합니다.');
+assert.strictEqual(safe.armorIdeal,211,'211은 필수가 아닌 완성 보강 목표로 남아야 합니다.');
 
 const triggerOnly={name:'테스트 발동깎',groupName:'전설 [물딜]',abilities:{'발동방어력 감소':20}},contribution=C.roleContribution(triggerOnly,'physical');
 assert.strictEqual(contribution.armor,0,'발동 방깎 후보가 하드 방깎 기여로 점수화되었습니다.');

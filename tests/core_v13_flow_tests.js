@@ -19,7 +19,7 @@ const tests=[];
 function test(name,fn){tests.push([name,fn]);}
 
 test('v13 exports state-aware flow and exact clear profiles',()=>{
-  assert.strictEqual(C.VERSION,'16.8.0');
+  assert.strictEqual(C.VERSION,'16.9.0');
   assert.strictEqual(typeof C.gameFlow,'function');
   assert.strictEqual(typeof C.clearProfileDetails,'function');
 });
@@ -91,7 +91,7 @@ test('a seven-board physical squad counts as nine equivalents and advances on th
   for(const id of ids)assert(db.byId.has(id),`weighted final fixture missing: ${id}`);
   const counts=Object.fromEntries(ids.map(id=>[id,1])),flow=C.gameFlow(makeState(counts),[],baseSettings({currentRound:55,mode:'physical',targetSquadCount:9}));
   assert.deepStrictEqual([flow.counts.board,flow.counts.squad,flow.squadReady,flow.clearReady,flow.phase],[7,9,true,true,'upgrade-control']);
-  assert.deepStrictEqual([flow.deficits.profile.armorCurrent,flow.deficits.profile.armorTarget,flow.deficits.profile.armorIdeal],[182,180,210]);
+  assert.deepStrictEqual([flow.deficits.profile.armorCurrent,flow.deficits.profile.armorTarget,flow.deficits.profile.armorIdeal],[182,180,211]);
   const comfort=flow.deficits.requirements.find(row=>row.key==='stunFull');
   assert(comfort&&comfort.required===false&&comfort.gap>0,'1.5 stun must remain an optional comfort gap');
   assert.match(flow.note,/업그레이드와 컨트롤/);
@@ -110,7 +110,7 @@ test('physical clear hard-gates armor at 180 and 0.5 stun while 210 and 1.5 rema
   assert(at179.clearRows.some(x=>x.key==='armor'&&x.target===180&&x.gap===1));
   assert.deepStrictEqual(at180.clearRows,[]);
   assert.deepStrictEqual(at210.clearRows,[]);
-  assert.deepStrictEqual([at180.profile.armorTarget,at180.profile.armorIdeal],[180,210]);
+  assert.deepStrictEqual([at180.profile.armorTarget,at180.profile.armorIdeal],[180,211]);
   const comfort=at180.requirements.find(row=>row.key==='stunFull');
   assert.deepStrictEqual([comfort.required,comfort.target,comfort.gap],[false,1.5,1]);
   assert(at180.buildRows.some(row=>row.key==='stunFull'&&row.recommended));
@@ -130,7 +130,7 @@ test('Nika Eternal and Garp Immortal use the 120 armor exception only with enoug
     const upper=db.byId.get(id);assert(upper);
     const noBuff=C.clearProfileDetails(physicalSpec({armor:120,attack:0,speed:0}),'physical',baseSettings({_upperUnit:upper}));
     const buffed=C.clearProfileDetails(physicalSpec({armor:120,attack:30,speed:25}),'physical',baseSettings({_upperUnit:upper}));
-    assert.deepStrictEqual([noBuff.armorTarget,noBuff.armorIdeal],[180,210],`${id} must not get a free exception`);
+    assert.deepStrictEqual([noBuff.armorTarget,noBuff.armorIdeal],[180,211],`${id} must not get a free exception`);
     assert.deepStrictEqual([buffed.armorExceptionActive,buffed.armorTarget],[true,120]);
     assert.deepStrictEqual(C.deficits(physicalSpec({armor:120,attack:30,speed:25}),'physical',baseSettings({_upperUnit:upper})).clearRows,[]);
   }

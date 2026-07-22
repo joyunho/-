@@ -72,7 +72,7 @@ const readyIds=['190H','830h','B30h','M30h','540h','unit_1752903381904_1445','un
 for(const id of readyIds)assert(db.byId.has(id),`round replay final fixture missing: ${id}`);
 const nineCounts=Object.fromEntries(readyIds.map(id=>[id,1])),r55Ready=replay(55,nineCounts,{firstRareRewardClaimed:true});
 assert.deepStrictEqual([r55Ready.counts.board,r55Ready.counts.squad,r55Ready.squadReady,r55Ready.clearReady,r55Ready.phase],[7,9,true,true,'upgrade-control']);
-assert.deepStrictEqual([r55Ready.deficits.profile.armorCurrent,r55Ready.deficits.profile.armorTarget,r55Ready.deficits.profile.armorIdeal],[182,180,210]);
+assert.deepStrictEqual([r55Ready.deficits.profile.armorCurrent,r55Ready.deficits.profile.armorTarget,r55Ready.deficits.profile.armorIdeal],[182,180,211]);
 const comfort=r55Ready.deficits.requirements.find(row=>row.key==='stunFull');
 assert(comfort&&comfort.required===false&&comfort.gap>0);
 assert.match(r55Ready.note,/업그레이드와 컨트롤/);

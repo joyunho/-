@@ -1,7 +1,7 @@
 (function(global){
 'use strict';
 
-const VERSION='16.8.0';
+const VERSION='16.9.0';
 const WISP_ID='810e';
 const SUPER_KUMA_ID='unit_1767884940750_9880';
 const MAX_WISP_COST=23;
@@ -68,20 +68,24 @@ const ABILITY_ALIASES={
   '폭발형 데미지 증폭':'폭발형 대미지 증폭','범위끝딜':'범위 끝딜','모든대미지증가':'모든피해증가'
 };
 
+// v16.9: 2.305 [C] 맵 파싱 검증값 반영 —
+//  이감 102 = 풀이감 기준, 117 = 나스쥬로(적 이속 +15%) 상쇄 조건부 목표.
+//  방깎 180 = 실전선, 211 = 공개 공략 풀방깎 목표(워큐리는 몹 방어 +10).
+//  스턴 0.5 = 하드 최소, 1.0 = 운용선, 1.5 = 안정선, 2.0+ = 과투자 주의.
 const GOROSEI={
-  none:{key:'none',name:'아직 모름',slowPhysical:102,slowMagic:102,armorSoft:180,armorSafe:210,stun:1.5},
-  nasjuro:{key:'nasjuro',name:'나스쥬로',slowPhysical:117,slowMagic:117,armorSoft:180,armorSafe:210,stun:1.5},
-  warcury:{key:'warcury',name:'워큐리',slowPhysical:102,slowMagic:102,armorSoft:190,armorSafe:220,stun:1.5},
-  saturn:{key:'saturn',name:'새턴',slowPhysical:102,slowMagic:102,armorSoft:180,armorSafe:210,stun:1.5}
+  none:{key:'none',name:'아직 모름',slowPhysical:102,slowMagic:102,armorSoft:180,armorSafe:211,stun:1.5},
+  nasjuro:{key:'nasjuro',name:'나스쥬로',slowPhysical:117,slowMagic:117,armorSoft:180,armorSafe:211,stun:1.5},
+  warcury:{key:'warcury',name:'워큐리',slowPhysical:102,slowMagic:102,armorSoft:190,armorSafe:221,stun:1.5},
+  saturn:{key:'saturn',name:'새턴',slowPhysical:102,slowMagic:102,armorSoft:180,armorSafe:211,stun:1.5}
 };
 const CONTROL_ENVELOPE={
   stableStun:1.5,
   slowFloorRatio:.88,
-  physicalOperationalStun:.9,
+  physicalOperationalStun:1,
   // 물딜은 사용자가 정한 실전 우선순위대로 0.5스턴을 하드 최소선으로
-  // 인정합니다. 1.5는 편안한 안정선이며, 그 사이 수치는 보강 여유입니다.
+  // 인정합니다. 1.0이 운용선, 1.5는 편안한 안정선입니다.
   physicalExpertStun:.5,
-  magicOperationalStun:1.2,
+  magicOperationalStun:1,
   efficientStunCap:1.5,
   triggerSafeWeightOne:.5,
   triggerSafeWeightMulti:.65,
@@ -90,16 +94,66 @@ const CONTROL_ENVELOPE={
 };
 const CONTROL_PROFILES={
   physical:{
-    operational:{slow:1,stun:.9,expertStun:.5},
+    operational:{slow:1,stun:1,expertStun:.5},
     stable:{slow:1,stun:1.5},
     conditional:{slow:.88,stun:1.5}
   },
   magic:{
-    operational:{slow:1,stun:1.2},
+    operational:{slow:1,stun:1},
     stable:{slow:1,stun:1.5},
     conditional:{slow:.88,stun:1.5}
   }
 };
+// v16.9: 2.305 [C] 맵 스크립트 파싱 확정값 (사용자 검증 제공).
+//  보스 HP 오로성 보정과 재생은 신세계(51라 이후) 보스에만 적용.
+//  광폭몹은 51라 이후 비보스 라운드 시작 7.5초에 플레이어당 1마리.
+const BOSS_META={
+  bossRounds:[10,20,30,40,50,55,60,65],
+  rounds:{
+    10:{boss:'아론',hp:137750},
+    20:{boss:'크로커다일',hp:807500},
+    30:{boss:'에넬',hp:7125000},
+    40:{boss:'루치',hp:27550000},
+    50:{boss:'센고쿠',hp:197600000},
+    55:{boss:'도플라밍고',hp:116821500},
+    60:{boss:'빅 맘',hp:121125000},
+    65:{boss:'카이도',hp:129152500}
+  },
+  goroseiBossHpBonusNewWorld:{warcury:10000000,saturn:10000000,nasjuro:25000000},
+  goroseiBossRegenNewWorld:{base:50000,warcury:350000,nasjuro:350000,saturn:725000},
+  goroseiMobHpBonusNewWorld:{saturn:10000000,nasjuro:10000000,warcury:20000000},
+  goroseiMobArmorBonus:{warcury:10},
+  goroseiMobSpeedPct:{nasjuro:15},
+  timers:{normal:35,boss:60,prepAfter50:70,newWorld:32},
+  mobs:{perRound:35,spawnIntervalSec:.5,frenzyFromRound:51,frenzyAtSec:7.5,countLimitBase:70,countLimitFrom41:50},
+  lineCurve:{
+    29:{name:'슈라',hp:114560,armor:40,speed:387},
+    39:{name:'스팬담 특수몹',hp:1,armor:39,speed:387},
+    49:{name:'아카이누',hp:34650000,armor:138,speed:387},
+    55:{name:'트레볼',hp:86726200,armor:183,speed:387,newWorld:true},
+    60:{name:'제우스',hp:124251000,armor:180,speed:387,newWorld:true},
+    65:{name:'오로치',hp:161775800,armor:191,speed:387,newWorld:true}
+  }
+};
+// 다음 보스 라운드의 오로성 반영 HP·재생·제한시간과 "보스 단독 최소 실효
+// DPS", 동반(또는 직전) 라인 웨이브를 계산합니다.  실제 전투는 일반몹
+// 최대 35마리가 겹치므로 이 DPS는 하한선이지 클리어 보장선이 아닙니다.
+function bossPreview(roundNow,goroseiKey){
+  const r=Math.max(1,Math.round(num(roundNow)||1)),next=BOSS_META.bossRounds.find(x=>x>=r);
+  if(next==null)return null;
+  const base=BOSS_META.rounds[next],newWorld=next>50,g=String(goroseiKey||'');
+  const hpBonus=newWorld?num(BOSS_META.goroseiBossHpBonusNewWorld[g]||0):0;
+  const regen=newWorld?num(BOSS_META.goroseiBossRegenNewWorld[g]!=null?BOSS_META.goroseiBossRegenNewWorld[g]:BOSS_META.goroseiBossRegenNewWorld.base):0;
+  const time=newWorld?BOSS_META.timers.newWorld:BOSS_META.timers.boss;
+  const hp=num(base.hp)+hpBonus,dpsNeed=Math.round((hp+regen*time)/time);
+  const lineRound=newWorld?next:next-1,lineBase=BOSS_META.lineCurve[lineRound]||null;
+  let line=null;
+  if(lineBase){
+    const mobBonus=lineBase.newWorld?num(BOSS_META.goroseiMobHpBonusNewWorld[g]||0):0;
+    line={round:lineRound,name:lineBase.name,hp:num(lineBase.hp)+mobBonus,armor:num(lineBase.armor)+num(BOSS_META.goroseiMobArmorBonus[g]||0),count:BOSS_META.mobs.perRound,withBoss:!!lineBase.newWorld};
+  }
+  return{round:next,boss:base.boss,hp,hpBonus,regen,time,dpsNeed,newWorld,line};
+}
 
 // 조합 후 ID가 바뀌는 상위는 한 경로로 취급합니다. 뒤쪽 ID일수록 실제 활성 형태입니다.
 const UPPER_VARIANT_FAMILIES=[
@@ -152,6 +206,20 @@ const UPPER_STRATEGY_OVERRIDES={
   'D40h':{key:'singleEnd',label:'폭뎀 단끝형 마딜',summary:'라인딜이 약해 단일·끝딜 유닛으로 한 마리씩 처치해야 하는 고난도 경로입니다.',needs:[['single','단일',2],['end','끝딜',1]]},
   'E50h':{key:'mana',label:'마젠·마방깎형 마딜',summary:'마나 스킬 가동과 마방깎을 살리도록 마젠·광보잡 파트너를 붙입니다.',needs:[['mana','마젠',4]]},
   'Z80H':{key:'builtInStun',label:'내장 고스턴 마딜',summary:'스턴은 이미 충분하므로 두 번째 스턴을 만들지 말고 이감·단끝·광보잡을 채웁니다.',needs:[]}
+};
+// v16.9: 2.305 공개 공략 근거의 상위 라인 자립도.  목록에 없는 상위는
+// unknown으로 남긴다 — 근거 없이 '약'으로 확정하지 않는다(검증 지침).
+//  self    = 라인 자립도가 높음(보조딜 강제 없음)
+//  support = 보강 필요·조건부(다른 라인 보강 요구가 없으면 보조·방무딜 1 요구)
+const UPPER_LINE_PROFILE={
+  '490H':{line:'self'},'5B0H':{line:'self'},'V80H':{line:'self'},'Q40h':{line:'self'},
+  'H90H':{line:'self'},'unit_1767886116631_3690':{line:'self'},'590H':{line:'self'},
+  '760h':{line:'self'},'N50H':{line:'self'},
+  'D40h':{line:'support',covered:'single-end'},
+  '480h':{line:'support'},'Z80H':{line:'support'},'G40h':{line:'support'},
+  '090H':{line:'support'},'G50h':{line:'support',note:'41라 이전 조합 조건'},
+  'JC0h':{line:'support'},'040h':{line:'support'},
+  '890H':{line:'support'},'F50h':{line:'support'}
 };
 
 // 2.300~2.305 연구표. displayStun은 표기값, capture는 표의 발동 포획률입니다.
@@ -415,10 +483,15 @@ function upperStrategy(u){
   if(!u)return{key:'none',label:'상위 미확정',summary:'메인 상위를 먼저 확정하세요.',needs:[],waives:[],partners:[],conditions:[]};
   const canonical=canonicalUpperId(u.id),role=roleProfile(u),desc=cleanName(u.desc||''),override=UPPER_STRATEGY_OVERRIDES[canonical]||{},needs=(override.needs||[]).map(([key,label,target])=>({key,label,target,reason:`${override.label||'상위'} 핵심 시너지`})),waives=(override.waives||[]).slice();let label=override.label,summary=override.summary;const addNeed=(key,needLabel,target,reason)=>{if(!needs.some(x=>x.key===key))needs.push({key,label:needLabel,target,reason});};
   if(/보조딜러\s*필수/.test(desc))addNeed('subdamage','보조·방무딜',1,'상위 스킬 설명의 보조딜러 필수 조건');
+  // v16.9: 공략 근거 라인 자립도 표.  support인데 별도 라인 보강 요구
+  // (예: 드래곤 단일·끝딜)가 없으면 보조·방무딜 1을 요구하고, self는
+  // 설명 추정 규칙보다 우선해 자립으로 확정한다.
+  const lineProfile=UPPER_LINE_PROFILE[canonical]||UPPER_LINE_PROFILE[u.id]||null;
+  if(lineProfile&&lineProfile.line==='support'&&lineProfile.covered!=='single-end')addNeed('subdamage','보조·방무딜(라인 보강)',1,'공략 근거: 상위 자체 라인딜 보강 필요');
   // v16.8: 상위 자체 라인딜이 약하다고 명시된 경우(예: 크로커다일 '약한
   // 스킬딜러') 보조·방무딜을 필수 역할로 요구한다 — 50라 보스 라인 붕괴의
-  // 재발 방지 규칙.
-  if(/약한\s*스킬\s*딜러|약한\s*스킬딜|라인딜?이?\s*(?:약|부족|빈)/.test(desc))addNeed('subdamage','보조·방무딜(라인 보강)',1,'상위 스킬 설명의 약한 라인딜 조건');if(/암브.*필수|필수.*암브/.test(desc))addNeed('armorBreak','암브 연계',1,'상위 스킬 설명의 암브 필수 조건');if(/공속.*(?:필수|챙)/.test(desc))addNeed('speed','공속 보강',20,'상위 스킬 설명의 공속 조건');if(/체젠.*필수/.test(desc))addNeed('regen','체젠 버프',2,'체젠 비례 스킬 조건');if(/공증이 있어야|공증.*필수/.test(desc))addNeed('attack','공증 버프',30,'공증 조건부 스킬');if(/보잡.*필수|보스.*필요/.test(desc))addNeed('boss','보잡',1,'상위 설명의 보잡 필수 조건');
+  // 재발 방지 규칙.  공략 근거 self로 확정된 상위에는 적용하지 않는다.
+  if((!lineProfile||lineProfile.line!=='self')&&/약한\s*스킬\s*딜러|약한\s*스킬딜|라인딜?이?\s*(?:약|부족|빈)/.test(desc))addNeed('subdamage','보조·방무딜(라인 보강)',1,'상위 스킬 설명의 약한 라인딜 조건');if(/암브.*필수|필수.*암브/.test(desc))addNeed('armorBreak','암브 연계',1,'상위 스킬 설명의 암브 필수 조건');if(/공속.*(?:필수|챙)/.test(desc))addNeed('speed','공속 보강',20,'상위 스킬 설명의 공속 조건');if(/체젠.*필수/.test(desc))addNeed('regen','체젠 버프',2,'체젠 비례 스킬 조건');if(/공증이 있어야|공증.*필수/.test(desc))addNeed('attack','공증 버프',30,'공증 조건부 스킬');if(/보잡.*필수|보스.*필요/.test(desc))addNeed('boss','보잡',1,'상위 설명의 보잡 필수 조건');
   if(!label&&role.family==='physical'&&role.armorBreak){label='암브 연계형 물딜';summary='암브 수와 방깎을 함께 올릴 때 효율이 커집니다.';addNeed('armorBreak','암브 연계',1,'암브 계열 상위 조건');}
   if(!label&&role.family==='physical'&&(role.attack||role.speed)){label='버프·범위딜형 물딜';summary=`풀방깎을 먼저 맞추고 ${role.attack?`공증 ${round2(role.attack)}`:''}${role.attack&&role.speed?' · ':''}${role.speed?`공속 ${round2(role.speed)}`:''} 버프를 스플·스킬딜러에 연결합니다.`;}
   if(!label&&role.family==='physical'){label=role.supportDamage?'보조·방무딜형 물딜':'물리 스킬·범위딜형';summary='풀방깎을 먼저 맞추고 부족한 공속·보잡·이감을 실제 보유 스킬에서 보강합니다.';}
@@ -427,7 +500,7 @@ function upperStrategy(u){
   if(!label&&role.family==='magic'){label='라인딜·방무딜형 마딜';summary='두 번째 상위, 마방깎·증폭, 광보잡을 실제 스킬에 맞춰 보강합니다.';}
   if(!label){label='복합 상위';summary='실제 상시·발동 스킬과 현재 결손의 순증으로 파트너를 고릅니다.';}
   const partners=UPPER_PAIR_SYNERGIES.filter(x=>canonicalUpperId(x.a)===canonical||canonicalUpperId(x.b)===canonical).map(x=>({unitId:canonicalUpperId(x.a)===canonical?x.b:x.a,label:x.label,reason:x.reason})),conditions=strategyConditions(u,role);
-  return{key:override.key||'generic',label,summary,needs,waives,partners,conditions,description:desc,attackPenalty:role.attackPenalty};
+  return{key:override.key||'generic',label,summary,needs,waives,partners,conditions,description:desc,attackPenalty:role.attackPenalty,lineSelf:lineProfile?lineProfile.line:needs.some(x=>x.key==='subdamage')?'support':'unknown',lineNote:lineProfile&&lineProfile.note||''};
 }
 
 function skillFacts(u){
@@ -629,6 +702,20 @@ function currentSpec(state,mode,settings,projectedUpper){
   const rc=ownedRoleCounts(state,mode),rawRc=ownedRawRoleCounts(state),raw=Object.keys(state.currentAbilities).length>0,corrected=(key,fallback,rawBase,precision=2,signed=false)=>hasRawAbility(state,key)?(precision===6?round6:precision===3?round3:round2)(signed?rawAbility(state,key)+num(fallback)-num(rawBase):Math.max(0,rawAbility(state,key)+num(fallback)-num(rawBase))):fallback;
   const rawMagicKeys=['마법 대미지 증가','단일마법 대미지 증가','모든피해증가'].filter(k=>hasRawAbility(state,k)),magicAmp=rawMagicKeys.length?round2(Math.max(0,Math.max(...rawMagicKeys.map(k=>rawAbility(state,k)))+rc.magicAmp-rawRc.magicAmp)):rc.magicAmp;
   let spec={source:raw?'TMO 원문 + 역할 교정':'보유 유닛 추정',mode,main:rc.main,stun:corrected('스턴',rc.stun,rawRc.stun,6),slow:corrected('이동속도 감소',rc.slow,rawRc.slow,2,true),triggerSlow:corrected('발동이동속도 감소',rc.triggerSlow,rawRc.triggerSlow,2,true),triggerSlowSources:rc.triggerSlowSources,armor:corrected('방어력 감소',rc.armor,rawRc.armor,2,true),triggerArmor:corrected('발동방어력 감소',rc.triggerArmor,rawRc.triggerArmor,2,true),singleArmor:corrected('단일방어력 감소',rc.singleArmor,rawRc.singleArmor),stackArmor:corrected('중첩방어력 감소',rc.stackArmor,rawRc.stackArmor),armorBreak:corrected('아머브레이크',rc.armorBreak,rawRc.armorBreak),single:rc.single,end:rc.end,singleEnd:rc.singleEnd,singleEndUnits:rc.singleEndUnits,singleEndExpected:rc.singleEndExpected,singleEndMax:rc.singleEndMax,singleEndLargest:rc.singleEndLargest,singleEndStable:rc.singleEndStable,toki:rc.toki,boss:rc.boss,frenzy:rc.frenzy,bossFrenzy:rc.bossFrenzy,utility:rc.utility,subdamage:rc.subdamage,magicDef:corrected('마법 방어력 감소',rc.magicDef,rawRc.magicDef),magicAmp,explosionAmp:corrected('폭발형 대미지 증폭',rc.explosionAmp,rawRc.explosionAmp),attack:corrected('공격력 증가',rc.attack,rawRc.attack,2,true),triggerAttack:corrected('발동공격력 증가',rc.triggerAttack,rawRc.triggerAttack,2,true),speed:corrected('공격속도 증가',rc.speed,rawRc.speed),regen:corrected('체력 재생',rc.regen,rawRc.regen),mana:corrected('마나 재생',rc.mana,rawRc.mana),deletion:rc.deletion};
+  // v16.9: 인게임 구매 업그레이드(공업·이감업·체젠업·마젠업 등)는 TMO
+  // 애드온이 전송하지 않는 것으로 확정됐다.  사용자가 게임 표기 수치를
+  // 직접 입력한 필드만 가산하고, 미입력(null·'')은 0과 구분해 건드리지
+  // 않는다 — 기본 0 처리는 후반 실제 스펙 저평가로 이어진다.
+  const mu=settings&&settings.manualUpgrades||null,muSet=key=>mu&&mu[key]!=null&&mu[key]!=='';
+  if(mu&&['attack','slow','regen','mana','speed'].some(muSet)){
+    if(muSet('attack'))spec.attack=round2(num(spec.attack)+num(mu.attack));
+    if(muSet('slow'))spec.slow=round2(num(spec.slow)+num(mu.slow));
+    if(muSet('regen'))spec.regen=round2(num(spec.regen)+num(mu.regen));
+    if(muSet('mana'))spec.mana=round2(num(spec.mana)+num(mu.mana));
+    if(muSet('speed'))spec.speed=round2(num(spec.speed)+num(mu.speed));
+    spec.manualUpgrades=Object.assign({},mu);
+    spec.source=`${spec.source} + 수동 업그레이드`;
+  }
   if(projectedUpper&&num(state.counts[projectedUpper.id])<=0){const after=projectedCountsForTarget(state,projectedUpper,state.counts);spec=transitionSpec(spec,state,state.counts,after,mode,' + 확정 상위 예상');}return spec;
 }
 function finalGradeSpec(state,mode,settings,projectedUpper){
@@ -982,5 +1069,5 @@ function snapshotHealth(snapshot,now){
 }
 function debugFixture(){return{VERSION,roleProfile,magicFinishProfile,evaluateMagicSingleEnd,skillFacts,upperStrategy,upperPairSynergy,storyGrade,storyLeagueKey,storyLeagueTier,storyLeagueGrade,storyLeagueRows,recipeSolve,predictCompletionWithAddedMaterial,specialPrerequisiteStatus,currentSpec,controlEnvelope,controlState,clearProfileDetails,deficits,recommendationPlan,gameFlow,progressionCounts,normalizePostLegendRoute,selectCompatibleQueue,rareTargetsForRound,rareInventoryFor,rarePressureForInventory,rareSpendForSolve,rowScore,roundClock,snapshotHealth};}
 
-global.ORDCore={VERSION,WISP_ID,SUPER_KUMA_ID,SPECIAL_IDS,COMMON_COLORS,GOROSEI,CONTROL_ENVELOPE,CONTROL_PROFILES,STUN_RESEARCH,STORY_RARE_BENCHMARKS,STORY_RARE_RANKS,STORY_RESEARCHED,STORY_LEAGUES,STORY_GRADE_TIERS,UPPER_VARIANT_FAMILIES,POST_LEGEND_ROUTES,MAX_WISP_COST,PREFERRED_WISP_COST,num,esc,cleanName,canonicalAbility,groupName,nameOf,displayNameOf,tierKey,isRare,isCommon,isUncommon,isSpecialTier,isUpper,isLegendish,isChanged,isWarped,isShip,isSeraph,isTranscend,requiresWarpedCraft,familyOf,canonicalUpperId,activeUpperVariant,upperPairSynergy,descriptionPartnerSynergy,roleProfile,magicFinishProfile,evaluateMagicSingleEnd,skillFacts,upperStrategy,stunResearch,stunCaptureRate,storyGrade,storyLeagueKey,storyLeagueTier,storyLeagueGrade,storyLeagueRows,buildDb,mergeLiveCatalog,normalizeState,recipeSolve,predictCompletionWithAddedMaterial,reserveTargets,specialPrerequisiteStatus,materialName,mapText,commonTop,completionPercent,ownedUnits,ownedDisplayUnits,isRoleBearingUnit,currentSpec,finalGradeSpec,applyBuildStep,controlEnvelope,controlState,clearProfileDetails,deficits,roleContribution,upperMemoFor,synergyRankFor,mainUpper,inferMode,candidateRow,recommendationPlan,gameFlow,normalizePostLegendRoute,milestonePurpose,phaseForRound,roundClock,rareResolution,rareTargetsForRound,rareInventoryFor,rarePressureForInventory,rareSpendForSolve,upperProfileData,statusForRow,summarizeRoles,snapshotHealth,debugFixture};
+global.ORDCore={VERSION,WISP_ID,SUPER_KUMA_ID,SPECIAL_IDS,COMMON_COLORS,GOROSEI,CONTROL_ENVELOPE,CONTROL_PROFILES,BOSS_META,bossPreview,UPPER_LINE_PROFILE,STUN_RESEARCH,STORY_RARE_BENCHMARKS,STORY_RARE_RANKS,STORY_RESEARCHED,STORY_LEAGUES,STORY_GRADE_TIERS,UPPER_VARIANT_FAMILIES,POST_LEGEND_ROUTES,MAX_WISP_COST,PREFERRED_WISP_COST,num,esc,cleanName,canonicalAbility,groupName,nameOf,displayNameOf,tierKey,isRare,isCommon,isUncommon,isSpecialTier,isUpper,isLegendish,isChanged,isWarped,isShip,isSeraph,isTranscend,requiresWarpedCraft,familyOf,canonicalUpperId,activeUpperVariant,upperPairSynergy,descriptionPartnerSynergy,roleProfile,magicFinishProfile,evaluateMagicSingleEnd,skillFacts,upperStrategy,stunResearch,stunCaptureRate,storyGrade,storyLeagueKey,storyLeagueTier,storyLeagueGrade,storyLeagueRows,buildDb,mergeLiveCatalog,normalizeState,recipeSolve,predictCompletionWithAddedMaterial,reserveTargets,specialPrerequisiteStatus,materialName,mapText,commonTop,completionPercent,ownedUnits,ownedDisplayUnits,isRoleBearingUnit,currentSpec,finalGradeSpec,applyBuildStep,controlEnvelope,controlState,clearProfileDetails,deficits,roleContribution,upperMemoFor,synergyRankFor,mainUpper,inferMode,candidateRow,recommendationPlan,gameFlow,normalizePostLegendRoute,milestonePurpose,phaseForRound,roundClock,rareResolution,rareTargetsForRound,rareInventoryFor,rarePressureForInventory,rareSpendForSolve,upperProfileData,statusForRow,summarizeRoles,snapshotHealth,debugFixture};
 })(window);
