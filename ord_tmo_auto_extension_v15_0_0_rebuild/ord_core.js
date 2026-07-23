@@ -1,7 +1,7 @@
 (function(global){
 'use strict';
 
-const VERSION='17.6.0';
+const VERSION='17.7.0';
 const WISP_ID='810e';
 const SUPER_KUMA_ID='unit_1767884940750_9880';
 // v17.5: 스토리 10라운드 확정 보상 — 레일리(히든)+해적선 묶음을 다른
@@ -370,10 +370,10 @@ const STORY_LEAGUES=Object.freeze({
 });
 // Each measured league is divided independently by its original source rank.
 // Keep this order in one exported constant so data, UI filters and tests cannot
-// silently disagree about the nine story grades.
-// v16.1: the destruction-speed grade runs S~F (seven equal-quantile bands)
-// inside each independent league (상위 / 전설급 / 희귀).
-const STORY_GRADE_TIERS=Object.freeze(['S','A','B','C','D','E','F']);
+// silently disagree about the user-requested nine story grades.
+// v17.7: SSS~F are equal-quantile bands inside each independent league
+// (상위 / 전설급 / 희귀). Raw source ranks and measurements stay unchanged.
+const STORY_GRADE_TIERS=Object.freeze(['SSS','SS','S','A','B','C','D','E','F']);
 
 function storyMeasuredLookup(id){
   for(const source of STORY_MEASURED_SOURCES){
@@ -627,9 +627,9 @@ function storyLeagueKey(u,grade){
 }
 function storyLeagueTier(rank,size){
   const r=Math.max(0,num(rank)),n=Math.max(0,num(size));if(!r||!n||r>n)return'—';
-  // Preserve the former equal-quantile policy, now with seven bands.  Using
+  // Preserve the equal-quantile policy with the requested nine bands. Using
   // cumulative ceil boundaries assigns every source rank exactly once while
-  // keeping the best rank in S and the last rank in F for every league size.
+  // keeping the best rank in SSS and the last rank in F for every league size.
   const index=STORY_GRADE_TIERS.findIndex((tier,offset)=>r<=Math.ceil(n*(offset+1)/STORY_GRADE_TIERS.length));
   return STORY_GRADE_TIERS[index<0?STORY_GRADE_TIERS.length-1:index];
 }
@@ -674,12 +674,16 @@ function normalizeState(catalog,snapshot,settings){
   for(const [id,v] of Object.entries(manual)){if(v!==''&&v!=null)counts[id]=Math.max(0,num(v));}
   // v17.6(감사 P0-2): 자격 없는 ID(압살롬·비특별·미존재)는 무시한다 —
   // 규칙상 불가능한 가상 재료가 추천 계산에 섞이지 않게.
-  let virtualResolved=false;const requestedVirtualId=settings&&settings.virtualSpecialId||'',virtualId=eligible152SpecialId(db,requestedVirtualId)?requestedVirtualId:'';if(virtualId){if(num(rawCounts[virtualId])>0)virtualResolved=true;else counts[virtualId]=Math.max(1,num(counts[virtualId]));}
+  let virtualResolved=false,virtualApplied=false;const requestedVirtualId=settings&&settings.virtualSpecialId||'',virtualId=eligible152SpecialId(db,requestedVirtualId)?requestedVirtualId:'',baselineId=String(settings&&settings.virtualSpecialBaselineId||''),baselineCaptured=!!virtualId&&baselineId===virtualId&&Object.prototype.hasOwnProperty.call(settings||{},'virtualSpecialBaselineCount'),virtualBaselineCount=baselineCaptured?Math.max(0,Math.floor(num(settings.virtualSpecialBaselineCount))):0,rawVirtualCount=num(rawCounts[virtualId]);
+  if(virtualId){
+    virtualResolved=baselineCaptured?rawVirtualCount>virtualBaselineCount:rawVirtualCount>0;
+    if(!virtualResolved){counts[virtualId]=Math.max(0,num(counts[virtualId]))+1;virtualApplied=true;}
+  }
   if(settings&&settings.superKumaOwned===false)counts[SUPER_KUMA_ID]=0;else counts[SUPER_KUMA_ID]=Math.max(1,num(counts[SUPER_KUMA_ID]));
   const wispOverride=settings&&settings.wispOverride;if(wispOverride!==''&&wispOverride!=null)counts[WISP_ID]=Math.max(0,num(wispOverride));
   const currentAbilities={};for(const [k,v] of Object.entries(snapshot&&snapshot.currentAbilities||{}))currentAbilities[canonicalAbility(k)]=num(v);
   const percent={};for(const u of merged)percent[u.id]=clamp(num(u.tmoPercent),0,100);
-  return{db,units:merged,rawCounts,counts,currentAbilities,percent,wisp:num(counts[WISP_ID]),virtualId,virtualResolved,stunConditions:{},snapshot:snapshot||{}};
+  return{db,units:merged,rawCounts,counts,currentAbilities,percent,wisp:num(counts[WISP_ID]),virtualId,virtualResolved,virtualApplied,virtualSpecialBaselineId:baselineCaptured?baselineId:'',virtualSpecialBaselineCount:virtualBaselineCount,stunConditions:{},snapshot:snapshot||{}};
 }
 
 function cloneCounts(c){return Object.assign({},c||{});}
@@ -871,7 +875,7 @@ function clearProfileDetails(spec,mode,settings){
       {key:'stunBase',label:'최소 0.5 스턴',current:stunBase,target:.5,weight:110},
       {key:'slow',label:`이감 ${slowTarget}%`,current:ctl.slow,target:slowTarget,weight:95},
       {key:'bossFrenzy',label:'광보잡',current:bossFrenzy,target:1,weight:95},
-      {key:'stunFull',label:'후순위 충분한 1.5 스턴',current:stunFull,target:1.5,weight:35,required:false,meta:{recommended:true,lastPriority:true}}
+      {key:'stunFull',label:'충분한 1.5 스턴',current:stunFull,target:1.5,weight:35,meta:{lastPriority:true}}
     ];
     return{mode,key:'physical',label:'물딜 상위 1 + 상시 풀방깎',requirements,distance:routeDistance(requirements),armorFloor,armorTarget,armorIdeal,armorCurrent:round2(armorCurrent),armorStatic:round2(armorCurrent),armorTrigger:round2(triggerArmor),armorExpected:round2(armorExpected),armorMaximum:round2(armorMaximum),armorConditionalOnly:armorCurrent<armorTarget&&armorExpected>=armorTarget,armorExceptionEligible:exceptionEligible,armorExceptionBuffReady:buffReady,armorExceptionActive:exceptionActive,slowTarget,stunTarget:1.5,priority:['armor','stunBase','slow','bossFrenzy','stunFull'],note:exceptionActive?'니카 영원함/거프 불멸 + 충분한 버프 예외도 상시 방깎 120부터 계산합니다.':'표준 물딜은 0.5스턴과 상시 방깎 180을 먼저 고정하고, 이감·광보잡 뒤에 남는 자리로 1.5스턴을 보강합니다. 210은 완성 보강 목표입니다.'};
   }
@@ -1167,7 +1171,7 @@ function snapshotHealth(snapshot,now){
   if(!supportedHelper||s.parser!=='ord-tmo-parser-v13-adapter')return result('error','지원하지 않는 TMO 도우미',false,'TMO 32172를 사용하세요. 기존 34366은 호환 모드로 지원합니다.');
   if(ageSec>12||scanAgeSec>12)return result('stale','TMO 새 스캔 없음',false,`브리지 ${ageSec}초·DOM 스캔 ${scanAgeSec}초 전입니다. TMO 탭과 확장 프로그램을 확인해 주세요. 오래된 추천은 숨겼습니다.`);
   const collection=s.collection||{},countDiscovery=s.countDiscovery||{},unitCount=num(s.unitCount),parsed=num(countDiscovery.parsed),coverage=unitCount?parsed/unitCount:0,confidence=num(collection.confidence);
-  const catalogSize=typeof global!=='undefined'&&global.ORD_TMO_UNITS?global.ORD_TMO_UNITS.length:0,unitMin=catalogSize?Math.max(200,catalogSize-7):280,unitMax=catalogSize?catalogSize+73:520;if(collection.found!==true||countDiscovery.found!==true||unitCount<unitMin||unitCount>unitMax||coverage!==1||num(countDiscovery.missing)>0||num(countDiscovery.ambiguous)>0||confidence<.72)return result('error','유닛 수량 수집 불완전',false,`유닛 ${unitCount}개·수량 ${parsed}/${unitCount}개·누락 ${num(countDiscovery.missing)}개·모호 ${num(countDiscovery.ambiguous)}개·신뢰도 ${Math.round(confidence*100)}%입니다. 실패한 수량을 0으로 쓰지 않고 이전 정상 패를 보호합니다.`);
+  const catalogSize=typeof global!=='undefined'&&global.ORD_TMO_UNITS?global.ORD_TMO_UNITS.length:0,unitMin=catalogSize?Math.max(200,catalogSize-7):300,unitMax=catalogSize?Math.min(380,catalogSize+73):380;if(collection.found!==true||countDiscovery.found!==true||unitCount<unitMin||unitCount>unitMax||coverage!==1||num(countDiscovery.missing)>0||num(countDiscovery.ambiguous)>0||confidence<.72)return result('error','유닛 수량 수집 불완전',false,`유닛 ${unitCount}개·수량 ${parsed}/${unitCount}개·누락 ${num(countDiscovery.missing)}개·모호 ${num(countDiscovery.ambiguous)}개·신뢰도 ${Math.round(confidence*100)}%입니다. 실패한 수량을 0으로 쓰지 않고 이전 정상 패를 보호합니다.`);
   if(s.wispCountFound!==true)return result('error','선택 위습 수량 미확인',false,'선택 위습은 제작 가능 여부를 바꾸므로 수량을 임의로 0 처리하지 않습니다. TMO 탭을 새로고침하거나 수동 보정하세요.');
   if(s.connected===false)return result('partial','패 수집 정상 · 데스크톱 미연동',true,'패 수량은 정상입니다. 자동 게임 연동까지 쓰려면 TMO.GG 데스크톱 프로그램을 실행하세요.');
   if(num(s.abilityCount)<3)return result('partial','패 정상 · 현재 능력치 보정 중',true,'보유 수량은 정상 수신했고 빠진 현재 능력치는 보유 유닛 역할값으로 보완합니다.');
@@ -1178,3 +1182,4 @@ function debugFixture(){return{VERSION,roleProfile,magicFinishProfile,evaluateMa
 
 global.ORDCore={VERSION,WISP_ID,SUPER_KUMA_ID,RAYLEIGH_HIDDEN_ID,PIRATE_SHIP_ID,STORY10_FORFEITS,SPECIAL_IDS,eligible152Specials,eligible152SpecialId,COMMON_COLORS,GOROSEI,CONTROL_ENVELOPE,CONTROL_PROFILES,BOSS_META,bossPreview,UPPER_LINE_PROFILE,DEFENSE_ARMOR,armorMultiplier,ATTACK_TYPE_VS_BOSS,upperCombatFor,upperRawDps,upperBossDps,bossRawDpsNeed,upperSkillProfile,upperSkillProcDps,simulateBossFlat,STUN_RESEARCH,STORY_RARE_BENCHMARKS,STORY_RARE_RANKS,STORY_RESEARCHED,STORY_LEAGUES,STORY_GRADE_TIERS,UPPER_VARIANT_FAMILIES,POST_LEGEND_ROUTES,MAX_WISP_COST,PREFERRED_WISP_COST,num,esc,cleanName,canonicalAbility,groupName,nameOf,displayNameOf,tierKey,isRare,isCommon,isUncommon,isSpecialTier,isUpper,isLegendish,isChanged,isWarped,isShip,isSeraph,isTranscend,requiresWarpedCraft,familyOf,canonicalUpperId,activeUpperVariant,upperPairSynergy,descriptionPartnerSynergy,roleProfile,magicFinishProfile,evaluateMagicSingleEnd,skillFacts,upperStrategy,stunResearch,stunCaptureRate,storyGrade,storyLeagueKey,storyLeagueTier,storyLeagueGrade,storyLeagueRows,buildDb,mergeLiveCatalog,normalizeState,recipeSolve,predictCompletionWithAddedMaterial,reserveTargets,specialPrerequisiteStatus,materialName,mapText,commonTop,completionPercent,ownedUnits,ownedDisplayUnits,isRoleBearingUnit,currentSpec,finalGradeSpec,applyBuildStep,controlEnvelope,controlState,clearProfileDetails,deficits,roleContribution,upperMemoFor,synergyRankFor,mainUpper,inferMode,candidateRow,recommendationPlan,gameFlow,normalizePostLegendRoute,milestonePurpose,phaseForRound,roundClock,rareResolution,rareTargetsForRound,rareInventoryFor,rarePressureForInventory,rareSpendForSolve,upperProfileData,statusForRow,summarizeRoles,snapshotHealth,debugFixture};
 })(window);
+

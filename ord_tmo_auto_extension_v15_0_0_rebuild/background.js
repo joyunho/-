@@ -1,6 +1,6 @@
 'use strict';
 
-// v17.6.0 local decision runtime. The v13 parser identifier is retained for
+// v17.7.0 local decision runtime. The v13 parser identifier is retained for
 // stored-snapshot and connector protocol compatibility.
 const PARSER = 'ord-tmo-parser-v13-adapter';
 const SUPPORTED_HELPER_IDS = new Set(['32172', '34366']);
@@ -40,7 +40,7 @@ function validSnapshot(snapshot) {
   const parsedCount = Number(counts.parsed) || 0;
   const confidence = Number(collection.confidence) || 0;
   const parsedCoverage = unitCount > 0 ? parsedCount / unitCount : 0;
-  return collection.found === true && counts.found === true && unitCount >= 300 && unitCount <= 520 &&
+  return collection.found === true && counts.found === true && unitCount >= 300 && unitCount <= 380 &&
     parsedCoverage === 1 && Number(counts.missing || 0) === 0 && Number(counts.ambiguous || 0) === 0 &&
     snapshot.wispCountFound === true && confidence >= 0.72;
 }

@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Rebuild generated artifacts
+        run: npm run build
+      - name: Generated files must match the commit
+        run: git diff --exit-code -- ord_2305_nightmare_helper_v17_7_0_manual.html 스토리_등급표_v17_7.md
+      - name: Full test suite (SKIP counts as failure)
+        run: npm run test:strict

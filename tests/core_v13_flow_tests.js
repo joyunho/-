@@ -19,7 +19,7 @@ const tests=[];
 function test(name,fn){tests.push([name,fn]);}
 
 test('v13 exports state-aware flow and exact clear profiles',()=>{
-  assert.strictEqual(C.VERSION,'17.6.0');
+  assert.strictEqual(C.VERSION,'17.7.0');
   assert.strictEqual(typeof C.gameFlow,'function');
   assert.strictEqual(typeof C.clearProfileDetails,'function');
 });
@@ -86,14 +86,16 @@ test('round 30, round 50 and final 9-11 squad phases are explicit',()=>{
   assert.strictEqual(capped.target,11);
 });
 
-test('a seven-board physical squad counts as nine equivalents and advances on the operational hard gates',()=>{
-  const ids=['190H','830h','B30h','M30h','540h','unit_1752903381904_1445','unit_1779015467592_9245'];
+test('an eight-board physical squad counts as ten equivalents and clears the 1.5-stun hard gate (v17.7)',()=>{
+  // v17.7: 물딜 1.5스턴이 필수 하드 게이트가 되면서, 0.5스턴 완료 픽스처를
+  // 실제 1.5스턴을 채운 패(바르톨로메오 전설 추가)로 교체했다.
+  const ids=['190H','830h','B30h','M30h','540h','unit_1752903381904_1445','unit_1779015467592_9245','Z20h'];
   for(const id of ids)assert(db.byId.has(id),`weighted final fixture missing: ${id}`);
   const counts=Object.fromEntries(ids.map(id=>[id,1])),flow=C.gameFlow(makeState(counts),[],baseSettings({currentRound:55,mode:'physical',targetSquadCount:9}));
-  assert.deepStrictEqual([flow.counts.board,flow.counts.squad,flow.squadReady,flow.clearReady,flow.phase],[7,9,true,true,'upgrade-control']);
-  assert.deepStrictEqual([flow.deficits.profile.armorCurrent,flow.deficits.profile.armorTarget,flow.deficits.profile.armorIdeal],[182,180,211]);
-  const comfort=flow.deficits.requirements.find(row=>row.key==='stunFull');
-  assert(comfort&&comfort.required===false&&comfort.gap>0,'1.5 stun must remain an optional comfort gap');
+  assert.deepStrictEqual([flow.counts.board,flow.counts.squad,flow.squadReady,flow.clearReady,flow.phase],[8,10,true,true,'upgrade-control']);
+  assert.deepStrictEqual([flow.deficits.profile.armorCurrent,flow.deficits.profile.armorTarget,flow.deficits.profile.armorIdeal],[194,180,211]);
+  const stunGate=flow.deficits.requirements.find(row=>row.key==='stunFull');
+  assert(stunGate&&stunGate.required===true&&stunGate.gap<=0,'1.5 stun hard gate must be required and closed in this fixture');
   assert.match(flow.note,/업그레이드와 컨트롤/);
 });
 
@@ -105,15 +107,15 @@ test('manual rare-reward history cannot advance or alter the TMO-driven flow',()
   assert.strictEqual(empty.expectedRareIncome,0);
 });
 
-test('physical clear hard-gates armor at 180 and 0.5 stun while 210 and 1.5 remain optional',()=>{
-  const at179=C.deficits(physicalSpec({armor:179,stun:.5}),'physical',baseSettings({mode:'physical'})),at180=C.deficits(physicalSpec({armor:180,stun:.5}),'physical',baseSettings({mode:'physical'})),at210=C.deficits(physicalSpec({armor:210,stun:.5}),'physical',baseSettings({mode:'physical'}));
+test('physical clear hard-gates armor at 180 and requires 1.5 stun as the last-priority gate (v17.7)',()=>{
+  const at179=C.deficits(physicalSpec({armor:179,stun:.5}),'physical',baseSettings({mode:'physical'})),at180=C.deficits(physicalSpec({armor:180,stun:.5}),'physical',baseSettings({mode:'physical'})),full=C.deficits(physicalSpec({armor:180,stun:1.5}),'physical',baseSettings({mode:'physical'}));
   assert(at179.clearRows.some(x=>x.key==='armor'&&x.target===180&&x.gap===1));
-  assert.deepStrictEqual(at180.clearRows,[]);
-  assert.deepStrictEqual(at210.clearRows,[]);
+  // v17.7: 물딜 1.5스턴은 이제 마지막 우선순위의 필수 하드 게이트다.
+  assert(at180.clearRows.every(x=>x.key==='stunFull'),'armor 180 closed but non-stun rows remain');
+  assert.deepStrictEqual(full.clearRows,[]);
   assert.deepStrictEqual([at180.profile.armorTarget,at180.profile.armorIdeal],[180,211]);
   const comfort=at180.requirements.find(row=>row.key==='stunFull');
-  assert.deepStrictEqual([comfort.required,comfort.target,comfort.gap],[false,1.5,1]);
-  assert(at180.buildRows.some(row=>row.key==='stunFull'&&row.recommended));
+  assert.deepStrictEqual([comfort.required,comfort.target,comfort.gap],[true,1.5,1]);
   assert.deepStrictEqual(at180.profile.priority,['armor','stunBase','slow','bossFrenzy','stunFull']);
 });
 
@@ -122,7 +124,8 @@ test('physical priority pairs armor with 0.5 stun, then slow with boss/frenzy, b
   assert.strictEqual(weight.armor,weight.stunBase);
   assert.strictEqual(weight.slow,weight.bossFrenzy);
   assert(weight.stunBase>weight.slow&&weight.slow>weight.stunFull);
-  assert.strictEqual(d.requirements.find(row=>row.key==='stunFull').required,false);
+  // v17.7: 필수지만 마지막 우선순위(가중치 최하)로 남는다.
+  assert.strictEqual(d.requirements.find(row=>row.key==='stunFull').required,true);
 });
 
 test('Nika Eternal and Garp Immortal use the 120 armor exception only with enough buffs',()=>{

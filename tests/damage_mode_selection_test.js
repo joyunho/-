@@ -59,7 +59,7 @@ check('반대 계통 선택은 모순된 확정 상위와 청사진을 해제한
 
 check('이미 선택된 같은 계통 버튼은 확정 경로를 건드리지 않는다',()=>{
   const app=Object.create(App.prototype);
-  app.catalog=global.ORD_TMO_UNITS;app.state=Object.assign(T.normalizeInitialState({mode:'physical'}),{snapshot:{counts:{},at:1},locks:[{stage:'upper',id:'190H'}],directionStatus:'selected',directionKey:'physical',directionUpperId:'190H'});
+  app.catalog=global.ORD_TMO_UNITS;app.state=Object.assign(T.normalizeInitialState({mode:'physical',modeExplicit:true,settingsRevision:177}),{snapshot:{counts:{},at:1},locks:[{stage:'upper',id:'190H'}],directionStatus:'selected',directionKey:'physical',directionUpperId:'190H'});
   assert.strictEqual(app.selectDamageMode('physical'),false);
   assert.strictEqual(app.upperLock().id,'190H');
   assert.strictEqual(app.state.directionStatus,'selected');

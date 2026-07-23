@@ -65,16 +65,16 @@ const r55=replay(55,eightCounts,{firstRareRewardClaimed:true});
 assert.deepStrictEqual([r55.phase,r55.purpose,r55.target,r55.stretchTarget],['final-patch','spec',9,11]);
 for(const phrase of ['전설·히든 1기','해적선 1기','희귀 2기','변화됨'])assert(r55.note.includes(phrase),`final patch option missing: ${phrase}`);
 
-// One upper plus six final-grade units is seven board units and nine equivalents.
-// Armor 182 and stun about .748 meet the operational gates even though the
-// optional 210 armor and 1.5 stun comfort targets remain incomplete.
-const readyIds=['190H','830h','B30h','M30h','540h','unit_1752903381904_1445','unit_1779015467592_9245'];
+// One upper plus seven final-grade units is eight board units and ten
+// equivalents. v17.7: full 1.5 stun is a required physical hard gate, so the
+// ready fixture includes Bartolomeo to close it alongside armor 194.
+const readyIds=['190H','830h','B30h','M30h','540h','Z20h','unit_1752903381904_1445','unit_1779015467592_9245'];
 for(const id of readyIds)assert(db.byId.has(id),`round replay final fixture missing: ${id}`);
 const nineCounts=Object.fromEntries(readyIds.map(id=>[id,1])),r55Ready=replay(55,nineCounts,{firstRareRewardClaimed:true});
-assert.deepStrictEqual([r55Ready.counts.board,r55Ready.counts.squad,r55Ready.squadReady,r55Ready.clearReady,r55Ready.phase],[7,9,true,true,'upgrade-control']);
-assert.deepStrictEqual([r55Ready.deficits.profile.armorCurrent,r55Ready.deficits.profile.armorTarget,r55Ready.deficits.profile.armorIdeal],[182,180,211]);
+assert.deepStrictEqual([r55Ready.counts.board,r55Ready.counts.squad,r55Ready.squadReady,r55Ready.clearReady,r55Ready.phase],[8,10,true,true,'upgrade-control']);
+assert.deepStrictEqual([r55Ready.deficits.profile.armorCurrent,r55Ready.deficits.profile.armorTarget,r55Ready.deficits.profile.armorIdeal],[194,180,211]);
 const comfort=r55Ready.deficits.requirements.find(row=>row.key==='stunFull');
-assert(comfort&&comfort.required===false&&comfort.gap>0);
+assert(comfort&&comfort.required===true&&comfort.gap<=0);
 assert.match(r55Ready.note,/업그레이드와 컨트롤/);
 
 console.log('PASS  round replay 7→15→20→25 preserves TMO-count deadlines without reward history');

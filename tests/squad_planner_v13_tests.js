@@ -100,11 +100,12 @@ test('planner requirement order and weights are derived from core clear prioriti
 
   const physical=P._test.requirementRows(spec,[],'physical','physical',{gorosei:'none'},null).rows.filter(row=>row.required);
   const pw=Object.fromEntries(physical.map(row=>[row.key,row.weight]));
-  assert.deepStrictEqual(physical.map(row=>row.key),['main','armor','stunBase','slow','bossFrenzy']);
+  // v17.7: 물딜 1.5스턴이 마지막 우선순위 필수 게이트로 승격됐다.
+  assert.deepStrictEqual(physical.map(row=>row.key),['main','armor','stunBase','slow','bossFrenzy','stunFull']);
   assert.strictEqual(pw.armor,pw.stunBase);
   assert.strictEqual(pw.slow,pw.bossFrenzy);
-  const comfort=P._test.requirementRows(spec,[],'physical','physical',{gorosei:'none'},null).rows.find(row=>row.key==='stunFull');
-  assert.strictEqual(comfort.required,false);assert(pw.slow>comfort.weight);
+  const lastGate=P._test.requirementRows(spec,[],'physical','physical',{gorosei:'none'},null).rows.find(row=>row.key==='stunFull');
+  assert.strictEqual(lastGate.required,true);assert(pw.slow>lastGate.weight);
 
   const dual=P._test.requirementRows(spec,[],'magic','dual',{gorosei:'none'},null).rows.filter(row=>row.required);
   const dw=Object.fromEntries(dual.map(row=>[row.key,row.weight]));

@@ -1,0 +1,18 @@
+{
+  "name": "ord-2305-nightmare-coach",
+  "version": "17.7.0",
+  "private": true,
+  "description": "원랜디 2.305 악몽 실전 판단 코치 — TMO 조합도우미 연동 확장 + 단일 HTML 수동판",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node ord_tmo_auto_extension_v15_0_0_rebuild/tools/build_manual.js && node ord_tmo_auto_extension_v15_0_0_rebuild/tools/build_story_grade_table.js",
+    "test": "node tests/run_all.js",
+    "test:strict": "ORD_REQUIRE_ALL=1 node tests/run_all.js",
+    "verify:package": "node tests/package_validation.js"
+  },
+  "devDependencies": {
+    "playwright": "1.61.1"
+  }
+}

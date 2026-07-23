@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  // v17.6.0 live cockpit bridge; connector protocol stays v13.
+  // v17.7.0 live cockpit bridge; connector protocol stays v13.
   const PATTERNS = [
     'https://tmo.gg/*/build-helper/32172*',
     'https://www.tmo.gg/*/build-helper/32172*',
@@ -188,7 +188,11 @@
     let app;
     try { app = window.ORDApp.create(root, window.ORD_TMO_UNITS || [], {source: 'extension', directionWorkerUrl: chrome.runtime.getURL('ord_direction_worker.js')}); }
     catch (error) {
-      root.innerHTML = '<pre style="padding:24px;color:white;background:#080d18;white-space:pre-wrap">' + String(error.stack || error) + '</pre>';
+      // v17.7: 오류 문자열이 HTML로 해석되지 않도록 textContent로 넣는다.
+      const errorPanel = document.createElement('pre');
+      errorPanel.style.cssText = 'padding:24px;color:#fff;background:#080d18;white-space:pre-wrap';
+      errorPanel.textContent = String(error && (error.stack || error.message) || error);
+      root.replaceChildren(errorPanel);
       return;
     }
     window.ORD_APP = app;

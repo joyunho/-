@@ -81,10 +81,21 @@ test('upper ranking sequentially consumes an owned first legend instead of doubl
 
 test('Absalom exception stays buildable in both rank and preview without showing zombie hard-missing',()=>{
   const counts=stockedCounts();counts['010h']=0;counts['unit_1767884889420_456']=0;const state=stateFromCounts(counts),ranked=rank(state,['A50h'])[0];
-  assert(ranked&&ranked.clearComplete);assert(ranked.plan.finalLineup.some(row=>row.id==='A50h'));
+  // v17.7: full 1.5 stun is now a required physical gate this synthetic hand
+  // cannot close (its lineage-legal ceiling is 1.435), so the plan is honestly
+  // incomplete — the Absalom exception itself must still quote A50h with no
+  // zombie hard-missing rows.
+  assert(ranked&&ranked.plan.finalLineup.some(row=>row.id==='A50h'));
+  assert.strictEqual(ranked.clearComplete,false);
+  const openRows=ranked.plan.roleCoverage.planned.rows.filter(row=>row.gap>0);
+  assert.deepStrictEqual(openRows.map(row=>row.key),['stunFull'],'only the full-stun hard gate may stay open');
   assert.deepStrictEqual(ranked.plan.actions[0].solve.hardMissing,[]);
   const preview=P.planFinalSquad({state,settings:settings({upperPreviewId:'A50h'}),upperBlueprint:ranked.blueprint});
-  assert(['kept','adapted'].includes(preview.blueprint.status));assert.strictEqual(preview.targetBoardCount,7);assert.strictEqual(preview.finalLineup.length,7);assert.strictEqual(preview.plannedCount,9);assert.strictEqual(preview.roleCoverage.planned.complete,true);assert(preview.finalLineup.some(row=>row.id==='A50h'));assert(!preview.blueprint.replacedIds.includes('A50h'),'Absalom upper itself was released');const absalomAction=preview.actions.find(action=>action.id==='A50h');assert(absalomAction);assert.deepStrictEqual(absalomAction.solve.hardMissing,[]);
+  // A role-incomplete hand may not silently lock a full party: the blueprint
+  // must degrade to the fail-safe invalid status instead of claiming kept.
+  assert.strictEqual(preview.blueprint.status,'invalid');
+  assert.strictEqual(preview.wispBudget.evidence,'role-incomplete');
+  assert.strictEqual(preview.targetBoardCount,7);assert.strictEqual(preview.finalLineup.length,7);assert.strictEqual(preview.plannedCount,9);assert(preview.finalLineup.some(row=>row.id==='A50h'));assert(!preview.blueprint.replacedIds.includes('A50h'),'Absalom upper itself was released');const absalomAction=preview.actions.find(action=>action.id==='A50h');assert(absalomAction);assert.deepStrictEqual(absalomAction.solve.hardMissing,[]);
 });
 
 test('confirmed blueprint is kept byte-for-byte while all current wisps can realize it',()=>{

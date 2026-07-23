@@ -6,7 +6,7 @@ if(root)root.ORDV15Model=api;
 })(typeof window!=='undefined'?window:globalThis,function(C){
 'use strict';
 
-const VERSION='17.6.0';
+const VERSION='17.7.0';
 const HAND_TIERS=['rare','special','uncommon','common'];
 
 function num(value){return C&&C.num?C.num(value):(Number(value)||0);}
@@ -62,8 +62,8 @@ function applyScenarioPatch(observed,settings){
   const virtualEligible=!requestedVirtualId||!C.eligible152SpecialId||C.eligible152SpecialId(observed.db,requestedVirtualId);
   const virtualId=virtualEligible?requestedVirtualId:'';
   if(requestedVirtualId&&!virtualEligible)assumptions.push({kind:'virtual-152-special-rejected',id:requestedVirtualId,before:0,after:0,evidence:'ineligible-pool'});
-  const alreadyObserved=!!virtualId&&num(observed.counts[virtualId])>0;let virtualApplied=false;
-  if(virtualId&&!alreadyObserved&&num(counts[virtualId])<=0){counts[virtualId]=1;virtualApplied=true;assumptions.push({kind:'virtual-152-special',id:virtualId,before:0,after:1,evidence:'user'});}
+  const baselineId=String(settings&&settings.virtualSpecialBaselineId||''),baselineCaptured=!!virtualId&&baselineId===virtualId&&Object.prototype.hasOwnProperty.call(settings||{},'virtualSpecialBaselineCount'),virtualBaselineCount=baselineCaptured?Math.max(0,Math.floor(num(settings.virtualSpecialBaselineCount))):0,observedVirtualCount=num(observed.counts[virtualId]),alreadyObserved=!!virtualId&&(baselineCaptured?observedVirtualCount>virtualBaselineCount:observedVirtualCount>0);let virtualApplied=false;
+  if(virtualId&&!alreadyObserved){const before=num(counts[virtualId]),after=before+1;counts[virtualId]=after;virtualApplied=true;assumptions.push({kind:'virtual-152-special',id:virtualId,before,after,evidence:'user',baseline:virtualBaselineCount});}
   // v16.5: 초월쿠마 is obtainable at will until the one transcend is spent —
   // that is the game rule the '초월 가능/소진' toggle expresses.  Assume one
   // Kuma while transcend is available so transcend uppers stay comparable in
@@ -72,18 +72,18 @@ function applyScenarioPatch(observed,settings){
   if(settings&&settings.superKumaOwned===false){if(num(counts[C.SUPER_KUMA_ID])>0){const before=num(counts[C.SUPER_KUMA_ID]);counts[C.SUPER_KUMA_ID]=0;assumptions.push({kind:'transcend-unavailable',id:C.SUPER_KUMA_ID,before,after:0,evidence:'user-setting'});}}
   else if(num(counts[C.SUPER_KUMA_ID])<=0){counts[C.SUPER_KUMA_ID]=1;assumptions.push({kind:'transcend-available',id:C.SUPER_KUMA_ID,before:0,after:1,evidence:'game-rule-until-spent'});}
   if(settings&&settings.wispOverride!==''&&settings&&settings.wispOverride!=null){const before=num(counts[C.WISP_ID]),after=Math.max(0,num(settings.wispOverride));counts[C.WISP_ID]=after;if(before!==after)assumptions.push({kind:'wisp-override',id:C.WISP_ID,before,after,evidence:'user'});}
-  return{counts,assumptions,virtualId,virtualApplied,alreadyObserved};
+  return{counts,assumptions,virtualId,virtualApplied,alreadyObserved,baselineId:baselineCaptured?baselineId:'',baselineCount:virtualBaselineCount,baselineCaptured,observedVirtualCount};
 }
 function build(input){
   if(!C||typeof C.mergeLiveCatalog!=='function'||typeof C.buildDb!=='function')throw new Error('ORDV15Model requires ORDCore to be loaded first.');
   input=input||{};const settings=clone(input.settings),snapshot=input.snapshot||{},catalog=input.catalog||[],units=C.mergeLiveCatalog(catalog,snapshot),db=C.buildDb(units),observedCounts=copyCountsFromSnapshot(units,snapshot),observed={kind:'observed',db,units,counts:observedCounts,currentAbilities:currentAbilities(snapshot),percent:completionMap(units),snapshot,wisp:num(observedCounts[C.WISP_ID]),sourceHealth:{source:String(snapshot.source||''),sessionId:String(snapshot.sessionId||''),seq:num(snapshot.seq),observedAt:num(snapshot.at||snapshot.bridgeAt),dataChangedAt:num(snapshot.dataChangedAt),complete:!!(snapshot.collection&&snapshot.collection.found&&snapshot.countDiscovery&&snapshot.countDiscovery.found),wispObserved:snapshot.wispCountFound===true}},patched=applyScenarioPatch(observed,settings),beforeVirtual=cloneCounts(patched.counts);
   if(patched.virtualApplied)beforeVirtual[patched.virtualId]=Math.max(0,num(beforeVirtual[patched.virtualId])-1);
-  const completionById=completionDetails(db,units,observed.percent,beforeVirtual,patched.counts,patched),effective={kind:'effective',db,units,rawCounts:observedCounts,counts:patched.counts,currentAbilities:observed.currentAbilities,percent:observed.percent,completionById,wisp:num(patched.counts[C.WISP_ID]),snapshot,virtualId:patched.virtualId,virtualApplied:patched.virtualApplied,assumptions:patched.assumptions};
+  const completionById=completionDetails(db,units,observed.percent,beforeVirtual,patched.counts,patched),effective={kind:'effective',db,units,rawCounts:observedCounts,counts:patched.counts,currentAbilities:observed.currentAbilities,percent:observed.percent,completionById,wisp:num(patched.counts[C.WISP_ID]),snapshot,virtualId:patched.virtualId,virtualApplied:patched.virtualApplied,virtualResolved:patched.alreadyObserved,virtualSpecialBaselineId:patched.baselineId,virtualSpecialBaselineCount:patched.baselineCount,assumptions:patched.assumptions};
   // Completion and live abilities can change while unit counts stay constant.
   // They must therefore participate in the authority fingerprint; otherwise a
   // cached first-legend decision can survive a newer TMO observation.
-  const fingerprint=digestText(JSON.stringify({sessionId:observed.sourceHealth.sessionId,seq:observed.sourceHealth.seq,dataHash:String(snapshot.dataHash||''),dataChangedAt:observed.sourceHealth.dataChangedAt,round:num(settings.currentRound),mode:settings.mode||'',route:settings.magicRoute||'',postLegendRoute:settings.postLegendRoute||'',virtualId:patched.virtualId,virtualApplied:patched.virtualApplied,counts:stablePairs(effective.counts),abilities:stablePairs(effective.currentAbilities),percent:stablePairs(effective.percent),assumptions:effective.assumptions.map(row=>[row.kind,row.id,row.after])}));
-  return{version:VERSION,knowledge:{db,units},observed,effective,patch:{manualCounts:clone(settings.manualCounts),virtualSpecialId:patched.virtualId,virtualSpecial:{id:patched.virtualId,selected:!!patched.virtualId,applied:patched.virtualApplied,alreadyObserved:patched.alreadyObserved},wispOverride:settings.wispOverride,superKumaOwned:settings.superKumaOwned,assumptions:patched.assumptions},intent:{damageMode:['physical','magic'].includes(settings.mode)?settings.mode:'undecided',magicRoute:['dual','singleEnd'].includes(settings.magicRoute)?settings.magicRoute:'undecided',upperPreviewId:String(settings.upperPreviewId||''),gorosei:String(settings.gorosei||'none')},round:{value:Math.max(1,Math.round(num(settings.currentRound)||1)),source:snapshot.autoRound&&snapshot.autoRound.active?'tmo-auto':'timer-or-user',confidence:snapshot.autoRound&&snapshot.autoRound.active?'observed':'estimated'},settings,fingerprint};
+  const fingerprint=digestText(JSON.stringify({sessionId:observed.sourceHealth.sessionId,seq:observed.sourceHealth.seq,dataHash:String(snapshot.dataHash||''),dataChangedAt:observed.sourceHealth.dataChangedAt,round:num(settings.currentRound),mode:settings.mode||'',route:settings.magicRoute||'',postLegendRoute:settings.postLegendRoute||'',virtualId:patched.virtualId,virtualApplied:patched.virtualApplied,virtualBaselineId:patched.baselineId,virtualBaselineCount:patched.baselineCount,counts:stablePairs(effective.counts),abilities:stablePairs(effective.currentAbilities),percent:stablePairs(effective.percent),assumptions:effective.assumptions.map(row=>[row.kind,row.id,row.after])}));
+  return{version:VERSION,knowledge:{db,units},observed,effective,patch:{manualCounts:clone(settings.manualCounts),virtualSpecialId:patched.virtualId,virtualSpecial:{id:patched.virtualId,selected:!!patched.virtualId,applied:patched.virtualApplied,alreadyObserved:patched.alreadyObserved,resolved:patched.alreadyObserved,baselineId:patched.baselineId,baselineCount:patched.baselineCount,baselineCaptured:patched.baselineCaptured,observedCount:patched.observedVirtualCount},wispOverride:settings.wispOverride,superKumaOwned:settings.superKumaOwned,assumptions:patched.assumptions},intent:{damageMode:['physical','magic'].includes(settings.mode)?settings.mode:'undecided',magicRoute:['dual','singleEnd'].includes(settings.magicRoute)?settings.magicRoute:'undecided',upperPreviewId:String(settings.upperPreviewId||''),gorosei:String(settings.gorosei||'none')},round:{value:Math.max(1,Math.round(num(settings.currentRound)||1)),source:snapshot.autoRound&&snapshot.autoRound.active?'tmo-auto':'timer-or-user',confidence:snapshot.autoRound&&snapshot.autoRound.active?'observed':'estimated'},settings,fingerprint};
 }
 function completionFor(model,unitOrId){
   const id=String(unitOrId&&unitOrId.id||unitOrId||''),detail=model&&model.effective&&model.effective.completionById&&model.effective.completionById[id];
@@ -125,3 +125,4 @@ function observedEvidence(model){return{snapshot:model.observed.sourceHealth,ass
 
 return{VERSION,HAND_TIERS,build,completionFor,completionScore,withCounts,durableCounts,finalEntries,finalSummary,tierInventory,roleState,observedEvidence,_test:{copyCountsFromSnapshot,applyScenarioPatch,completionDetails,completionDetail,digestText,stablePairs,cloneCounts}};
 });
+

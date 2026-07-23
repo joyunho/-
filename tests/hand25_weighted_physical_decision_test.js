@@ -58,7 +58,7 @@ assert.strictEqual(result.roleCoverage.basis,'final-only');
 assert.strictEqual(coverage.spec.total,result.finalLineup.length,'역할표에 보유 하위패나 미선택 유닛이 섞였습니다.');
 assert.strictEqual(coverage.complete,false,'부분 미래 참고안을 완성 역할표로 표시했습니다.');
 assert(['armor','slow','bossFrenzy'].some(key=>byKey[key]&&byKey[key].gap>0),'실제 남은 핵심 역할 결손이 숨겨졌습니다.');
-assert.strictEqual(byKey.stunFull.required,false,'1.5 스턴은 하드 게이트가 아닙니다.');
+assert.strictEqual(byKey.stunFull.required,true,'v17.7: 물딜 1.5 스턴은 마지막 우선순위 필수 하드 게이트다.');
 assert.strictEqual(result.routeEvaluation.status,'insufficient');
 assert.strictEqual(result.routeEvaluation.combatVerified,false,'정적 역할표를 50라 보스 화력 검증으로 승격했습니다.');
 assert.strictEqual(result.decision.gates.operationalReady,false);
@@ -107,7 +107,7 @@ for(const wisp of [0,10,30,100,200]){
   assert(varied.safePrefix.actions.length<=2,'현재 패 확정 영역이 재계산 범위를 넘어 고정 9기로 확장됐습니다.');
   assert.strictEqual(varied.routeEvaluation.combatVerified,false);
   replaySafePrefix(variedState,varied.safePrefix);
-  if(varied.wispBudget.fullPartyFeasible){assert(varied.plannedCount>=varied.targetCount);assert.strictEqual(varied.wispBudget.shortage,0);}else assert.strictEqual(varied.wispBudget.evidence,'future-random-drops-not-funded');
+  if(varied.wispBudget.fullPartyFeasible){assert(varied.plannedCount>=varied.targetCount);assert.strictEqual(varied.wispBudget.shortage,0);}else assert(['future-random-drops-not-funded','role-incomplete'].includes(varied.wispBudget.evidence),`unexpected evidence: ${varied.wispBudget.evidence}`);
   previousProjected=varied.projectedCount;previousPrefixCount=varied.safePrefix.actions.length;previousVector=varied.safePrefix.rankVector;
 }
 

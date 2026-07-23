@@ -20,7 +20,7 @@ function digest(value){return crypto.createHash('sha256').update(JSON.stringify(
 
 test('league metadata and catalog membership are independent and exhaustive',()=>{
   assert.deepStrictEqual(Object.keys(C.STORY_LEAGUES).sort(),['legend','rare','upper']);
-  assert.deepStrictEqual(Array.from(C.STORY_GRADE_TIERS),['S','A','B','C','D','E','F']);
+  assert.deepStrictEqual(Array.from(C.STORY_GRADE_TIERS),['SSS','SS','S','A','B','C','D','E','F']);
   assert(Object.isFrozen(C.STORY_GRADE_TIERS));
   assert.deepStrictEqual(
     Object.fromEntries(Object.entries(C.STORY_LEAGUES).map(([key,row])=>[key,[row.label,row.size]])),
@@ -40,18 +40,18 @@ test('league metadata and catalog membership are independent and exhaustive',()=
   assert.strictEqual([...members.upper].filter(id=>members.legend.has(id)).length,0);
 });
 
-test('rare benchmark has a complete independent 1-42 ranking and seven grade bands',()=>{
+test('rare benchmark has a complete independent 1-42 ranking and nine grade bands',()=>{
   // 갤러리 250029 실측 데미지% 전체 42종 (거프 31.73% 1위 → 와이퍼 7.29% 42위)
   const expectedOrder=['Q10h','Y10h','E20h','X90h','I20h','K20h','X10h','R10h','Z10h','620h','V10h','020h','L50h','F20h','320h','220h','M10h','M20h','H40h','L20h','H20h','P10h','520h','920h','G20h','L10h','J20h','K50h','S10h','120h','T10h','U10h','W10h','D20h','A20h','820h','B20h','720h','N10h','C20h','O10h','420h'];
   assert.strictEqual(expectedOrder.length,42);
   assert.deepStrictEqual(expectedOrder.map(id=>C.STORY_RARE_RANKS[id]),Array.from({length:42},(_,index)=>index+1));
   assert.deepStrictEqual(
     ['Q10h','K20h','X10h','020h','L50h','220h','M10h','H20h','920h','G20h','120h','T10h','820h','B20h','420h'].map(id=>{const grade=leagueGrade(id);return[id,grade.leagueRank,grade.leagueTier];}),
-    [['Q10h',1,'S'],['K20h',6,'S'],['X10h',7,'A'],['020h',12,'A'],['L50h',13,'B'],['220h',16,'B'],['M10h',17,'B'],['H20h',21,'C'],['920h',24,'C'],['G20h',25,'D'],['120h',30,'D'],['T10h',31,'E'],['820h',36,'E'],['B20h',37,'F'],['420h',42,'F']]
+    [['Q10h',1,'SSS'],['K20h',6,'SS'],['X10h',7,'SS'],['020h',12,'S'],['L50h',13,'S'],['220h',16,'A'],['M10h',17,'A'],['H20h',21,'B'],['920h',24,'B'],['G20h',25,'C'],['120h',30,'D'],['T10h',31,'D'],['820h',36,'E'],['B20h',37,'E'],['420h',42,'F']]
   );
   assert.deepStrictEqual(
     Array.from({length:42},(_,index)=>C.storyLeagueTier(index+1,42)),
-    ['S','S','S','S','S','S','A','A','A','A','A','A','B','B','B','B','B','B','C','C','C','C','C','C','D','D','D','D','D','D','E','E','E','E','E','E','F','F','F','F','F','F']
+    ['SSS','SSS','SSS','SSS','SSS','SS','SS','SS','SS','SS','S','S','S','S','A','A','A','A','A','B','B','B','B','B','C','C','C','C','D','D','D','D','D','E','E','E','E','E','F','F','F','F']
   );
   const first=leagueGrade('Q10h'),last=leagueGrade('420h');
   assert.deepStrictEqual([first.leagueScore,last.leagueScore],[100,0]);
@@ -59,7 +59,7 @@ test('rare benchmark has a complete independent 1-42 ranking and seven grade ban
 });
 
 test('legend-grade ranks are re-banded only inside the 76-row league',()=>{
-  const boundaries=[[1,'S'],[11,'S'],[12,'A'],[22,'A'],[23,'B'],[33,'B'],[34,'C'],[44,'C'],[45,'D'],[55,'D'],[56,'E'],[66,'E'],[67,'F'],[76,'F']];
+  const boundaries=[[1,'SSS'],[9,'SSS'],[10,'SS'],[17,'SS'],[18,'S'],[26,'S'],[27,'A'],[34,'A'],[35,'B'],[43,'B'],[44,'C'],[51,'C'],[52,'D'],[60,'D'],[61,'E'],[68,'E'],[69,'F'],[76,'F']];
   const rowByRank=new Map(Object.values(nonupper).map(row=>[row.rank,row]));
   for(const [rank,tier] of boundaries){
     const row=rowByRank.get(rank);assert(row,`legend source rank ${rank} missing`);
@@ -75,7 +75,7 @@ test('upper source states keep 1-80 ranks while 78 ranked catalog cards stay exp
   assert.strictEqual(sourceRows.length,80);
   assert.deepStrictEqual(sourceRows.map(row=>row.rank),Array.from({length:80},(_,index)=>index+1));
 
-  const boundaries=[[1,'S'],[12,'S'],[13,'A'],[23,'A'],[24,'B'],[35,'B'],[36,'C'],[46,'C'],[47,'D'],[58,'D'],[59,'E'],[69,'E'],[70,'F'],[80,'F']];
+  const boundaries=[[1,'SSS'],[9,'SSS'],[10,'SS'],[18,'SS'],[19,'S'],[27,'S'],[28,'A'],[36,'A'],[37,'B'],[45,'B'],[46,'C'],[54,'C'],[55,'D'],[63,'D'],[64,'E'],[72,'E'],[73,'F'],[80,'F']];
   const sourceByRank=new Map(sourceRows.map(row=>[row.rank,row]));
   for(const [rank,tier] of boundaries){
     const row=sourceByRank.get(rank),grade=leagueGrade(row.id);
@@ -124,13 +124,13 @@ test('league derivation leaves raw storyGrade results and measured source data u
 
   const rareSource=C.storyGrade(unit('V10h')),rareLeague=leagueGrade('V10h');
   assert.deepStrictEqual([rareSource.tier,rareSource.score,rareSource.storyRank],[ 'B',58,undefined]);
-  assert.deepStrictEqual([rareLeague.sourceTier,rareLeague.sourceScore,rareLeague.leagueTier,rareLeague.leagueRank],['B',58,'A',11]);
+  assert.deepStrictEqual([rareLeague.sourceTier,rareLeague.sourceScore,rareLeague.leagueTier,rareLeague.leagueRank],['B',58,'S',11]);
   const legendSource=C.storyGrade(unit('S30h')),legendLeague=leagueGrade('S30h');
   assert.deepStrictEqual([legendSource.scope,legendSource.storyRank,legendSource.tier],['nonupper',16,'A']);
-  assert.deepStrictEqual([legendLeague.sourceTier,legendLeague.leagueTier],['A','A']);
+  assert.deepStrictEqual([legendLeague.sourceTier,legendLeague.leagueTier],['A','SS']);
   const upperSource=C.storyGrade(unit('G50h')),upperLeague=leagueGrade('G50h');
   assert.deepStrictEqual([upperSource.scope,upperSource.storyRank,upperSource.tier],['upper',16,'A']);
-  assert.deepStrictEqual([upperLeague.sourceTier,upperLeague.leagueTier],['A','A']);
+  assert.deepStrictEqual([upperLeague.sourceTier,upperLeague.leagueTier],['A','SS']);
 
   const rareTuples=Object.entries(C.STORY_RARE_BENCHMARKS).sort((a,b)=>a[0].localeCompare(b[0])).map(([id,value])=>[id,value]);
   const legendTuples=Object.values(nonupper).sort((a,b)=>a.rank-b.rank).map(row=>[row.id,row.rank,row.tableTier,row.imageTier,row.displayName,row.metricType,row.value,row.approximate,row.note]);

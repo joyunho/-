@@ -6,7 +6,7 @@ const path = require('path');
 
 const extensionDir = path.resolve(__dirname, '..');
 const packageDir = path.resolve(extensionDir, '..');
-const outputPath = path.join(packageDir, 'ord_2305_nightmare_helper_v16_0_0_manual.html');
+const outputPath = path.join(packageDir, 'ord_2305_nightmare_helper_v17_7_0_manual.html');
 const staleOutputs = [
   path.join(packageDir, 'ord_2305_nightmare_helper_v14_2_0_manual.html'),
   path.join(packageDir, 'ord_2305_nightmare_helper_v15_1_0_manual.html')
@@ -54,8 +54,10 @@ const standaloneBoot = `(function () {
   try {
     app = window.ORDApp.create(root, catalog, {source: 'standalone-manual'});
   } catch (error) {
-    root.innerHTML = '<pre style="padding:24px;color:#fff;background:#080d18;white-space:pre-wrap">' +
-      String(error && (error.stack || error.message) || error) + '</pre>';
+    const errorPanel = document.createElement('pre');
+    errorPanel.style.cssText = 'padding:24px;color:#fff;background:#080d18;white-space:pre-wrap';
+    errorPanel.textContent = String(error && (error.stack || error.message) || error);
+    root.replaceChildren(errorPanel);
     return;
   }
   window.ORD_APP = app;
@@ -138,9 +140,9 @@ const html = `<!doctype html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="ord-helper" content="v17.6.0-decision-engine-manual">
+  <meta name="ord-helper" content="v17.7.0-decision-engine-manual">
   <meta name="description" content="현재 패의 정확한 순차 원장과 생존 마감으로 다음 한 행동만 결정하는 원랜디 2.305 악몽 수동 도우미">
-  <title>원랜디 2.305 악몽 실전 판단 코치 v17.6.0 · 수동 모드</title>
+  <title>원랜디 2.305 악몽 실전 판단 코치 v17.7.0 · 수동 모드</title>
   <style data-source="ord_app.css">
 ${safeStyle(fs.readFileSync(cssPath, 'utf8'))}
   </style>

@@ -25,14 +25,15 @@ const triggerOnly={name:'테스트 발동깎',groupName:'전설 [물딜]',abilit
 assert.strictEqual(contribution.armor,0,'발동 방깎 후보가 하드 방깎 기여로 점수화되었습니다.');
 assert.strictEqual(contribution.triggerArmor,20);
 
-const readyIds=['190H','830h','B30h','M30h','540h','unit_1752903381904_1445','unit_1779015467592_9245'];
+// v17.7: 1.5스턴 필수 게이트에 맞춰 바르톨로메오 전설을 픽스처에 추가.
+const readyIds=['190H','830h','B30h','M30h','540h','unit_1752903381904_1445','unit_1779015467592_9245','Z20h'];
 const db=C.buildDb(units);for(const id of readyIds)assert(db.byId.has(id),`stable armor fixture missing: ${id}`);
 const counts=Object.fromEntries(readyIds.map(id=>[id,1]));
 function state(extra={},base=counts){return C.normalizeState(units,{counts:Object.assign({},base,extra),currentAbilities:{}},{manualCounts:{},superKumaOwned:true});}
 const settings={currentRound:55,mode:'physical',targetSquadCount:9,gorosei:'none'};
 const ready=C.gameFlow(state(),[],settings);
-assert.deepStrictEqual([ready.counts.board,ready.counts.squad,ready.deficits.profile.armorCurrent],[7,9,182]);
-assert.strictEqual(ready.clearReady,true,'상시 182와 0.5+ 스턴을 갖춘 환산 9기는 판매·강화 단계로 넘어가야 합니다.');
+assert.deepStrictEqual([ready.counts.board,ready.counts.squad,ready.deficits.profile.armorCurrent],[8,10,194]);
+assert.strictEqual(ready.clearReady,true,'상시 194와 1.5+ 스턴을 갖춘 환산 10기는 판매·강화 단계로 넘어가야 합니다.');
 assert.strictEqual(ready.phase,'upgrade-control');
 
 // 시저 대신 크래커를 쓴 최종 7기는 상시 방깎 177입니다. 현재 TMO에는

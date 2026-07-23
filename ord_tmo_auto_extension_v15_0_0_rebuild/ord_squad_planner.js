@@ -6,8 +6,8 @@ if(root)root.ORDSquadPlanner=api;
 })(typeof window!=='undefined'?window:globalThis,function(C){
 'use strict';
 
-const VERSION='17.6.0';
-const DEFAULTS={beamWidth:4,branchWidth:3,branchScan:6,candidateCap:36,maxDepth:14};
+const VERSION='17.7.0';
+const DEFAULTS={beamWidth:8,branchWidth:5,branchScan:8,candidateCap:44,maxDepth:14};
 const ROUTE_LABELS={physical:'물딜',dual:'마딜 2상위+토키',singleEnd:'마딜 1상위+단끝'};
 const STUN_OVERSUPPLY_PENALTY=420;
 const SLOW_OVERSUPPLY_PENALTY=4;
@@ -628,7 +628,7 @@ function nodeSignature(node,state){
   return node.actions.map(x=>x.id).sort().join('|')+`@${node.wisp}#${stock}`;
 }
 function requirementPriorityVector(requirements){
-  const rows=requirements&&requirements.rows||[],byKey=new Map(rows.filter(row=>row.required).map(row=>[row.key,row])),route=requirements&&requirements.route||'physical',groups=route==='physical'?[['main'],['armor','stunBase'],['slow','bossFrenzy']]:route==='dual'?[['main','stunBase'],['slow'],['stunFull'],['bossFrenzy','toki']]:[['main'],['bossFrenzy','stunBase'],['slow'],['stunFull'],['singleEndExpected']],vector=[];
+  const rows=requirements&&requirements.rows||[],byKey=new Map(rows.filter(row=>row.required).map(row=>[row.key,row])),route=requirements&&requirements.route||'physical',groups=route==='physical'?[['main'],['armor','stunBase'],['slow','bossFrenzy'],['stunFull']]:route==='dual'?[['main','stunBase'],['slow'],['stunFull'],['bossFrenzy','toki']]:[['main'],['bossFrenzy','stunBase'],['slow'],['stunFull'],['singleEndExpected']],vector=[];
   for(const keys of groups){const selected=keys.map(key=>byKey.get(key)).filter(Boolean),missed=selected.filter(row=>num(row.gap)>0).length,debt=selected.reduce((total,row)=>total+num(row.gap)/Math.max(.01,num(row.target)),0);vector.push(missed,round(debt,6));}return vector;
 }
 function comparePriorityVectors(a,b){const left=a||[],right=b||[],length=Math.max(left.length,right.length);for(let index=0;index<length;index++){const av=num(left[index]),bv=num(right[index]);if(av!==bv)return av-bv;}return 0;}
@@ -1227,3 +1227,4 @@ function planFinalSquad(input){
 
 return{VERSION,planFinalSquad,rankUpperBlueprints,rankDeckDirections,_test:{normalizeSettings,normalizeCommonPolicy,normalizeBlueprint,requirementRows,routeEvaluationFor,commonPressure,finalEntries,finalOnlySpec,buildStaticRows,makeLightStaticData,routeFor,routeBoardTarget,settingsForRoute,finalWeight,legendEquivalentCount,decorateLegendEquivalent,squadDecisionSummary,finalStageSnapshot,strategyGateRows,stageGateSnapshot,rareDeadlineAssessment,timelineReadiness,exactPrefixStage,exactPrefixCheckpoint,exactPrefixMetrics,compareExactPrefixMetrics,exactPrefixPlan,finalPatchOptions,allowedCandidate,prerequisiteStatus,staticPotential,excessStun,excessSlow,hasNonControlRole,incrementalStunPenalty,incrementalSlowPenalty,recipeProfile,pairMaterialOverlap,lineupMaterialOverlap,introducesLineageConflict,candidateOverlapPenalty,consumptionTotals,tierBurnVector,compareTierBurn,handFitMetrics,compareHandFit,fullHandAllocation,wispBudgetSummary,futureWispCharge,deferredFutureFeasibility,compareDeferredSwaps,buildDeferred,requirementPriorityVector,comparePriorityVectors,nodeCompare,compareRoutePlans,searchExactBlueprint,searchRouteLight,draftUpperBlueprintPlan,repairDraftSingleSwap,blueprintMetadata,projectUpperCandidate,upperPreparationFor,upperBlueprintCompare,directionRow,uniqueDirectionRows,directionUpperShortlist}};
 });
+

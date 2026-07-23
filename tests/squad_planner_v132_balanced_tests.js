@@ -39,7 +39,7 @@ function replaySafePrefix(state,prefix){
 
 const tests=[];function test(name,fn){tests.push([name,fn]);}
 
-test('physical seven-board/nine-equivalent plan keeps hard gates without forcing comfort stun',()=>{
+test('physical seven-board/nine-equivalent plan keeps hard gates including the 1.5-stun last gate (v17.7)',()=>{
   const state=stateFromCounts(stockedCounts()),result=P.planFinalSquad({state,settings:{mode:'physical',currentRound:25,targetSquadCount:9,superKumaOwned:true,recommendWarped:true},locks:[{stage:'upper',id:'J40h'}],bottleneckCommons:['우솝']}),coverage=result.roleCoverage.planned,byKey=Object.fromEntries(coverage.rows.map(row=>[row.key,row]));
   assert.strictEqual(result.targetBoardCount,7);
   assert.strictEqual(result.finalLineup.length,7);
@@ -50,7 +50,8 @@ test('physical seven-board/nine-equivalent plan keeps hard gates without forcing
   assert(byKey.stunBase.current>=.5,`minimum stun ${byKey.stunBase.current}`);
   assert(byKey.slow.current>=102,`slow ${byKey.slow.current}`);
   assert(byKey.bossFrenzy.current>=1,`boss/frenzy ${byKey.bossFrenzy.current}`);
-  assert.strictEqual(byKey.stunFull.required,false,'1.5 stun must remain a comfort recommendation');
+  assert.strictEqual(byKey.stunFull.required,true,'v17.7: 1.5 stun is the last-priority hard gate');
+  assert(byKey.stunFull.current>=1.5,`1.5 stun gate open: ${byKey.stunFull.current}`);
   assert(byKey.stunFull.current<=2.05,`unnecessary stun stack ${byKey.stunFull.current}`);
   assert(coverage.excessStun<=.55,`excess stun ${coverage.excessStun}`);
   assert.strictEqual(result.wispBudget.fullPartyFeasible,true);

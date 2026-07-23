@@ -1,6 +1,6 @@
 'use strict';
 
-// v17.6.0 compact popup; parser protocol remains v13-compatible.
+// v17.7.0 compact popup; parser protocol remains v13-compatible.
 const state = document.getElementById('state');
 const detail = document.getElementById('detail');
 const testButton = document.getElementById('test');
@@ -72,7 +72,7 @@ function renderStored(value) {
   const valid = !!(snapshot && tabId && supported(snapshot.helperId) && snapshot.parser === PARSER &&
     Number(snapshot.sourceTabId) === tabId && Number(snapshot.sourceEpoch) === epoch &&
     collection.found === true && Number(collection.confidence) >= 0.72 && counts.found === true &&
-    unitCount >= 300 && unitCount <= 520 && coverage === 1 && Number(counts.missing || 0) === 0 &&
+    unitCount >= 300 && unitCount <= 380 && coverage === 1 && Number(counts.missing || 0) === 0 &&
     Number(counts.ambiguous || 0) === 0 && snapshot.wispCountFound === true);
   if (!valid) {
     const confidence = Number(diagnostic.confidence) || 0;
