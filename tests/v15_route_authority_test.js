@@ -38,7 +38,16 @@ function input({counts={},percent={},settings={},locks=[]}={}){
   assert.strictEqual(decision.routeCandidates[0].tiers.special,1);
   assert.strictEqual(decision.routeCandidates[0].tiers.uncommon,1);
   assert.strictEqual(decision.routeCandidates[0].wispCost,1);
-  assert(!decision.routeCandidates.some(row=>row.id===upperHard.id),'missing Rayleigh prerequisite leaked into recommendations');
+  // v17.5: 레일리(히든)만 막힌 상위는 스토리 10 보상 수령 전제로 후보에
+  // 남을 수 있다 — 단 storyReward 표시가 붙고 지금 제작 가능이 아니어야
+  // 하며, 다른 보상을 선언하면 예전처럼 완전히 제외된다.
+  const hardRow=decision.routeCandidates.find(row=>row.id===upperHard.id);
+  if(hardRow){
+    assert.strictEqual(hardRow.storyReward,true,'Rayleigh-gated upper must be flagged as story-reward-planned');
+    assert.strictEqual(hardRow.feasible,false,'story-reward-planned upper must not claim buildable-now');
+  }
+  const declined=E.decide(input({counts:{[ownedLegend.id]:1,[rareA.id]:2,[rareB.id]:2,[special.id]:1,[uncommon.id]:1,[C.WISP_ID]:10},percent:{[upperRareHeavy.id]:45,[upperRareLight.id]:99,[upperHard.id]:100},settings:{story10Reward:'kuma'}}));
+  assert(!declined.routeCandidates.some(row=>row.id===upperHard.id),'missing Rayleigh prerequisite leaked after declaring another story-10 reward');
   assert.strictEqual(decision.evidence.fixedFinalParty,false);
 }
 
