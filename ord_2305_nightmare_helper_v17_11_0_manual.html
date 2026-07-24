@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="ord-helper" content="v17.10.0-decision-engine-manual">
+  <meta name="ord-helper" content="v17.11.0-decision-engine-manual">
   <meta name="description" content="현재 패의 정확한 순차 원장과 생존 마감으로 다음 한 행동만 결정하는 원랜디 2.305 악몽 수동 도우미">
-  <title>원랜디 2.305 악몽 실전 판단 코치 v17.10.0 · 수동 모드</title>
+  <title>원랜디 2.305 악몽 실전 판단 코치 v17.11.0 · 수동 모드</title>
   <style data-source="ord_app.css">
 :root{color-scheme:dark;--bg:#060b18;--panel:#0d162a;--panel2:#101d35;--line:#223454;--text:#eef5ff;--muted:#91a2bd;--blue:#4f7cff;--cyan:#25c2e7;--green:#27d17f;--amber:#f3b84b;--red:#ef6262;--violet:#8b67ff;--shadow:0 20px 55px rgba(0,0,0,.28)}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 10% 0,#122a5a 0,#060b18 35%,#040812 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;word-break:keep-all;overflow-wrap:anywhere}button,input,select{font:inherit}button{cursor:pointer}.ord-app{min-height:100vh;padding:18px;max-width:1860px;margin:0 auto}.ord-header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding:22px 24px;border:1px solid rgba(112,154,255,.26);border-radius:24px;background:linear-gradient(135deg,rgba(66,83,222,.34),rgba(17,64,94,.3));box-shadow:var(--shadow)}.ord-kicker{font-size:11px;letter-spacing:.14em;color:#9bb7ff;font-weight:900}.ord-header h1{margin:5px 0 3px;font-size:29px;line-height:1.15}.ord-header p{margin:0;color:var(--muted);font-size:13px}.ord-head-status{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:720px}.ord-head-status>*{border:1px solid var(--line);border-radius:999px;background:rgba(6,11,24,.7);color:#d9e8ff;padding:8px 12px;font-size:12px;font-weight:800;white-space:nowrap}.ord-head-status .good{border-color:rgba(39,209,127,.45);color:#a8f7ce}.ord-head-status .warn{border-color:rgba(243,184,75,.45);color:#ffe1a1}.ord-head-status button{background:#1b2b4d}.ord-tabs{display:flex;gap:8px;margin:14px 0}.ord-tabs button,.purpose-buttons button,.two-button button,.round-box button,.action-buttons button,.prep-list button,.mini-cards button,.ghost,.primary{border:1px solid var(--line);border-radius:11px;background:#111d32;color:#dce9ff;padding:9px 13px;font-weight:850}.ord-tabs button.on,.purpose-buttons button.on,.primary{border-color:transparent;background:linear-gradient(135deg,var(--violet),var(--blue));color:white}.ord-layout{display:grid;grid-template-columns:294px minmax(0,1fr);gap:14px;align-items:start}.ord-side{display:grid;gap:12px;position:sticky;top:10px;max-height:calc(100vh - 20px);overflow:auto;padding-right:3px;min-width:0}.side-card,.ord-panel{border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,rgba(15,26,48,.96),rgba(9,16,31,.96));box-shadow:0 14px 38px rgba(0,0,0,.18);min-width:0}.side-card{padding:14px}.side-card b{font-size:14px}.side-title{display:flex;justify-content:space-between;gap:8px}.side-title span{font-size:11px;color:var(--cyan)}.side-card label{display:grid;gap:5px;color:var(--muted);font-size:11px;margin-top:11px}.side-card input,.side-card select,.form-grid input{width:100%;min-width:0;border:1px solid var(--line);border-radius:10px;background:#071020;color:var(--text);padding:9px}.side-card small{display:block;color:var(--muted);font-size:10.5px;line-height:1.45;margin-top:6px}.round-box{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-top:10px;padding:10px;border:1px solid rgba(37,194,231,.3);border-radius:13px;background:rgba(10,39,62,.35)}.round-box strong{font-size:13px;min-width:0}.round-box div{display:flex;gap:4px}.round-box button{padding:6px 8px;font-size:11px}.side-card details{margin-top:10px}.side-card summary,.detail-modal summary{cursor:pointer;color:#cbd9ef;font-size:11px;font-weight:800}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.two-button{display:flex;gap:6px;margin-top:10px}.two-button button{flex:1;font-size:11px;padding:8px}.two-button .on{border-color:var(--green);color:#c5ffe0;background:rgba(39,209,127,.1)}.two-button .danger.on{border-color:var(--red);color:#ffc1c1;background:rgba(239,98,98,.1)}.stat-row{display:flex;justify-content:space-between;align-items:center}.stat-row b{font-size:24px;color:#ffe7a3}.lock-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.lock-list>span{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(139,103,255,.35);border-radius:999px;padding:5px 8px;background:rgba(139,103,255,.1);font-size:10px}.lock-list button{border:0;background:none;color:#ffaaaa;font-weight:900}.side-card.compact{padding-bottom:10px}.common-line{display:grid;grid-template-columns:8px 1fr auto;gap:7px;align-items:center;margin-top:7px;font-size:11px}.common-line i{width:8px;height:8px;border-radius:50%}.common-line b{font-size:11px}.ord-main{display:grid;gap:13px;min-width:0}.milestone{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:17px 19px;border:1px solid rgba(37,194,231,.4);border-radius:21px;background:linear-gradient(135deg,rgba(6,47,78,.78),rgba(31,25,87,.56));min-width:0}.milestone small{color:#61daf5;font-weight:900}.milestone h2{margin:3px 0 5px;font-size:24px}.milestone p{margin:0;color:#abc0df;font-size:12px}.purpose-buttons{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.purpose-buttons button{font-size:11px}.top-two{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:13px}.ord-panel{padding:17px}.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:13px}.panel-head small{color:#72d8ef;font-size:10px;font-weight:900}.panel-head h2{margin:2px 0 4px;font-size:20px}.panel-head p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.45}.count-pill,.mode-pill,.control-badge{border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:11px;font-weight:900;white-space:nowrap}.mode-pill.physical{color:#ffcb9a;border-color:#e48e45}.mode-pill.magic{color:#a9c9ff;border-color:#5c84d8}.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.profile-grid>div,.spec-grid>div{border:1px solid var(--line);border-radius:13px;background:#091326;padding:11px;min-width:0}.profile-grid small,.spec-grid small{display:block;color:var(--muted);font-size:10px}.profile-grid b{display:block;margin-top:5px;font-size:12px;line-height:1.45}.synergy-line{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.synergy-line small{width:100%;color:var(--muted)}.synergy-line span{border:1px solid rgba(39,209,127,.3);border-radius:999px;padding:5px 8px;font-size:10px;color:#b8f7d5}.upper-focus details{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}.upper-focus details p{color:#aebbd0;font-size:11px}.control-badge.safe{color:#a9f7cc;border-color:rgba(39,209,127,.45)}.control-badge.edge{color:#ffe2a4;border-color:rgba(243,184,75,.45)}.control-badge.danger{color:#ffb4b4;border-color:rgba(239,98,98,.45)}.spec-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.spec-grid b{display:block;font-size:21px;margin:4px 0}.spec-grid span{color:#8193ae;font-size:9.5px}.deficit-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:11px}.deficit-line>b{font-size:11px}.deficit-line span{border:1px solid rgba(243,184,75,.32);border-radius:999px;padding:5px 8px;color:#ffd78d;font-size:10px}.deficit-line .ok{color:#a9f7cc;border-color:rgba(39,209,127,.3)}.state-intro{display:flex;justify-content:space-between;gap:15px;align-items:center}.state-intro h2{margin:4px 0}.state-intro p{color:var(--muted);margin:0;font-size:12px}.control{min-width:260px;border:1px solid var(--line);border-radius:15px;padding:12px}.control b,.control span{display:block}.control span{font-size:10px;color:var(--muted);margin-top:4px}.control.safe{border-color:rgba(39,209,127,.35)}.control.edge{border-color:rgba(243,184,75,.35)}.control.danger{border-color:rgba(239,98,98,.35)}.mini-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.mini-cards article{display:grid;grid-template-columns:38px 1fr auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:10px;background:#091326;min-width:0}.mini-cards img{width:38px;height:38px;border-radius:10px;object-fit:cover}.mini-cards b,.mini-cards span,.mini-cards small{display:block;min-width:0}.mini-cards b{font-size:12px}.mini-cards span{font-size:10px;color:#9fb1ca}.mini-cards small{font-size:9px;color:#7085a4}.mini-cards button{padding:7px;font-size:10px}.action-list{display:grid;gap:8px}.action-row{display:grid;grid-template-columns:42px 48px minmax(0,1fr) 124px auto;gap:11px;align-items:center;border:1px solid rgba(55,84,132,.8);border-radius:16px;padding:11px;background:linear-gradient(90deg,rgba(12,27,50,.95),rgba(8,17,33,.95));min-width:0}.action-row .rank{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--violet),var(--cyan));font-weight:950}.action-row>img{width:46px;height:46px;border-radius:12px;object-fit:cover}.action-main{min-width:0}.unit-title{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.unit-title b{font-size:14px}.unit-title span{font-size:10px;color:#8da1bd}.role-tags{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0}.role-tags>span,.role-tags i{border:1px solid #284266;border-radius:999px;padding:4px 7px;font-size:9.5px;font-style:normal;color:#bcd3f2}.role-tags i{border-color:color-mix(in srgb,var(--pc) 60%,#223454);box-shadow:inset 3px 0 var(--pc)}.action-main p{margin:0;color:#91a6c2;font-size:10.5px}.action-cost{border:1px solid var(--line);border-radius:12px;padding:8px;text-align:center}.action-cost b{display:block;font-size:22px;color:#ffe1a1}.action-cost small{display:block;color:#7f91ab;font-size:9px}.action-cost span{display:block;margin-top:4px;font-size:9px}.action-cost .good{color:#9ff1c5}.action-cost .warn{color:#ffd083}.action-cost .bad{color:#ffaaaa}.action-buttons{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.action-buttons button{font-size:10px;padding:8px}.empty{padding:20px;border:1px dashed #2c4266;border-radius:14px;text-align:center;color:#8193ad}.prep-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}.prep-list>div{display:grid;grid-template-columns:40px minmax(0,1fr) auto auto;gap:9px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:10px;background:#091326;min-width:0}.prep-list img{width:38px;height:38px;border-radius:10px;object-fit:cover}.prep-list b,.prep-list small{display:block}.prep-list b{font-size:12px}.prep-list small{color:#8195b2;font-size:9.5px}.prep-list em{font-style:normal;color:#ffd587;font-size:9.5px}.prep-list button{font-size:9px;padding:6px}.rare-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.rare-columns>div{border:1px solid var(--line);border-radius:14px;padding:11px}.rare-columns h3{margin:0 0 8px;font-size:12px}.rare-columns .use{border-color:rgba(39,209,127,.3)}.rare-columns .hold{border-color:rgba(243,184,75,.3)}.rare-columns .reroll{border-color:rgba(239,98,98,.3)}.rare-columns>div>div{display:grid;grid-template-columns:28px 1fr auto;gap:7px;align-items:center;margin-top:6px;font-size:10px}.rare-columns img{width:28px;height:28px;border-radius:8px}.rare-panel>small{display:block;margin-top:9px;color:#7f91aa;font-size:9.5px}.owned-chips{display:flex;gap:7px;flex-wrap:wrap}.owned-chips button{display:flex;align-items:center;gap:7px;max-width:260px;border:1px solid var(--line);border-radius:12px;background:#091326;color:#dceaff;padding:7px 9px}.owned-chips img{width:30px;height:30px;border-radius:8px}.owned-chips span{font-size:10px;text-align:left}.deck-page,.data-page{display:grid;gap:13px}.raw-ability-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:7px}.raw-ability-grid>div{display:flex;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:12px;padding:9px;background:#091326;font-size:10px}.raw-ability-grid b{color:#d9ecff}.owned-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px}.owned-grid button{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:12px;background:#091326;color:#e3efff;padding:9px;text-align:left}.owned-grid img{width:36px;height:36px;border-radius:9px}.owned-grid span,.owned-grid small{display:block}.owned-grid span{font-size:11px}.owned-grid small{font-size:9px;color:#8296b4}.owned-grid.small button{grid-template-columns:32px 1fr auto}.diag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.diag-grid>div{border:1px solid var(--line);border-radius:12px;padding:10px;background:#091326}.diag-grid small,.diag-grid b{display:block}.diag-grid small{color:#8395b0;font-size:9px}.diag-grid b{font-size:11px;margin-top:4px}.data-page pre{white-space:pre-wrap;max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:12px;background:#050b16;padding:11px;color:#9fb5d0;font-size:10px}.manual-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px}.manual-grid label{display:grid;grid-template-columns:1fr 70px;gap:8px;align-items:center;border:1px solid var(--line);border-radius:11px;padding:7px;font-size:10px}.manual-grid input{width:100%;border:1px solid var(--line);border-radius:8px;background:#050b16;color:white;padding:7px}.modal-back{position:fixed;inset:0;z-index:9999;background:rgba(1,4,12,.8);backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:18px}.detail-modal{width:min(900px,96vw);max-height:92vh;overflow:auto;border:1px solid #30486f;border-radius:24px;background:#081121;padding:20px;box-shadow:0 30px 90px rgba(0,0,0,.65);position:relative}.modal-x{position:absolute;right:15px;top:15px;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;background:#111d31;color:white;font-size:20px}.detail-modal header{display:flex;gap:12px;align-items:center;padding-right:50px}.detail-modal header img{width:54px;height:54px;border-radius:14px}.detail-modal h2{margin:0;font-size:19px}.detail-modal header p{margin:4px 0 0;color:#8ea4c1;font-size:10px}.detail-hero{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:8px;margin:15px 0}.detail-hero>div,.missing-grid>div{border:1px solid var(--line);border-radius:13px;background:#091326;padding:11px}.detail-hero small,.detail-hero b,.detail-hero span{display:block}.detail-hero small{color:#8296b4;font-size:9px}.detail-hero b{margin:4px 0;font-size:16px}.detail-hero span{font-size:10px;color:#a9bad0}.detail-modal section{margin-top:14px}.detail-modal h3{font-size:12px}.direct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:7px}.direct-grid>div{display:flex;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:11px;padding:9px;font-size:10px}.missing-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.missing-grid small,.missing-grid b{display:block}.missing-grid small{color:#8296b4;font-size:9px}.missing-grid b{font-size:10px;line-height:1.55;margin-top:5px}.detail-modal details{margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:10px}.detail-modal details p{font-size:10px;color:#9cb0cb}.detail-modal .close{margin-top:14px}.ord-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:10000;border-radius:14px;padding:11px 16px;background:linear-gradient(135deg,var(--violet),var(--blue));box-shadow:var(--shadow);font-weight:900;font-size:12px}
@@ -905,6 +905,35 @@ textarea{font:inherit}.run-log-quick{display:grid;gap:8px;margin-top:9px;border:
 /* v17.8: 후보 카드 필요 선위·부족 희귀 명시줄 + 잠금 상위 남은 경로 */
 .v151-cost-line{display:block;color:#B7E3FF;font-size:9px;font-weight:750;line-height:1.35;white-space:normal}
 .v151-cost-line b{color:#ECF8FF}
+/* v17.11: 클리어 파티 참고안 (9~11환산 · 위습 수입 시간표) */
+.v151-clear-party{display:grid;flex:0 0 auto;gap:5px;margin-top:6px;border:1px solid rgba(110,220,243,.3);border-radius:10px;padding:7px 9px;background:rgba(20,58,84,.1)}
+.v151-clear-party>header{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;justify-content:space-between}
+.v151-clear-party>header>b{color:#8AE4F5;font-size:10.5px}
+.v151-clear-party>header>em{font-size:9px;font-style:normal;font-weight:850}
+.v151-clear-party>header>em.ok{color:#6FDBA7}.v151-clear-party>header>em.gap{color:#FFB1A6}
+.v151-party-rows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px}
+.v151-party-row{display:flex;gap:6px;align-items:center;min-width:0;border:1px solid #1E3450;border-radius:8px;padding:3px 6px;background:#081426;text-align:left;cursor:pointer}
+.v151-party-row img,.v151-party-row>i{display:grid;flex:none;place-items:center;width:22px;height:22px;border-radius:6px;object-fit:cover;background:#142A45;color:#7FDFF1;font-size:9px;font-style:normal}
+.v151-party-row span{display:grid;min-width:0}
+.v151-party-row b{overflow:hidden;color:#ECF8FF;font-size:9.5px;text-overflow:ellipsis;white-space:nowrap}
+.v151-party-row b em{color:#D3B56F;font-size:8px;font-style:normal}
+.v151-party-row small{overflow:hidden;font-size:8.5px;text-overflow:ellipsis;white-space:nowrap}
+.v151-party-row.own small{color:#6FDBA7}.v151-party-row.now small{color:#8AE4F5}.v151-party-row.wait small{color:#F5CE84}.v151-party-row.rare small{color:#FFB1A6}.v151-party-row.mat small{color:#A7BBD0}
+.v151-party-row.rare{border-color:rgba(240,145,143,.4)}.v151-party-row.now{border-color:rgba(110,220,243,.35)}
+.v151-party-stretch{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.v151-party-stretch>small{color:#8CA2BE;font-size:8.5px;font-weight:900}
+.v151-party-stretch>button{display:flex;gap:5px;align-items:baseline;border:1px dashed #2E4A68;border-radius:8px;padding:2px 7px;background:transparent}
+.v151-party-stretch b{color:#C8D8EA;font-size:9px}.v151-party-stretch span{color:#8CA2BE;font-size:8px}
+.v151-party-note{color:#7E94B4;font-size:8px;line-height:1.4}
+/* v17.11: 리롤 목표 블록 (2번 패널) */
+.v151-reroll-targets{display:grid;flex:0 0 auto;gap:4px;border-top:1px dashed #4A3A2E;padding-top:6px}
+.v151-reroll-targets>small{color:#EBC98E;font-size:9.5px;font-weight:900;letter-spacing:.03em}
+.v151-reroll-target-chips{display:flex;flex-wrap:wrap;gap:4px}
+.v151-reroll-target-chips>button{display:flex;gap:5px;align-items:baseline;min-width:0;border:1px solid rgba(235,201,142,.4);border-radius:8px;padding:3px 7px;background:rgba(94,68,24,.12);cursor:pointer}
+.v151-reroll-target-chips b{overflow:hidden;color:#FFE0AC;font-size:9.5px;text-overflow:ellipsis;white-space:nowrap}
+.v151-reroll-target-chips span{color:#B79A6C;font-size:8px;white-space:nowrap}
+.v151-reroll-targets>em{color:#D8C4A0;font-size:9px;font-style:normal}
+.v151-reroll-fuel{color:#8CA2BE;font-size:8.5px}
 .v151-upper-path{display:grid;flex:0 0 auto;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:4px;margin-top:5px}
 .v151-upper-path>span{display:grid;gap:1px;min-width:0;border:1px solid #1E3450;border-radius:8px;padding:4px 7px;background:#091528}
 .v151-upper-path small{overflow:hidden;color:#8CA2BE;font-size:8.5px;font-weight:900;text-overflow:ellipsis;white-space:nowrap}
@@ -1230,7 +1259,7 @@ if(typeof module==='object'&&module.exports)module.exports=ORD_UPPER_SKILL_DPS;
 (function(global){
 'use strict';
 
-const VERSION='17.10.0';
+const VERSION='17.11.0';
 const WISP_ID='810e';
 const SUPER_KUMA_ID='unit_1767884940750_9880';
 // v17.5: 스토리 10라운드 확정 보상 — 레일리(히든)+해적선 묶음을 다른
@@ -1409,6 +1438,20 @@ const ATTACK_TYPE_VS_BOSS={pierce:1.25,normal:1,siege:.75,hero:1.05};
 // 이 환산은 표시·필요 DPS 참고 계산에만 쓰고, 제작 하드 게이트의
 // 정적 방깎 목표는 낮추지 않는다(암브 유닛이 묶이거나 죽으면 사라지는
 // 조건부 자원이기 때문).
+// v17.11: 위습 수입 예측 — 두 스트림을 구분한다.
+//  · 선택 위습(제작 통화): 실전 로그 2판 스냅샷 재구성 실측 ~0.6/라
+//    (양의 증가분 합/라운드 — 소비에 가려진 수입이 있어 하한에 가깝다).
+//  · 랜덤 위습(유닛 수입): 라운드마다 2개, 흔함만 준다(둘 다 사용자
+//    확인 맵 사실). 특정 흔함 1종 기대 도착은 9종 균등 가정 2/9개/라.
+//    안흔함 이상은 랜덤 위습으로 직접 오지 않으므로 조합으로만 채운다. 이 예측은 참고 계획 전용이며 확정 게이트(현재
+//    패 순차 장부)는 그대로 유지한다.
+const SELECTION_WISP_INCOME_PER_ROUND=.6;
+const RANDOM_WISP_PER_ROUND=2;
+const COMMON_KIND_COUNT=9;
+function wispIncomeProjection(currentRound,targetRound){
+  const from=Math.max(1,Math.round(num(currentRound)||1)),to=Math.max(from,Math.round(num(targetRound)||50)),rounds=Math.max(0,to-from);
+  return{fromRound:from,toRound:to,rounds,selectionPerRound:SELECTION_WISP_INCOME_PER_ROUND,selectionTotal:round2(rounds*SELECTION_WISP_INCOME_PER_ROUND),randomPerRound:RANDOM_WISP_PER_ROUND,randomTotal:rounds*RANDOM_WISP_PER_ROUND,commonKindPerRound:round2(RANDOM_WISP_PER_ROUND/COMMON_KIND_COUNT),basis:'selection-measured-logs-2games·random-2-commons-only-user-confirmed',measured:{selection:true,random:false}};
+}
 const ARMOR_BREAK_CAP=75;
 function armorBreakStacks(weight){const w=Math.max(0,num(weight));return w<=0?0:Math.round(ARMOR_BREAK_CAP*(1-Math.pow(.5,w)));}
 function armorBreakModel(spec,options){
@@ -2440,7 +2483,7 @@ function snapshotHealth(snapshot,now){
 }
 function debugFixture(){return{VERSION,roleProfile,magicFinishProfile,evaluateMagicSingleEnd,skillFacts,upperStrategy,upperPairSynergy,storyGrade,storyLeagueKey,storyLeagueTier,storyLeagueGrade,storyLeagueRows,recipeSolve,predictCompletionWithAddedMaterial,specialPrerequisiteStatus,currentSpec,controlEnvelope,controlState,clearProfileDetails,deficits,recommendationPlan,gameFlow,progressionCounts,normalizePostLegendRoute,selectCompatibleQueue,rareTargetsForRound,rareInventoryFor,rarePressureForInventory,rareSpendForSolve,rowScore,roundClock,snapshotHealth};}
 
-global.ORDCore={VERSION,WISP_ID,SUPER_KUMA_ID,RAYLEIGH_HIDDEN_ID,PIRATE_SHIP_ID,STORY10_FORFEITS,SPECIAL_IDS,eligible152Specials,eligible152SpecialId,COMMON_COLORS,GOROSEI,CONTROL_ENVELOPE,CONTROL_PROFILES,BOSS_META,bossPreview,UPPER_LINE_PROFILE,DEFENSE_ARMOR,armorMultiplier,ARMOR_BREAK_CAP,armorBreakStacks,armorBreakModel,ATTACK_TYPE_VS_BOSS,upperCombatFor,upperRawDps,upperBossDps,bossRawDpsNeed,upperSkillProfile,upperSkillProcDps,simulateBossFlat,STUN_RESEARCH,STORY_RARE_BENCHMARKS,STORY_RARE_RANKS,STORY_RESEARCHED,STORY_LEAGUES,STORY_GRADE_TIERS,UPPER_VARIANT_FAMILIES,POST_LEGEND_ROUTES,MAX_WISP_COST,PREFERRED_WISP_COST,num,esc,cleanName,canonicalAbility,groupName,nameOf,displayNameOf,tierKey,isRare,isCommon,isUncommon,isSpecialTier,isUpper,isLegendish,isChanged,isWarped,isShip,isSeraph,isTranscend,requiresWarpedCraft,familyOf,canonicalUpperId,activeUpperVariant,upperPairSynergy,descriptionPartnerSynergy,roleProfile,magicFinishProfile,evaluateMagicSingleEnd,skillFacts,upperStrategy,stunResearch,stunCaptureRate,storyGrade,storyLeagueKey,storyLeagueTier,storyLeagueGrade,storyLeagueRows,buildDb,mergeLiveCatalog,normalizeState,recipeSolve,predictCompletionWithAddedMaterial,reserveTargets,specialPrerequisiteStatus,materialName,mapText,commonTop,completionPercent,ownedUnits,ownedDisplayUnits,isRoleBearingUnit,currentSpec,finalGradeSpec,applyBuildStep,controlEnvelope,controlState,clearProfileDetails,deficits,roleContribution,upperMemoFor,synergyRankFor,mainUpper,inferMode,candidateRow,recommendationPlan,gameFlow,normalizePostLegendRoute,milestonePurpose,phaseForRound,roundClock,rareResolution,rareTargetsForRound,rareInventoryFor,rarePressureForInventory,rareSpendForSolve,upperProfileData,statusForRow,summarizeRoles,snapshotHealth,debugFixture};
+global.ORDCore={VERSION,WISP_ID,SUPER_KUMA_ID,RAYLEIGH_HIDDEN_ID,PIRATE_SHIP_ID,STORY10_FORFEITS,SPECIAL_IDS,eligible152Specials,eligible152SpecialId,COMMON_COLORS,GOROSEI,CONTROL_ENVELOPE,CONTROL_PROFILES,BOSS_META,bossPreview,UPPER_LINE_PROFILE,DEFENSE_ARMOR,armorMultiplier,SELECTION_WISP_INCOME_PER_ROUND,RANDOM_WISP_PER_ROUND,COMMON_KIND_COUNT,wispIncomeProjection,ARMOR_BREAK_CAP,armorBreakStacks,armorBreakModel,ATTACK_TYPE_VS_BOSS,upperCombatFor,upperRawDps,upperBossDps,bossRawDpsNeed,upperSkillProfile,upperSkillProcDps,simulateBossFlat,STUN_RESEARCH,STORY_RARE_BENCHMARKS,STORY_RARE_RANKS,STORY_RESEARCHED,STORY_LEAGUES,STORY_GRADE_TIERS,UPPER_VARIANT_FAMILIES,POST_LEGEND_ROUTES,MAX_WISP_COST,PREFERRED_WISP_COST,num,esc,cleanName,canonicalAbility,groupName,nameOf,displayNameOf,tierKey,isRare,isCommon,isUncommon,isSpecialTier,isUpper,isLegendish,isChanged,isWarped,isShip,isSeraph,isTranscend,requiresWarpedCraft,familyOf,canonicalUpperId,activeUpperVariant,upperPairSynergy,descriptionPartnerSynergy,roleProfile,magicFinishProfile,evaluateMagicSingleEnd,skillFacts,upperStrategy,stunResearch,stunCaptureRate,storyGrade,storyLeagueKey,storyLeagueTier,storyLeagueGrade,storyLeagueRows,buildDb,mergeLiveCatalog,normalizeState,recipeSolve,predictCompletionWithAddedMaterial,reserveTargets,specialPrerequisiteStatus,materialName,mapText,commonTop,completionPercent,ownedUnits,ownedDisplayUnits,isRoleBearingUnit,currentSpec,finalGradeSpec,applyBuildStep,controlEnvelope,controlState,clearProfileDetails,deficits,roleContribution,upperMemoFor,synergyRankFor,mainUpper,inferMode,candidateRow,recommendationPlan,gameFlow,normalizePostLegendRoute,milestonePurpose,phaseForRound,roundClock,rareResolution,rareTargetsForRound,rareInventoryFor,rarePressureForInventory,rareSpendForSolve,upperProfileData,statusForRow,summarizeRoles,snapshotHealth,debugFixture};
 })(window);
 
 
@@ -2454,7 +2497,7 @@ if(root)root.ORDSquadPlanner=api;
 })(typeof window!=='undefined'?window:globalThis,function(C){
 'use strict';
 
-const VERSION='17.10.0';
+const VERSION='17.11.0';
 const DEFAULTS={beamWidth:8,branchWidth:5,branchScan:8,candidateCap:44,maxDepth:14};
 const ROUTE_LABELS={physical:'물딜',dual:'마딜 2상위+토키',singleEnd:'마딜 1상위+단끝'};
 const STUN_OVERSUPPLY_PENALTY=420;
@@ -3687,7 +3730,7 @@ if(root)root.ORDV15Model=api;
 })(typeof window!=='undefined'?window:globalThis,function(C){
 'use strict';
 
-const VERSION='17.10.0';
+const VERSION='17.11.0';
 const HAND_TIERS=['rare','special','uncommon','common'];
 
 function num(value){return C&&C.num?C.num(value):(Number(value)||0);}
@@ -3818,7 +3861,7 @@ if(root)root.ORDV15Ledger=api;
 })(typeof window!=='undefined'?window:globalThis,function(C,M){
 'use strict';
 
-const VERSION='17.10.0';
+const VERSION='17.11.0';
 const TIERS=['rare','special','uncommon','common'];
 function num(value){return C&&C.num?C.num(value):(Number(value)||0);}
 function clone(value){return Object.assign({},value||{});}
@@ -3890,7 +3933,7 @@ if(root)root.ORDV15Policy=api;
 })(typeof window!=='undefined'?window:globalThis,function(C,M){
 'use strict';
 
-const VERSION='17.10.0';
+const VERSION='17.11.0';
 const ROUTES=Object.freeze({
   physical:Object.freeze({key:'physical',mode:'physical',label:'물딜 1상위',groups:[['main'],['armor','stunBase'],['slow','bossFrenzy'],['stunFull']],priority:'상위 → 상시 방깎·최소 0.5스턴 → 이감·광보잡 → 1.5스턴'}),
   dual:Object.freeze({key:'dual',mode:'magic',label:'마딜 2상위·토키',groups:[['main','stunBase'],['slow'],['stunFull'],['bossFrenzy','toki']],priority:'상위 2기·최소 0.5스턴 → 이감 → 1.5스턴 → 광보잡·토키'}),
@@ -4002,7 +4045,7 @@ if(root)root.ORDV15Engine=api;
 })(typeof window!=='undefined'?window:globalThis,function(C,M,L,P){
 'use strict';
 
-const VERSION='17.10.0';
+const VERSION='17.11.0';
 const MAX_CANDIDATES=36;
 const BEAM_WIDTH=6;
 const HORIZON=2;
@@ -5522,7 +5565,7 @@ class App{
     },key=[fingerprint(this.state.snapshot),JSON.stringify(strategic)].join('|');
     if(key!==this._v15CacheKey){
       try{this._v15Cache=engine.decide({catalog:this.catalog,snapshot:this.state.snapshot||{},settings,locks:this.state.locks||[]});}
-      catch(error){this._v15Cache={version:'17.10.0',authority:true,state:'SYNC_BLOCKED',label:'판단 엔진 점검 필요',reason:String(error&&error.message||error),action:null,alternatives:[],unknowns:['판단 엔진 오류']};}
+      catch(error){this._v15Cache={version:'17.11.0',authority:true,state:'SYNC_BLOCKED',label:'판단 엔진 점검 필요',reason:String(error&&error.message||error),action:null,alternatives:[],unknowns:['판단 엔진 오류']};}
       this._v15CacheKey=key;
     }
     const base=this._v15Cache;if(!base)return null;
@@ -6010,12 +6053,15 @@ class App{
     // 않는 희귀는 다음 행동과 무관하게 리롤을 권장한다(한 번에 1장 원칙).
     const rerollRows=decision.rare&&!decision.rare.conflict?(decision.rare.reroll||[]).filter(row=>C.num(row.reroll)>0).slice(0,2):[];
     const rerollHint=rerollRows.length&&decision.state!=='REROLL_ONE'?`<div class="v151-reroll-hint"><small>리롤 권장</small>${rerollRows.map(row=>`<button data-act="detail" data-id="${C.esc(row.id)}"><b>${C.esc(row.name)}${C.num(row.reroll)>1?` ×${C.num(row.reroll)}`:''}</b><span>확정 상위·보조 경로에 사용처 없음 · 1장씩 리롤 후 다시 동기화 · 원하는 1종 확률 1/41(2.4%)/회</span></button>`).join('')}</div>`:'';
+    // v17.11(사용자 요청): 리롤로 노릴 희귀 목표 + 적중 확률.
+    const rerollTargets=this.v151RerollTargets(state,plan,decision);
+    const targetsHtml=rerollTargets?`<div class="v151-reroll-targets"><small>리롤 목표 ${rerollTargets.kinds}종 · 남은 리롤 ${rerollTargets.rerollLeft}/2</small><div class="v151-reroll-target-chips">${rerollTargets.list.map(row=>`<button data-act="detail" data-id="${C.esc(row.id)}"><b>${C.esc(row.name)}${row.need>1?`×${row.need}`:''}</b><span>${row.sources.map(source=>C.esc(source)).join('·')}</span></button>`).join('')}</div><em>1회당 목표 적중 ${rerollTargets.kinds}/41 = ${rerollTargets.perRollPercent}%${rerollTargets.rerollLeft?` · 남은 ${rerollTargets.rerollLeft}회 안에 1개 이상 ${rerollTargets.anyHitPercent}%`:' · 리롤 소진'}</em>${rerollTargets.rollAway.length?`<span class="v151-reroll-fuel">돌릴 후보(사용처 없음): ${rerollTargets.rollAway.map(row=>C.esc(row.name)).join(' · ')}</span>`:'<span class="v151-reroll-fuel">지금 돌릴 무용 희귀 없음 — 무용 희귀가 잡히면 위 목표를 노리세요</span>'}</div>`:'';
     const shipPlan=this.v151ShipPlan(state);
     // v17.9(사용자 요청 1): 전설급 완성체와 상위(제한됨)를 나눠 표기하고
     // 현재 계통 적합 + 재료 근접 순으로 추천 1개를 명시한다.
     const shipRow=row=>{const recommended=shipPlan.recommendedId===row.unit.id;return`<button data-act="detail" data-id="${C.esc(row.unit.id)}" class="${recommended?'recommended':''}"><b>${recommended?'<i class="v151-ship-reco">추천</i>':''}${C.esc(displayNameOf(row.unit))}${row.familyFit?'':'<i class="v151-ship-off">타계통</i>'}</b><span>${row.feasible?'지금 제작 가능 — 배 사용처로 최우선 검토':`부족: ${row.missing.map(m=>`${C.esc(m.name)}${m.need>1?`×${m.need}`:''}`).join(' · ')}${row.missingRares.length?' — 부족 희귀는 리롤·152킬 목표로':''}`}</span></button>`;};
     const shipHint=shipPlan?`<div class="v151-ship-plan"><small>해적선 활용 · ${shipPlan.shipCount}척 보유</small>${shipPlan.legendRows.length?`<em class="v151-ship-group">전설급 완성체</em>${shipPlan.legendRows.map(shipRow).join('')}`:''}${shipPlan.upperRows.length?`<em class="v151-ship-group">상위 (제한됨) — 메인 상위 자리 소모</em>${shipPlan.upperRows.map(shipRow).join('')}`:''}</div>`:'';
-    return items.length||rerollHint||shipHint?`<div class="v151-prep-list">${items.slice(0,5).map((item,index)=>{const unit=state.db&&state.db.byId.get(item.id);return`<button data-act="detail" data-id="${C.esc(item.id)}">${unit&&unit.image?`<img src="${C.esc(unit.image)}" alt="">`:`<i>${index+1}</i>`}<span class="v151-prep-copy"><span class="v151-prep-name"><b>${C.esc(item.name)}</b>${this.v151StoryTag(unit)}</span><small>${C.esc(item.note)}</small></span><em>선위 ${C.num(item.wispCost)}</em></button>`;}).join('')}${shipHint}${rerollHint}<p>미리 준비만 하며, 실제 다음 행동은 TMO 패 변화 뒤 다시 확정합니다.</p></div>`:`<div class="v151-empty"><b>현재 행동만 확정</b><span>다음 행동은 지금 미리 고정하지 않고 TMO 변화 뒤 계산합니다.</span></div>`;
+    return items.length||rerollHint||shipHint||targetsHtml?`<div class="v151-prep-list">${items.slice(0,5).map((item,index)=>{const unit=state.db&&state.db.byId.get(item.id);return`<button data-act="detail" data-id="${C.esc(item.id)}">${unit&&unit.image?`<img src="${C.esc(unit.image)}" alt="">`:`<i>${index+1}</i>`}<span class="v151-prep-copy"><span class="v151-prep-name"><b>${C.esc(item.name)}</b>${this.v151StoryTag(unit)}</span><small>${C.esc(item.note)}</small></span><em>선위 ${C.num(item.wispCost)}</em></button>`;}).join('')}${targetsHtml}${shipHint}${rerollHint}<p>미리 준비만 하며, 실제 다음 행동은 TMO 패 변화 뒤 다시 확정합니다.</p></div>`:`<div class="v151-empty"><b>현재 행동만 확정</b><span>다음 행동은 지금 미리 고정하지 않고 TMO 변화 뒤 계산합니다.</span></div>`;
   }
 
   renderV151CurrentSpec(state,plan){
@@ -6177,6 +6223,95 @@ class App{
     return`<small class="v151-clear-why">추천 이유: ${C.esc(strengths.join(', ')||'뚜렷한 우위 없음')}${weakest&&weakest.score<.35?`. 약점은 ${C.esc(weakest.weak)}`:''}. ${C.esc(eta)}${lineNote}${storyNote}</small>`;
   }
 
+  // v17.11(사용자 요청): 선택한 상위 기준, 내 패 + 50라까지 위습 수입을
+  // 전제한 클리어 파티(9환산, 여유 시 11환산 확장)를 시간표로 보여준다.
+  //  · 선택 위습(제작 통화): 실측 0.6/라 수입으로 각 제작의 충당 라운드 계산
+  //  · 랜덤 위습(유닛): 2/라(맵 사실) — 부족 흔함의 기대 도착 라운드 계산
+  //  · 희귀 부족은 수입으로 못 채우므로 리롤 목표로 연결
+  // 파티 확정 게이트(현재 패 순차 장부)는 그대로 — 이 화면은 참고 계획이다.
+  v151ClearParty(state,plan){
+    const squad=plan.squadPlan;
+    if(!squad||squad.error||!Array.isArray(squad.finalLineup)||!squad.finalLineup.length)return null;
+    const lock=this.upperLock(),upperId=lock&&lock.id||this.state.upperPreviewId||this.state.directionUpperId;
+    if(!upperId)return null;
+    const roundNow=this.actualRound(),income=C.wispIncomeProjection(roundNow,50);
+    const available=C.num(state.wisp);
+    // 유닛별 부족 재료(현재 패 기준): futurePending을 유닛으로 묶는다.
+    const pendingByUnit=new Map();
+    for(const item of squad.handFit&&squad.handFit.futurePending||[]){
+      const key=String(item.unitId||'');
+      if(!pendingByUnit.has(key))pendingByUnit.set(key,[]);
+      pendingByUnit.get(key).push(item);
+    }
+    // 제작 순서 시간표: 누적 선위 필요량이 (보유 + 0.6/라 수입)으로 충당되는 라운드.
+    let cumulative=0;const arrivalByUnit=new Map();
+    for(const action of squad.actions||[]){
+      cumulative+=C.num(action.wispCost);
+      const short=Math.max(0,cumulative-available);
+      arrivalByUnit.set(String(action.id),short<=0?roundNow:roundNow+Math.ceil(short/Math.max(.1,income.selectionPerRound)));
+    }
+    const rows=squad.finalLineup.map(item=>{
+      const id=String(item.id||item.unit&&item.unit.id||''),unit=state.db.byId.get(id);
+      const owned=C.num(state.counts[id])>0;
+      const pending=pendingByUnit.get(id)||[];
+      const rareGaps=pending.filter(gap=>gap.tier==='rare');
+      const commonGaps=pending.filter(gap=>gap.tier==='common');
+      const otherGaps=pending.filter(gap=>!['rare','common'].includes(gap.tier));
+      let badge,tone;
+      if(owned){badge='보유';tone='own';}
+      else if(rareGaps.length){badge=`희귀 필요: ${rareGaps.map(gap=>`${gap.name}${gap.count>1?`×${gap.count}`:''}`).join('·')}`;tone='rare';}
+      else if(otherGaps.length){badge=`재료 준비: ${otherGaps.slice(0,2).map(gap=>gap.name).join('·')}`;tone='mat';}
+      else if(commonGaps.length){
+        // 특정 흔함 k개 기대 도착: 랜덤 위습 2/라 × (1/9종) — 균등 가정.
+        // 표시용 반올림 값(0.22) 대신 정확식 k×9/2로 계산한다.
+        const worst=Math.max(...commonGaps.map(gap=>C.num(gap.count)));
+        const waitRounds=Math.ceil(worst*C.COMMON_KIND_COUNT/Math.max(.01,income.randomPerRound));
+        badge=`~${roundNow+waitRounds}라 (랜덤 위습 기대)`;tone='wait';
+      }else{
+        const arrival=arrivalByUnit.get(id);
+        if(arrival==null||arrival<=roundNow){badge='지금 제작 가능';tone='now';}
+        else{badge=`~${Math.min(65,arrival)}라 (선위 수입 대기)`;tone='wait';}
+      }
+      return{id,unit,name:item.name||(unit?displayNameOf(unit):id),isUpper:unit?C.isUpper(unit):false,badge,tone};
+    });
+    // 요약: 총 필요 선위 vs 보유 + 50라까지 수입.
+    const totalNeed=cumulative,projected=available+income.selectionTotal;
+    const funded=projected>=totalNeed;
+    // 11환산 확장: 파티 밖 제작 가능 전설급 상위 2개(스토리 등급 우선).
+    const lineupIds=new Set(rows.map(row=>row.id));
+    const stretch=(plan.rows||[]).filter(row=>row.unit&&C.isLegendish(row.unit)&&!lineupIds.has(row.unit.id)&&row.solve&&row.solve.wispCost!=null).slice(0,8)
+      .sort((a,b)=>C.num(C.storyGrade(b.unit).score)-C.num(C.storyGrade(a.unit).score)).slice(0,2)
+      .map(row=>({id:row.unit.id,name:displayNameOf(row.unit),wispCost:C.num(row.solve.wispCost)}));
+    return{upperId,rows,totalNeed,available,income,projected:Math.floor(projected),funded,plannedCount:C.num(squad.plannedCount),targetCount:C.num(squad.targetCount),stretch};
+  }
+  renderV151ClearParty(state,plan){
+    const party=this.v151ClearParty(state,plan);
+    if(!party)return'';
+    const rows=party.rows.map((row,index)=>`<button data-act="detail" data-id="${C.esc(row.id)}" class="v151-party-row ${C.esc(row.tone)}">${row.unit&&row.unit.image?`<img src="${C.esc(row.unit.image)}" alt="">`:`<i>${index+1}</i>`}<span><b>${C.esc(row.name)}${row.isUpper?' <em>(상위 · 3환산)</em>':''}</b><small>${C.esc(row.badge)}</small></span></button>`).join('');
+    const stretchHtml=party.stretch.length?`<div class="v151-party-stretch"><small>여유 확장(11환산 후보)</small>${party.stretch.map(row=>`<button data-act="detail" data-id="${C.esc(row.id)}"><b>${C.esc(row.name)}</b><span>선위 ${C.num(row.wispCost)}</span></button>`).join('')}</div>`:'';
+    return`<div class="v151-clear-party"><header><b>클리어 파티 참고안 · ${C.num(party.plannedCount)}/${C.num(party.targetCount)}환산</b><em class="${party.funded?'ok':'gap'}">필요 선위 ${C.num(party.totalNeed)} vs 보유 ${C.num(party.available)}+50라까지 수입 ~${C.num(Math.floor(party.income.selectionTotal))} = ${C.num(party.projected)} ${party.funded?'충당 가능':'부족'}</em></header><div class="v151-party-rows">${rows}</div>${stretchHtml}<small class="v151-party-note">수입 근거: 선택 위습 ${party.income.selectionPerRound}/라(로그 실측) · 랜덤 위습 ${C.num(party.income.randomPerRound)}/라 흔함만(확인됨 · 9종 균등 기대). 참고 계획이며 파티 확정은 현재 패 검증만 사용합니다.</small></div>`;
+  }
+  // v17.11(사용자 요청): 리롤로 노릴 희귀 목표를 확률과 함께 안내한다.
+  v151RerollTargets(state,plan,decision){
+    const targets=new Map();
+    const add=(id,name,need,source)=>{
+      if(!id)return;
+      const entry=targets.get(id)||{id,name,need:0,sources:new Set()};
+      entry.need=Math.max(entry.need,C.num(need)||1);entry.sources.add(source);
+      targets.set(id,entry);
+    };
+    const lock=this.upperLock(),upperId=lock&&lock.id||this.state.upperPreviewId||this.state.directionUpperId;
+    if(upperId)for(const row of this.v151MissingRares(state,upperId))add(row.id,row.name,row.short,'상위');
+    for(const item of plan.squadPlan&&plan.squadPlan.handFit&&plan.squadPlan.handFit.futurePending||[])if(item.tier==='rare')add(item.id,item.name,item.count,'파티');
+    const shipPlan=this.v151ShipPlan(state);
+    if(shipPlan)for(const row of[...shipPlan.legendRows,...shipPlan.upperRows])for(const missing of row.missingRares)add(missing.id,missing.name,missing.need,'해적선');
+    if(!targets.size)return null;
+    const list=[...targets.values()].map(entry=>Object.assign(entry,{sources:[...entry.sources]})).sort((a,b)=>b.sources.length-a.sources.length||b.need-a.need).slice(0,6);
+    const kinds=targets.size,rerollLeft=Math.max(0,2-C.num(this.state.rerollsUsed));
+    const perRoll=kinds/41,anyHit=rerollLeft>0?1-Math.pow(1-perRoll,rerollLeft):0;
+    const rollAway=(decision&&decision.rare&&!decision.rare.conflict?decision.rare.reroll||[]:[]).filter(row=>C.num(row.reroll)>0);
+    return{list,kinds,rerollLeft,perRollPercent:Math.round(perRoll*1000)/10,anyHitPercent:Math.round(anyHit*1000)/10,rollAway};
+  }
   // v17.8(사용자 요청 5): 상위까지 남은 희귀를 이름으로 보여준다.
   v151MissingRares(state,targetId){
     if(!C.rareNeedsForTarget)return[];
@@ -6245,7 +6380,7 @@ class App{
       const costLine=row.locked?'':`<small class="v151-cost-line">필요 선위 <b>${C.num(row.wispCost)}</b>${C.num(row.wispGap)>0?` · 현재 부족 <b>${C.num(row.wispGap)}</b>`:' · 지금 충당 가능'}${missingRares.length?` · 부족 희귀: ${missingRares.map(item=>`${C.esc(item.name)}${item.short>1?`×${item.short}`:''}`).join(' · ')}`:' · 희귀 재료 충족'}</small>`;
       return`<article class="${index===0?'best':''} ${selected?'selected':''}"><span><b>${index+1}. ${C.esc(row.name)}${nearestBadge}${storyBadge}</b><small>${C.esc(row.routeLabel||'')} · TMO ${fmt(row.completion)}% · ${C.esc(status)}</small>${costLine}${whyLine}</span><button data-act="detail" data-id="${C.esc(row.id)}">재료</button><button class="primary" data-act="choose-direction" data-key="${C.esc(row.routeKey)}" data-id="${C.esc(row.id)}" ${canConfirm?'':'disabled'}>${canConfirm?(selected?'유지':'확정'):'25라'}</button></article>`;}).join('');
     const strategicKeys=new Set(['single','end','toki','singleEndExpected','magicSupport','attack']),strategic=(decision.assessment&&decision.assessment.requirements||[]).filter(row=>strategicKeys.has(row.key)),needs=upper&&strategic.length?`<div class="v151-upper-needs"><small>이 상위의 조합 필수 역할</small>${strategic.map(row=>`<span class="${C.num(row.gap)<=0?'ok':'gap'}"><b>${C.esc(row.label)}</b><i>${fmt(row.current)}/${fmt(row.target)}</i>${C.num(row.gap)>0?`<em>부족 ${fmt(row.gap)}</em>`:'<em>확보</em>'}</span>`).join('')}</div>`:'';
-    return`${main}${lockedPath}${dpsLine}${needs}${cards?`<div class="v151-upper-candidates">${cards}</div>`:`<div class="v151-upper-note">${upper?'확정 상위 중심으로 다음 행동을 계속 계산합니다. 패가 바뀔 때마다 아래 필수 역할 충족을 다시 검사합니다.':'상위 선택 단계가 되면 최대 6개 후보가 여기에 표시됩니다.'}</div>`}`;
+    return`${main}${lockedPath}${dpsLine}${needs}${this.renderV151ClearParty(state,plan)}${cards?`<div class="v151-upper-candidates">${cards}</div>`:`<div class="v151-upper-note">${upper?'확정 상위 중심으로 다음 행동을 계속 계산합니다. 패가 바뀔 때마다 아래 필수 역할 충족을 다시 검사합니다.':'상위 선택 단계가 되면 최대 6개 후보가 여기에 표시됩니다.'}</div>`}`;
   }
 
   renderV151RunHeader(state,clock,health){

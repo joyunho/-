@@ -676,6 +676,35 @@
 /* v17.8: 후보 카드 필요 선위·부족 희귀 명시줄 + 잠금 상위 남은 경로 */
 .v151-cost-line{display:block;color:#B7E3FF;font-size:9px;font-weight:750;line-height:1.35;white-space:normal}
 .v151-cost-line b{color:#ECF8FF}
+/* v17.11: 클리어 파티 참고안 (9~11환산 · 위습 수입 시간표) */
+.v151-clear-party{display:grid;flex:0 0 auto;gap:5px;margin-top:6px;border:1px solid rgba(110,220,243,.3);border-radius:10px;padding:7px 9px;background:rgba(20,58,84,.1)}
+.v151-clear-party>header{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;justify-content:space-between}
+.v151-clear-party>header>b{color:#8AE4F5;font-size:10.5px}
+.v151-clear-party>header>em{font-size:9px;font-style:normal;font-weight:850}
+.v151-clear-party>header>em.ok{color:#6FDBA7}.v151-clear-party>header>em.gap{color:#FFB1A6}
+.v151-party-rows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px}
+.v151-party-row{display:flex;gap:6px;align-items:center;min-width:0;border:1px solid #1E3450;border-radius:8px;padding:3px 6px;background:#081426;text-align:left;cursor:pointer}
+.v151-party-row img,.v151-party-row>i{display:grid;flex:none;place-items:center;width:22px;height:22px;border-radius:6px;object-fit:cover;background:#142A45;color:#7FDFF1;font-size:9px;font-style:normal}
+.v151-party-row span{display:grid;min-width:0}
+.v151-party-row b{overflow:hidden;color:#ECF8FF;font-size:9.5px;text-overflow:ellipsis;white-space:nowrap}
+.v151-party-row b em{color:#D3B56F;font-size:8px;font-style:normal}
+.v151-party-row small{overflow:hidden;font-size:8.5px;text-overflow:ellipsis;white-space:nowrap}
+.v151-party-row.own small{color:#6FDBA7}.v151-party-row.now small{color:#8AE4F5}.v151-party-row.wait small{color:#F5CE84}.v151-party-row.rare small{color:#FFB1A6}.v151-party-row.mat small{color:#A7BBD0}
+.v151-party-row.rare{border-color:rgba(240,145,143,.4)}.v151-party-row.now{border-color:rgba(110,220,243,.35)}
+.v151-party-stretch{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.v151-party-stretch>small{color:#8CA2BE;font-size:8.5px;font-weight:900}
+.v151-party-stretch>button{display:flex;gap:5px;align-items:baseline;border:1px dashed #2E4A68;border-radius:8px;padding:2px 7px;background:transparent}
+.v151-party-stretch b{color:#C8D8EA;font-size:9px}.v151-party-stretch span{color:#8CA2BE;font-size:8px}
+.v151-party-note{color:#7E94B4;font-size:8px;line-height:1.4}
+/* v17.11: 리롤 목표 블록 (2번 패널) */
+.v151-reroll-targets{display:grid;flex:0 0 auto;gap:4px;border-top:1px dashed #4A3A2E;padding-top:6px}
+.v151-reroll-targets>small{color:#EBC98E;font-size:9.5px;font-weight:900;letter-spacing:.03em}
+.v151-reroll-target-chips{display:flex;flex-wrap:wrap;gap:4px}
+.v151-reroll-target-chips>button{display:flex;gap:5px;align-items:baseline;min-width:0;border:1px solid rgba(235,201,142,.4);border-radius:8px;padding:3px 7px;background:rgba(94,68,24,.12);cursor:pointer}
+.v151-reroll-target-chips b{overflow:hidden;color:#FFE0AC;font-size:9.5px;text-overflow:ellipsis;white-space:nowrap}
+.v151-reroll-target-chips span{color:#B79A6C;font-size:8px;white-space:nowrap}
+.v151-reroll-targets>em{color:#D8C4A0;font-size:9px;font-style:normal}
+.v151-reroll-fuel{color:#8CA2BE;font-size:8.5px}
 .v151-upper-path{display:grid;flex:0 0 auto;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:4px;margin-top:5px}
 .v151-upper-path>span{display:grid;gap:1px;min-width:0;border:1px solid #1E3450;border-radius:8px;padding:4px 7px;background:#091528}
 .v151-upper-path small{overflow:hidden;color:#8CA2BE;font-size:8.5px;font-weight:900;text-overflow:ellipsis;white-space:nowrap}
