@@ -105,12 +105,16 @@ test('해적선 활용 계획: 부족 희귀가 리롤 목표로 나열된다',(
   partial[jozu.id]=0;
   const plan=app.v151ShipPlan({db,counts:partial});
   assert(plan&&plan.shipCount===2,'배 보유 수 인식 실패');
-  assert(plan.rows.length>=3,'배 완성체 3종이 모두 나열되어야 한다');
-  const mobyRow=plan.rows.find(row=>row.unit.id==='Q30h');
+  // v17.9: 전설급 완성체와 상위(제한됨) 소비를 구분해 반환한다.
+  assert(plan.legendRows.length>=3,'배 전설급 완성체 3종이 모두 나열되어야 한다');
+  assert(plan.legendRows.every(row=>row.kind==='legend'),'전설급 그룹에 다른 등급이 섞였다');
+  assert(plan.upperRows.every(row=>row.kind==='upper'),'상위 그룹에 다른 등급이 섞였다');
+  const mobyRow=plan.legendRows.find(row=>row.unit.id==='Q30h');
   assert(mobyRow,'모비딕호 행 누락');
   assert.strictEqual(mobyRow.feasible,false);
   assert(mobyRow.missing.some(m=>m.id===jozu.id),'부족 재료가 나열되지 않았다');
-  assert.strictEqual(plan.rows[0].missing.length<=plan.rows[plan.rows.length-1].missing.length,true,'부족 적은 순 정렬 위반');
+  assert.strictEqual(plan.legendRows[0].missing.length<=plan.legendRows[plan.legendRows.length-1].missing.length,true,'부족 적은 순 정렬 위반');
+  assert(plan.recommendedId,'추천 대상이 비어 있다');
   assert.strictEqual(app.v151ShipPlan({db,counts:{}}),null,'배 없으면 계획 없음');
 });
 

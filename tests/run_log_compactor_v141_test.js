@@ -100,7 +100,7 @@ const squad={
 const laneRows=Array.from({length:5},(_,index)=>({rank:index+1,upperId:`upper-${index}`,upperName:`상위 ${index}`,completion:90-index,status:'prefix',projectedComplete:index===0,guaranteedComplete:false,provisionalSelectable:index===0,readiness:80,wispCost:2,wispShortage:1,rareUsed:5,rareRemaining:1,safePrefix,image:'private'}));
 const direction={decision:'provisional-upper',dominant:'',reason:'현재 체크포인트 우세',lanes:Array.from({length:5},(_,index)=>({key:`lane-${index}`,mode:index?'magic':'physical',route:index?'dual':'physical',label:`경로 ${index}`,priority:'핵심 역할 우선',rows:laneRows,description:'private'})),provisionalDirection:{upperId:'upper-0',upperName:'상위 0',routeKeys:['physical','dual'],checkpoint:checkpoint('r30',30,'passed',true),actions:[{id:'upper',name:'메인 상위',wispCost:2}],image:'private'},url:'https://private.invalid'};
 const v15Decision={
-  version:'17.8.0',
+  version:'17.9.0',
   authority:true,
   state:'PREPARE',
   label:'메인 상위 재료 준비',

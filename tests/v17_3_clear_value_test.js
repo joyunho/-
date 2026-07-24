@@ -125,7 +125,7 @@ test('1번 패널: 대안 제거 · 재료 즉시 표시 · 최단 완성 배지
   assert(app.includes('바로 필요한 조합 재료'),'직접 재료 라벨 누락');
   assert(app.includes('부족 최하위 재료 = 선택위습'),'최하위 재료=선위 라벨 누락');
   assert(app.includes('v151-nearest-badge'),'최단 완성 배지 마크업 누락');
-  assert(app.includes('v151-clear-line'),'클리어 가치 부분점수 라인 누락');
+  assert(!app.includes('v151-clear-line'),'v17.9: 내부 점수 나열 라인은 카드에서 제거됐다');assert(app.includes('v151-clear-why'),'사람이 읽는 추천 이유 라인 누락');
   assert(css.includes('.v151-mats'),'재료 블록 CSS 누락');
   assert(css.includes('.v151-nearest-badge'),'배지 CSS 누락');
 });

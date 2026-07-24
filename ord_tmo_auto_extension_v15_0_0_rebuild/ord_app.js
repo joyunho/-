@@ -341,7 +341,7 @@ class App{
     },key=[fingerprint(this.state.snapshot),JSON.stringify(strategic)].join('|');
     if(key!==this._v15CacheKey){
       try{this._v15Cache=engine.decide({catalog:this.catalog,snapshot:this.state.snapshot||{},settings,locks:this.state.locks||[]});}
-      catch(error){this._v15Cache={version:'17.8.0',authority:true,state:'SYNC_BLOCKED',label:'판단 엔진 점검 필요',reason:String(error&&error.message||error),action:null,alternatives:[],unknowns:['판단 엔진 오류']};}
+      catch(error){this._v15Cache={version:'17.9.0',authority:true,state:'SYNC_BLOCKED',label:'판단 엔진 점검 필요',reason:String(error&&error.message||error),action:null,alternatives:[],unknowns:['판단 엔진 오류']};}
       this._v15CacheKey=key;
     }
     const base=this._v15Cache;if(!base)return null;
@@ -626,8 +626,8 @@ class App{
     }
   }
   renderUnsafe(){
-    // The eight-panel coach remains the default live screen. Focused auxiliary
-    // pages are reachable from panel 8 without reviving the legacy tab bar.
+    // The seven-panel coach remains the default live screen. Focused auxiliary
+    // pages are reachable from panel 7 without reviving the legacy tab bar.
     if(!REACHABLE_TABS.has(this.state.tab))this.state.tab='coach';
     const pack=this.plan(),state=pack.state,plan=pack.plan,settings=pack.settings,phase=phaseForPurpose(plan,settings.currentRound),clock=C.roundClock(settings,Date.now()),health=this.health();this._renderedRound=settings.currentRound;this._renderedHealthKey=health.key;this._deferredExternalRender=false;this.captureRunDecision(pack);
     const savedScroll=this.captureScrollPositions();
@@ -651,7 +651,7 @@ class App{
   // A live TMO snapshot rebuilds the whole screen; without this, every
   // rebuild snapped the page and each scrolled panel back to the top —
   // the reported up-and-down jumping while the clock/hand refreshed.
-  scrollableSelector(){return'.v151-scroll,.v151-action,.v151-prep-list,.v151-build-list,.v151-spec-grid,.v151-forecast-list,.v151-upper-candidates,.v151-gorosei-values,.v151-runlog-page,.detail-modal';}
+  scrollableSelector(){return'.v151-scroll,.v151-action,.v151-prep-list,.v151-build-list,.v151-spec-grid,.v151-spec-body,.v151-forecast-list,.v151-upper-candidates,.v151-gorosei,.v151-gorosei-values,.v151-runlog-page,.detail-modal';}
   captureScrollPositions(){
     try{
       const doc=typeof document!=='undefined'&&(document.scrollingElement||document.documentElement);
@@ -737,7 +737,7 @@ class App{
       // 후보를 바로 이 자리에서 확정할 수 있게 한다.
       const quick=(decision.routeCandidates||[]).slice(0,2),canConfirm=this.actualRound()>=25;
       const quickHtml=quick.length?`<div class="v151-route-quick">${quick.map((row,index)=>`<div><span><b>${index+1}. ${C.esc(row.name)}</b><small>${C.esc(row.routeLabel||'')} · TMO ${fmt(row.completion)}% · 선위 ${C.num(row.wispCost)}${C.num(row.wispGap)>0?` (부족 ${C.num(row.wispGap)})`:''}</small></span><button class="primary" data-act="choose-direction" data-key="${C.esc(row.routeKey)}" data-id="${C.esc(row.id)}" ${canConfirm?'':'disabled'}>${canConfirm?'확정':'25라 이후'}</button></div>`).join('')}</div>`:'';
-      return`<div class="v151-action choice"><span class="v151-state">상위 선택 필요</span><b class="v151-action-title">${C.esc(decision.label||'메인 상위 방향 선택')}</b><p>${C.esc(decision.reason||'아래 상위 정보에서 현재 패 후보를 비교하세요.')} 선택 전에는 제작·리롤이 잠깁니다.</p>${quickHtml}<span class="v151-jump-note">⑦ 상위 정보에서 전체 6개 후보를 비교할 수 있습니다.</span>${this.v151ActionFacts(state,decision)}</div>`;
+      return`<div class="v151-action choice"><span class="v151-state">상위 선택 필요</span><b class="v151-action-title">${C.esc(decision.label||'메인 상위 방향 선택')}</b><p>${C.esc(decision.reason||'아래 상위 정보에서 현재 패 후보를 비교하세요.')} 선택 전에는 제작·리롤이 잠깁니다.</p>${quickHtml}<span class="v151-jump-note">⑥ 상위 정보에서 전체 6개 후보를 비교할 수 있습니다.</span>${this.v151ActionFacts(state,decision)}</div>`;
     }
     const shown=decision.action||decision.blockedAction||null,reroll=decision.rare&&decision.rare.safeReroll,unit=shown&&shown.unit||reroll&&reroll.unit||null,target=status==='REROLL_ONE'&&reroll?`${reroll.name} 1장 리롤`:shown&&shown.name||decision.label||'현재 패 소비 보류',waivedKeys=new Set(((decision.assessment||{}).requirements||[]).filter(row=>row.waived).map(row=>row.key)),deltas=(shown&&shown.deltas||[]).filter(row=>!waivedKeys.has(row.key)&&(Math.abs(C.num(row.delta))>.001||row.closed)).slice(0,3),cost=shown?C.num(shown.wispCost):0,after=shown&&shown.wispAfter!=null?C.num(shown.wispAfter):C.num(state.wisp),button=status==='ACT_NOW'&&decision.action?`<button class="primary" data-act="mark-made" data-step="0" data-id="${C.esc(decision.action.id)}">제작함 · TMO 확인</button>`:status==='REROLL_ONE'&&reroll?`<button class="primary danger" data-act="reroll-confirmed" data-id="${C.esc(reroll.id)}">1장 리롤함</button>`:status==='SYNC_BLOCKED'?`<button data-act="connection">TMO 다시 읽기</button>${this.state.pendingTransaction?'<button data-act="dismiss-transaction">거래 취소 · TMO 현재값 사용</button>':''}`:'<button disabled>지금은 재료 보존</button>',stop=shown&&shown.stopCondition?shown.stopCondition:status==='PREPARE'?'재료나 선위가 달라지면 실행하지 않습니다.':'패가 바뀌면 먼저 다시 읽습니다.';
     return`<div class="v151-action ${C.esc(status.toLowerCase())}" data-state="${C.esc(status)}"><div class="v151-action-main">${unit&&unit.image?`<img src="${C.esc(unit.image)}" alt="">`:'<i>→</i>'}<div><span class="v151-state">${C.esc({ACT_NOW:'지금 실행',PREPARE:'재료 보호',HOLD:'소비 보류',REROLL_ONE:'안전 리롤',SYNC_BLOCKED:'확인 대기'}[status]||'다음 판단')}</span><b class="v151-action-title">${C.esc(target)}${this.v151StoryTag(unit)}</b><p>${C.esc(decision.reason||'현재 패에서 안전한 다음 행동을 기다립니다.')}</p></div>${shown?`<div class="v151-cost"><small>선위</small><b>${cost}</b><span>${status==='PREPARE'?'필요':`후 ${after}`}</span></div>`:''}</div>${deltas.length?`<div class="v151-deltas">${deltas.map(row=>`<span>${C.esc(row.label)} <b>${fmt(row.before)}→${fmt(row.after)}</b></span>`).join('')}</div>`:''}${decision.upperReserve?`<div class="v151-upper-guard"><i>🔒</i>확정 상위 <b>${C.esc(decision.upperReserve.name)}</b> 트리 재료 ${C.num(decision.upperReserve.reservedUnits)}개 잠금 · 선위 ${C.num(decision.upperReserve.wispCost)} 필요(부족 ${C.num(decision.upperReserve.wispShort)}) — 잠긴 재료를 빼고 추천 중${decision.upperReserve.storyRewardNeeded?' · 스토리 10 보상에서 레일리+해적선을 선택해야 열립니다':''}</div>`:''}${(()=>{
@@ -788,6 +788,7 @@ class App{
     if(shipCount<=0)return null;
     const products=db.units.filter(u=>(u.stuffs||[]).some(s=>s.id===C.PIRATE_SHIP_ID));
     if(!products.length)return null;
+    const mode=(this.state&&this.state.mode)||this.v151FamilyIntent(state)||'';
     const rows=products.map(unit=>{
       const missing=[];
       for(const s of unit.stuffs||[]){
@@ -796,9 +797,20 @@ class App{
         const mat=db.byId.get(s.id);
         missing.push({id:s.id,name:mat?C.nameOf(mat):String(s.id),need:C.num(s.count)-owned,rare:!!(mat&&C.isRare(mat))});
       }
-      return{unit,feasible:!missing.length,missing,missingRares:missing.filter(m=>m.rare)};
-    }).sort((a,b)=>Number(b.feasible)-Number(a.feasible)||a.missing.length-b.missing.length||C.nameOf(a.unit).localeCompare(C.nameOf(b.unit),'ko'));
-    return{shipCount,rows};
+      const family=C.familyOf(unit);
+      // v17.9(사용자 요청 1): 전설급 완성체(방주맥심 등)와 상위(제한됨,
+      // 에넬 등)는 쓰임이 다르다 — 구분하고 현재 계통 적합도로 추천한다.
+      const kind=C.isUpper(unit)?'upper':'legend';
+      const familyFit=!mode||family===mode||family==='neutral';
+      return{unit,kind,family,familyFit,feasible:!missing.length,missing,missingRares:missing.filter(m=>m.rare)};
+    });
+    const order=(a,b)=>Number(b.familyFit)-Number(a.familyFit)||Number(b.feasible)-Number(a.feasible)||a.missing.length-b.missing.length||C.nameOf(a.unit).localeCompare(C.nameOf(b.unit),'ko');
+    const legendRows=rows.filter(row=>row.kind==='legend').sort(order);
+    const upperRows=rows.filter(row=>row.kind==='upper').sort(order);
+    const upperCommitted=!!(this.state&&((this.upperLock&&this.upperLock())||this.state.directionUpperId));
+    const pool=upperCommitted&&legendRows.length?legendRows:[...legendRows,...upperRows];
+    const recommended=pool.slice().sort(order)[0]||null;
+    return{shipCount,legendRows,upperRows,recommendedId:recommended?recommended.unit.id:''};
   }
 
   renderV151Preparation(state,plan){
@@ -818,8 +830,11 @@ class App{
     const rerollRows=decision.rare&&!decision.rare.conflict?(decision.rare.reroll||[]).filter(row=>C.num(row.reroll)>0).slice(0,2):[];
     const rerollHint=rerollRows.length&&decision.state!=='REROLL_ONE'?`<div class="v151-reroll-hint"><small>리롤 권장</small>${rerollRows.map(row=>`<button data-act="detail" data-id="${C.esc(row.id)}"><b>${C.esc(row.name)}${C.num(row.reroll)>1?` ×${C.num(row.reroll)}`:''}</b><span>확정 상위·보조 경로에 사용처 없음 · 1장씩 리롤 후 다시 동기화 · 원하는 1종 확률 1/41(2.4%)/회</span></button>`).join('')}</div>`:'';
     const shipPlan=this.v151ShipPlan(state);
-    const shipHint=shipPlan?`<div class="v151-ship-plan"><small>해적선 활용 · ${shipPlan.shipCount}척 보유</small>${shipPlan.rows.map(row=>`<button data-act="detail" data-id="${C.esc(row.unit.id)}"><b>${C.esc(displayNameOf(row.unit))}</b><span>${row.feasible?'지금 제작 가능 — 배 사용처로 최우선 검토':`부족: ${row.missing.map(m=>`${C.esc(m.name)}${m.need>1?`×${m.need}`:''}`).join(' · ')}${row.missingRares.length?' — 부족 희귀는 리롤·152킬 목표로':''}`}</span></button>`).join('')}</div>`:'';
-    return items.length||rerollHint||shipHint?`<div class="v151-prep-list">${items.slice(0,5).map((item,index)=>{const unit=state.db&&state.db.byId.get(item.id);return`<button data-act="detail" data-id="${C.esc(item.id)}">${unit&&unit.image?`<img src="${C.esc(unit.image)}" alt="">`:`<i>${index+1}</i>`}<span><b>${C.esc(item.name)}${this.v151StoryTag(unit)}</b><small>${C.esc(item.note)}</small></span><em>선위 ${C.num(item.wispCost)}</em></button>`;}).join('')}${shipHint}${rerollHint}<p>미리 준비만 하며, 실제 다음 행동은 TMO 패 변화 뒤 다시 확정합니다.</p></div>`:`<div class="v151-empty"><b>현재 행동만 확정</b><span>다음 행동은 지금 미리 고정하지 않고 TMO 변화 뒤 계산합니다.</span></div>`;
+    // v17.9(사용자 요청 1): 전설급 완성체와 상위(제한됨)를 나눠 표기하고
+    // 현재 계통 적합 + 재료 근접 순으로 추천 1개를 명시한다.
+    const shipRow=row=>{const recommended=shipPlan.recommendedId===row.unit.id;return`<button data-act="detail" data-id="${C.esc(row.unit.id)}" class="${recommended?'recommended':''}"><b>${recommended?'<i class="v151-ship-reco">추천</i>':''}${C.esc(displayNameOf(row.unit))}${row.familyFit?'':'<i class="v151-ship-off">타계통</i>'}</b><span>${row.feasible?'지금 제작 가능 — 배 사용처로 최우선 검토':`부족: ${row.missing.map(m=>`${C.esc(m.name)}${m.need>1?`×${m.need}`:''}`).join(' · ')}${row.missingRares.length?' — 부족 희귀는 리롤·152킬 목표로':''}`}</span></button>`;};
+    const shipHint=shipPlan?`<div class="v151-ship-plan"><small>해적선 활용 · ${shipPlan.shipCount}척 보유</small>${shipPlan.legendRows.length?`<em class="v151-ship-group">전설급 완성체</em>${shipPlan.legendRows.map(shipRow).join('')}`:''}${shipPlan.upperRows.length?`<em class="v151-ship-group">상위 (제한됨) — 메인 상위 자리 소모</em>${shipPlan.upperRows.map(shipRow).join('')}`:''}</div>`:'';
+    return items.length||rerollHint||shipHint?`<div class="v151-prep-list">${items.slice(0,5).map((item,index)=>{const unit=state.db&&state.db.byId.get(item.id);return`<button data-act="detail" data-id="${C.esc(item.id)}">${unit&&unit.image?`<img src="${C.esc(unit.image)}" alt="">`:`<i>${index+1}</i>`}<span class="v151-prep-copy"><span class="v151-prep-name"><b>${C.esc(item.name)}</b>${this.v151StoryTag(unit)}</span><small>${C.esc(item.note)}</small></span><em>선위 ${C.num(item.wispCost)}</em></button>`;}).join('')}${shipHint}${rerollHint}<p>미리 준비만 하며, 실제 다음 행동은 TMO 패 변화 뒤 다시 확정합니다.</p></div>`:`<div class="v151-empty"><b>현재 행동만 확정</b><span>다음 행동은 지금 미리 고정하지 않고 TMO 변화 뒤 계산합니다.</span></div>`;
   }
 
   renderV151CurrentSpec(state,plan){
@@ -834,18 +849,26 @@ class App{
     const preview=C.bossPreview?C.bossPreview(this.actualRound(),this.state.gorosei):null;
     const armorSource=rows.find(row=>row.key==='armor');
     const abModel=armorSource&&C.armorBreakModel?C.armorBreakModel(plan.spec||{},{bossArmor:preview&&preview.bossArmor!=null?preview.bossArmor:null,armorReduce:C.num(armorSource.current)}):null;
-    const line=(row,cls,rank)=>{const pct=Math.max(0,Math.min(100,C.num(row.target)>0?100*C.num(row.current)/C.num(row.target):C.num(row.gap)<=0?100:0));
+    // v17.9(사용자 요청 3): 결손만 큰 타일로, 확보·면제는 한 줄 칩으로 —
+    // 스크롤 없이 전체가 들어오고 시선은 결손 타일에만 간다.
+    const tile=(row,rank)=>{const pct=Math.max(0,Math.min(100,C.num(row.target)>0?100*C.num(row.current)/C.num(row.target):0));
       const abNote=row.key==='armor'&&abModel&&abModel.stacks>0?`<small class="v151-ab-note">+ 암브 ${C.num(abModel.units)}기 환산 ${C.num(abModel.stacks)}(정착 추정) = 유효 ${fmt(C.num(row.current)+abModel.stacks)}${abModel.gainPercent?` · 피해 +${fmt(abModel.gainPercent)}%`:''} — 제작 목표는 정적 기준 유지</small>`:'';
-      return`<div class="v151-spec-row ${cls}${rank===0?' lead':''}">${rank!=null?`<i class="v151-spec-rank">${rank+1}</i>`:'<i class="v151-spec-rank ok">✓</i>'}<span class="v151-spec-label">${C.esc(row.label)}</span><b class="v151-spec-val">${fmt(row.current)}<i>/${fmt(row.target)}</i></b><span class="v151-spec-bar"><i style="--pct:${Math.round(pct)}%"></i></span><em class="v151-spec-state">${row.waived?'요구 없음':C.num(row.gap)<=0?'확보':`부족 ${fmt(row.gap)}`}</em>${abNote}</div>`;};
-    const body=[open.map((row,index)=>line(row,'gap',index)).join(''),closed.map(row=>line(row,'ok',null)).join(''),waived.map(row=>line(row,'waived',null)).join('')].join('');
+      return`<div class="v151-spec-tile${rank===0?' lead':''}"><small><i>${rank+1}</i>${C.esc(row.label)}</small><b>${fmt(row.current)}<i> / ${fmt(row.target)}</i></b><em>부족 ${fmt(row.gap)}</em><span class="v151-spec-bar"><i style="--pct:${Math.round(pct)}%"></i></span>${abNote}</div>`;};
+    const chips=closed.map(row=>{
+      const abChip=row.key==='armor'&&abModel&&abModel.stacks>0?` (+암브 ${C.num(abModel.stacks)})`:'';
+      return`<span class="v151-spec-chip ok" title="목표 ${fmt(row.target)}">✓ ${C.esc(row.label)} ${fmt(row.current)}${abChip}</span>`;
+    }).concat(waived.map(row=>`<span class="v151-spec-chip waived" title="이 상위는 요구하지 않음">${C.esc(row.label)} 면제</span>`)).join('');
+    const armorInOpen=open.some(row=>row.key==='armor');
+    const tiles=open.map((row,index)=>tile(row,index)).join('');
     const summary=open.length?`<div class="v151-spec-summary gap"><b>필수 결손 ${open.length}개</b><span>최우선: ${C.esc(open[0].label)} 부족 ${fmt(open[0].gap)}</span></div>`:rows.length?`<div class="v151-spec-summary ok"><b>필수 역할 전부 확보</b><span>보스 화력은 별도 미검증</span></div>`:'';
-    return`<div class="v151-spec-head"><div class="damage-mode-switch" role="group" aria-label="딜 계통 선택"><button class="${!this.state.mode?'on':''}" data-act="mode" data-value="">자동</button><button class="${this.state.mode==='physical'?'on':''}" data-act="mode" data-value="physical">물딜</button><button class="${magic?'on':''}" data-act="mode" data-value="magic">마딜</button></div>${magic?`<select data-opt="magicRoute" aria-label="마딜 경로"><option value="auto" ${route==='auto'?'selected':''}>자동 경로</option><option value="dual" ${route==='dual'?'selected':''}>2상위·토키</option><option value="singleEnd" ${route==='singleEnd'?'selected':''}>1상위·단끝</option></select>`:''}<strong>선위 ${C.num(state.wisp)}</strong></div>${(()=>{const lab=this.state.labResearch||{},box=(key,label)=>`<label><input type="checkbox" data-upg="${key}" ${lab[key]?'checked':''}><span>${label}</span></label>`;return`<div class="v151-upg-row"><small>연구소(1회 구매) <i>구매한 것만 체크</i></small>${box('attack','공업+12%')}${box('slow','이감+10')}${box('hpRegen','체젠+0.45')}${box('mpRegen','마젠+0.8')}<label class="v151-upg-level"><span>등급 공업 Lv</span><input type="number" min="1" data-upg="upperLevel" value="${C.num(this.state.upperResearchLevel)||1}"></label></div>`;})()}${summary}<div class="v151-spec-rows">${body||'<div class="v151-empty"><b>스펙 계산 대기</b><span>첫 제작 뒤 역할 수치를 표시합니다.</span></div>'}</div>`;
+    const body=rows.length?`${tiles?`<div class="v151-spec-tiles${armorInOpen?'':' compact'}">${tiles}</div>`:''}${chips?`<div class="v151-spec-chips">${chips}</div>`:''}`:'<div class="v151-empty"><b>스펙 계산 대기</b><span>첫 제작 뒤 역할 수치를 표시합니다.</span></div>';
+    return`<div class="v151-spec-head"><div class="damage-mode-switch" role="group" aria-label="딜 계통 선택"><button class="${!this.state.mode?'on':''}" data-act="mode" data-value="">자동</button><button class="${this.state.mode==='physical'?'on':''}" data-act="mode" data-value="physical">물딜</button><button class="${magic?'on':''}" data-act="mode" data-value="magic">마딜</button></div>${magic?`<select data-opt="magicRoute" aria-label="마딜 경로"><option value="auto" ${route==='auto'?'selected':''}>자동 경로</option><option value="dual" ${route==='dual'?'selected':''}>2상위·토키</option><option value="singleEnd" ${route==='singleEnd'?'selected':''}>1상위·단끝</option></select>`:''}<strong>선위 ${C.num(state.wisp)}</strong></div>${(()=>{const lab=this.state.labResearch||{},box=(key,label)=>`<label><input type="checkbox" data-upg="${key}" ${lab[key]?'checked':''}><span>${label}</span></label>`;return`<div class="v151-upg-row"><small>연구소(1회 구매) <i>구매한 것만 체크</i></small>${box('attack','공업+12%')}${box('slow','이감+10')}${box('hpRegen','체젠+0.45')}${box('mpRegen','마젠+0.8')}<label class="v151-upg-level"><span>등급 공업 Lv</span><input type="number" min="1" data-upg="upperLevel" value="${C.num(this.state.upperResearchLevel)||1}"></label></div>`;})()}${summary}<div class="v151-spec-body">${body}</div>`;
   }
 
   // v16.7: 자동 모드에서는 첫 전설(보유 비상위 전설·히든)의 계열이 이후
   // 전설급 추천 방향을 정한다.  명시 선택(물딜/마딜)이 있으면 그것이 우선.
   v151FamilyIntent(state){
-    const mode=this.state.mode;
+    const mode=this.state&&this.state.mode;
     if(mode==='physical'||mode==='magic')return mode;
     if(!state||!state.db||!Array.isArray(state.db.legendish))return'';
     let physical=0,magic=0;
@@ -898,7 +921,7 @@ class App{
 
   renderV151RewardForecast(state,plan){
     const id=String(this.state.virtualSpecialId||''),options=(C.eligible152Specials?C.eligible152Specials(state.db):state.db&&state.db.specials||[]).map(unit=>`<option value="${C.esc(unit.id)}" ${id===unit.id?'selected':''}>${C.esc(displayNameOf(unit))}</option>`).join(''),forecast=this.v151VirtualSpecialForecast(state,plan);
-    return`<label class="v151-reward-select"><span>152킬 특별함</span><select data-opt="virtualSpecialId"><option value="">받은 유닛 선택</option>${options}</select></label>${forecast.special?`<div class="v151-forecast-head">${forecast.special.image?`<img src="${C.esc(forecast.special.image)}" alt="">`:''}<span><b>${C.esc(displayNameOf(forecast.special))}</b><small>TMO 원본과 152 포함 예상값을 분리 표시</small></span></div><div class="v151-forecast-list">${forecast.rows.map(row=>`<div class="${row.isProjected?'projected':'observed'}"><b>${C.esc(displayNameOf(row.unit))}</b><span>원 TMO ${fmt(row.current)}% → <strong>${row.isProjected?'예상 ':''}${fmt(row.predicted)}%</strong></span><em>${row.delta>0?`+${fmt(row.delta)}`:'변화 없음'}</em></div>`).join('')||'<small>이 특별함을 쓰는 희귀 조합이 없습니다.</small>'}</div>`:`<div class="v151-empty"><b>152킬 보상은 시작 시 이미 정해져 있습니다</b><span>특별함 32종 중 1종 균등 추첨(각 1/32 = 3.125% · 압살롬 제외). 보상을 확인하면 위에서 선택해 잠그세요.</span></div>`}<small class="v151-estimate-note">보상은 게임 시작 시 고정 추첨(1/32)이며, 예상값은 v15 레시피 반사실 계산으로 TMO 원본 수치를 덮어쓰지 않습니다.</small>`;
+    return`<label class="v151-reward-select"><span>152킬 특별함</span><select data-opt="virtualSpecialId"><option value="">받은 유닛 선택</option>${options}</select></label>${forecast.special?`<div class="v151-forecast-head">${forecast.special.image?`<img src="${C.esc(forecast.special.image)}" alt="">`:''}<span><b>${C.esc(displayNameOf(forecast.special))}</b><small>TMO 원본과 152 포함 예상값을 분리 표시</small></span></div><div class="v151-forecast-list">${forecast.rows.map(row=>`<div class="${row.isProjected?'projected':'observed'}"><b>${C.esc(displayNameOf(row.unit))}</b><span>원 TMO ${fmt(row.current)}% → <strong>${row.isProjected?'예상 ':''}${fmt(row.predicted)}%</strong></span><em>${row.delta>0?`+${fmt(row.delta)}`:'변화 없음'}</em></div>`).join('')||'<small>이 특별함을 쓰는 희귀 조합이 없습니다.</small>'}</div>`:`<small class="v151-reward-idle">보상은 시작 시 1종 고정 추첨(각 1/32 · 압살롬 제외) — 확인하면 위에서 선택해 잠그세요.</small>`}<small class="v151-estimate-note">예상값은 v15 레시피 반사실 계산으로 TMO 원본 수치를 덮어쓰지 않습니다.</small>`;
   }
 
   renderV151Gorosei(state,plan){
@@ -939,7 +962,7 @@ class App{
       return`<div class="v151-boss-preview">${rows.join('')}</div>`;
     })():'';
     const story10=this.state.story10Reward,story10Options=[['','미정 (레일리 경로 후보 유지)'],['rayleigh','레일리+해적선 선택'],['kuma','초월 쿠마 선택'],['chest','유니크·상자 선택']];
-    return`<label class="v151-gorosei-select"><span>이번 판 오로성</span><select data-opt="gorosei">${Object.values(C.GOROSEI).map(item=>`<option value="${item.key}" ${selected.key===item.key?'selected':''}>${C.esc(item.name)}</option>`).join('')}</select></label><label class="v151-gorosei-select v151-story10-select"><span>스토리 10 보상</span><select data-opt="story10Reward">${story10Options.map(([value,label])=>`<option value="${value}" ${story10===value?'selected':''}>${C.esc(label)}</option>`).join('')}</select></label><div class="v151-gorosei-values"><span><small>이감 목표·상한</small><b>${slow}</b></span><span><small>물딜 방깎 실전·풀</small><b>${C.num(selected.armorSoft)}·${C.num(selected.armorSafe)}</b></span><span><small>스턴 운용·안정</small><b>1.0·${fmtStun(selected.stun)}</b></span></div>${bossHtml}`;
+    return`<label class="v151-gorosei-select"><span>이번 판 오로성</span><select data-opt="gorosei">${Object.values(C.GOROSEI).map(item=>`<option value="${item.key}" ${selected.key===item.key?'selected':''}>${C.esc(item.name)}</option>`).join('')}</select></label><label class="v151-gorosei-select v151-story10-select"><span>스토리 10 보상</span><select data-opt="story10Reward">${story10Options.map(([value,label])=>`<option value="${value}" ${story10===value?'selected':''}>${C.esc(label)}</option>`).join('')}</select></label><div class="v151-gorosei-values"><span><small>이감 목표·상한</small><b>${slow}</b></span><span><small>물딜 방깎 실전·풀</small><b>${C.num(selected.armorSoft)}·${C.num(selected.armorSafe)}</b></span><span><small>스턴 운용·안정</small><b>1.0·${fmtStun(selected.stun)}</b></span></div>${bossHtml}<div class="v151-reward-inline">${this.renderV151RewardForecast(state,plan)}</div>`;
   }
 
   // v17.4(사용자 요청): 후보 순위의 내부 판단 이유를 문장으로.  각 축의
@@ -956,20 +979,21 @@ class App{
     const slowTotal=C.num(kit.slow)+C.num(kit.triggerSlow);if(slowTotal>0)kitBits.push(`이감${Math.round(slowTotal)}`);
     const armorTotal=C.num(kit.armor)+C.num(kit.triggerArmor);if(armorTotal>0)kitBits.push(`깍${Math.round(armorTotal)}`);
     const dpsPct=Math.round(C.num(value.dpsCover)*100);
+    // v17.9(사용자 요청 2): 내부 점수 용어 대신 사람이 읽는 문장으로.
     const axes=[
-      {key:'story',weight:.3,score:C.num(value.story),strong:grade&&grade.leagueRanked?`스토리 ${grade.leagueTier}리그 ${grade.leagueRank}위/${grade.leagueSize}`:`스토리 ${grade?grade.tier:'?'}(${grade&&grade.measured?'실측':'추정'})`,weak:grade&&grade.leagueRanked?`스토리 ${grade.leagueTier}리그 ${grade.leagueRank}위 그침`:`스토리 ${grade?grade.tier:'?'} 추정(순위 외)`},
-      {key:'dps',weight:.3,score:C.num(value.dpsCover),strong:`60라 보스 요구 DPS의 ${dpsPct}%를 정적 하한으로 충족`,weak:`화력 하한 ${dpsPct}%뿐(수동스킬 미집계) — 단일·끝딜 보강 필수`},
-      {key:'line',weight:.15,score:C.num(value.line),strong:C.num(value.line)>=1?'라인 자립(보조딜 부담 없음)':'라인 보조딜 확보됨',weak:C.num(value.line)<=.2?'라인딜 약함 · 보조딜 미확보':'라인 자립도 미확인'},
-      {key:'rare',weight:.12,score:C.num(value.rareUtil),strong:`보유 희귀 ${C.num(row.tiers&&row.tiers.rare)}/${C.num(row.tierAvailable&&row.tierAvailable.rare)}장 활용`,weak:`보유 희귀 ${C.num(row.tiers&&row.tiers.rare)}/${C.num(row.tierAvailable&&row.tierAvailable.rare)}장만 사용`},
-      {key:'util',weight:.13,score:C.num(value.utility),strong:kitBits.length?`유틸 ${kitBits.join('·')}`:'유틸 킷',weak:'유틸(스턴·이감·깍) 없음'}
+      {key:'story',weight:.3,score:C.num(value.story),strong:grade&&grade.leagueRanked?`스토리 철거가 빠릅니다(리그 ${grade.leagueRank}위·${grade.leagueTier})`:`스토리 속도 ${grade?grade.tier:'?'}등급(추정)`,weak:'스토리 철거 속도가 느린 편'},
+      {key:'dps',weight:.3,score:C.num(value.dpsCover),strong:`후반 보스 화력 기본기가 좋습니다(필요치의 ${dpsPct}% 하한 확보)`,weak:`보스 화력 하한이 ${dpsPct}%뿐 — 단일·끝딜 보강 필요`},
+      {key:'line',weight:.15,score:C.num(value.line),strong:'라인 정리를 혼자 감당합니다',weak:'라인딜이 약해 보조딜러가 필요'},
+      {key:'rare',weight:.12,score:C.num(value.rareUtil),strong:`지금 손의 희귀 ${C.num(row.tiers&&row.tiers.rare)}장을 그대로 씁니다`,weak:'보유 희귀를 거의 쓰지 못함'},
+      {key:'util',weight:.13,score:C.num(value.utility),strong:kitBits.length?`유틸까지 겸비(${kitBits.join('·')})`:'유틸 겸비',weak:'스턴·이감·깍 유틸 없음'}
     ].map(axis=>Object.assign(axis,{contribution:axis.weight*axis.score}));
     const byContribution=axes.slice().sort((a,b)=>b.contribution-a.contribution);
     const strengths=byContribution.slice(0,2).filter(axis=>axis.score>.05).map(axis=>axis.strong);
     const weakest=byContribution[byContribution.length-1];
-    const eta=row.feasible?'지금 완성 가능':`~${C.num(value.roundsToGo)}라 뒤 완성${C.num(value.deadlineFactor)<1?` · 마감 할인 ×${value.deadlineFactor}`:''}`;
+    const eta=row.feasible?'지금 완성 가능':`약 ${C.num(value.roundsToGo)}라 뒤 완성`;
     const lineNote=strategy.lineSelf==='support'&&C.num(value.line)<=.2?' · 보조딜러 필요':'';
-    const storyNote=row.storyReward?' · 스토리 10 보상(레일리+해적선) 선택 전제 — 초월쿠마·상자 포기':'';
-    return`<small class="v151-clear-why">왜: ${C.esc(strengths.join(' · ')||'상대 우위 없음')}${weakest&&weakest.score<.35?` — 약점: ${C.esc(weakest.weak)}`:''} · ${C.esc(eta)}${lineNote}${storyNote}</small>`;
+    const storyNote=row.storyReward?' · 스토리 10 보상(레일리+해적선) 선택 전제':'';
+    return`<small class="v151-clear-why">추천 이유: ${C.esc(strengths.join(', ')||'뚜렷한 우위 없음')}${weakest&&weakest.score<.35?`. 약점은 ${C.esc(weakest.weak)}`:''}. ${C.esc(eta)}${lineNote}${storyNote}</small>`;
   }
 
   // v17.8(사용자 요청 5): 상위까지 남은 희귀를 이름으로 보여준다.
@@ -1029,9 +1053,8 @@ class App{
       return`<div class="v151-upper-path">${parts.join('')}</div>`;
     })();
     const cards=candidates.map((row,index)=>{const selected=this.state.directionKey===row.routeKey&&C.canonicalUpperId(this.state.directionUpperId)===C.canonicalUpperId(row.id),status=row.locked?'경로 선택':row.feasible?'지금 제작 가능':`선위 ${C.num(row.wispGap)} 부족`;
-      // v17.3: 클리어 가치 근거를 카드에 그대로 노출 — 직감이 감사할 수
-      // 있어야 가중치를 보정할 수 있다.
-      const value=row.clearValue,valueLine=value?`<small class="v151-clear-line">가치 ${Math.round(C.num(value.value)*100)} · DPS ${Math.round(C.num(value.dpsCover)*100)}% · 스토리 ${Math.round(C.num(value.story)*100)} · 라인 ${Math.round(C.num(value.line)*100)} · 희귀활용 ${Math.round(C.num(value.rareUtil)*100)}%${value.roundsToGo?` · ~${C.num(value.roundsToGo)}라 뒤`:' · 지금'}</small>`:'';
+      // v17.9(사용자 요청 2): 내부 점수 나열(가치·DPS%·스토리 …)은 카드에서
+      // 제거 — 부분점수는 판단 녹화(routeCandidates.clearValue)에만 남긴다.
       const nearestBadge=row.nearestBuild?'<i class="v151-nearest-badge">최단 완성</i>':'';
       const storyBadge=row.storyReward?'<i class="v151-story10-badge">스토리10 보상 필요</i>':'';
       const whyLine=this.v151ClearWhy(row);
@@ -1039,7 +1062,7 @@ class App{
       // 직접 명시한다 — "선위 N 부족"만으로는 준비 목표가 안 보였다.
       const missingRares=row.locked?[]:this.v151MissingRares(state,row.id).slice(0,3);
       const costLine=row.locked?'':`<small class="v151-cost-line">필요 선위 <b>${C.num(row.wispCost)}</b>${C.num(row.wispGap)>0?` · 현재 부족 <b>${C.num(row.wispGap)}</b>`:' · 지금 충당 가능'}${missingRares.length?` · 부족 희귀: ${missingRares.map(item=>`${C.esc(item.name)}${item.short>1?`×${item.short}`:''}`).join(' · ')}`:' · 희귀 재료 충족'}</small>`;
-      return`<article class="${index===0?'best':''} ${selected?'selected':''}"><span><b>${index+1}. ${C.esc(row.name)}${nearestBadge}${storyBadge}</b><small>${C.esc(row.routeLabel||'')} · TMO ${fmt(row.completion)}% · ${C.esc(status)}</small>${costLine}${valueLine}${whyLine}</span><button data-act="detail" data-id="${C.esc(row.id)}">재료</button><button class="primary" data-act="choose-direction" data-key="${C.esc(row.routeKey)}" data-id="${C.esc(row.id)}" ${canConfirm?'':'disabled'}>${canConfirm?(selected?'유지':'확정'):'25라'}</button></article>`;}).join('');
+      return`<article class="${index===0?'best':''} ${selected?'selected':''}"><span><b>${index+1}. ${C.esc(row.name)}${nearestBadge}${storyBadge}</b><small>${C.esc(row.routeLabel||'')} · TMO ${fmt(row.completion)}% · ${C.esc(status)}</small>${costLine}${whyLine}</span><button data-act="detail" data-id="${C.esc(row.id)}">재료</button><button class="primary" data-act="choose-direction" data-key="${C.esc(row.routeKey)}" data-id="${C.esc(row.id)}" ${canConfirm?'':'disabled'}>${canConfirm?(selected?'유지':'확정'):'25라'}</button></article>`;}).join('');
     const strategicKeys=new Set(['single','end','toki','singleEndExpected','magicSupport','attack']),strategic=(decision.assessment&&decision.assessment.requirements||[]).filter(row=>strategicKeys.has(row.key)),needs=upper&&strategic.length?`<div class="v151-upper-needs"><small>이 상위의 조합 필수 역할</small>${strategic.map(row=>`<span class="${C.num(row.gap)<=0?'ok':'gap'}"><b>${C.esc(row.label)}</b><i>${fmt(row.current)}/${fmt(row.target)}</i>${C.num(row.gap)>0?`<em>부족 ${fmt(row.gap)}</em>`:'<em>확보</em>'}</span>`).join('')}</div>`:'';
     return`${main}${lockedPath}${dpsLine}${needs}${cards?`<div class="v151-upper-candidates">${cards}</div>`:`<div class="v151-upper-note">${upper?'확정 상위 중심으로 다음 행동을 계속 계산합니다. 패가 바뀔 때마다 아래 필수 역할 충족을 다시 검사합니다.':'상위 선택 단계가 되면 최대 6개 후보가 여기에 표시됩니다.'}</div>`}`;
   }
@@ -1050,7 +1073,9 @@ class App{
   }
 
   renderCoach(state,plan,phase,clock,health){
-    return`<div class="v151-screen"><div class="v151-grid"><section class="v151-panel v151-next" data-region="next-action"><header><small>1</small><h2>다음 행동</h2></header>${this.renderV151NextAction(state,plan,health)}</section><section class="v151-panel v151-prep" data-region="next-preparation"><header><small>2</small><h2>다음 행동 미리 준비</h2></header>${this.renderV151Preparation(state,plan)}</section><section class="v151-panel v151-spec" data-region="current-spec"><header><small>3</small><h2>현재 스펙</h2></header>${this.renderV151CurrentSpec(state,plan)}</section><section class="v151-panel v151-build" data-region="buildable-legends"><header><small>4</small><h2>보유 희귀로 만들 수 있는 전설급</h2><span>개별 제작 가능 · 완성도순</span></header>${this.renderV151BuildableLegends(state,plan)}</section><section class="v151-panel v151-reward" data-region="kill-152"><header><small>5</small><h2>TMO 152킬 선택·희귀 예측</h2></header>${this.renderV151RewardForecast(state,plan)}</section><section class="v151-panel v151-gorosei" data-region="gorosei"><header><small>6</small><h2>오로성 선택</h2></header>${this.renderV151Gorosei(state,plan)}</section><section class="v151-panel v151-upper" data-region="upper-info"><header><small>7</small><h2>상위 정보</h2><span>후보 최대 6개</span></header>${this.renderV151UpperInfo(state,plan)}</section><section class="v151-panel v151-run" data-region="game-recording"><header><small>8</small><h2>현재 라운드 + 녹화</h2></header>${this.renderV151RunHeader(state,clock,health)}</section></div></div>`;
+    // v17.9(사용자 요청 4): 152킬 패널은 선택 전 거대한 빈 칸이었다 —
+    // 선택창·예측을 5번 오로성 패널 안으로 옮기고 7패널로 재배치한다.
+    return`<div class="v151-screen"><div class="v151-grid"><section class="v151-panel v151-next" data-region="next-action"><header><small>1</small><h2>다음 행동</h2></header>${this.renderV151NextAction(state,plan,health)}</section><section class="v151-panel v151-prep" data-region="next-preparation"><header><small>2</small><h2>다음 행동 미리 준비</h2></header>${this.renderV151Preparation(state,plan)}</section><section class="v151-panel v151-spec" data-region="current-spec"><header><small>3</small><h2>현재 스펙</h2></header>${this.renderV151CurrentSpec(state,plan)}</section><section class="v151-panel v151-build" data-region="buildable-legends"><header><small>4</small><h2>보유 희귀로 만들 수 있는 전설급</h2><span>개별 제작 가능 · 완성도순</span></header>${this.renderV151BuildableLegends(state,plan)}</section><section class="v151-panel v151-gorosei" data-region="gorosei"><header><small>5</small><h2>오로성 · 152킬 선택</h2></header>${this.renderV151Gorosei(state,plan)}</section><section class="v151-panel v151-upper" data-region="upper-info"><header><small>6</small><h2>상위 정보</h2><span>후보 최대 6개</span></header>${this.renderV151UpperInfo(state,plan)}</section><section class="v151-panel v151-run" data-region="game-recording"><header><small>7</small><h2>현재 라운드 + 녹화</h2></header>${this.renderV151RunHeader(state,clock,health)}</section></div></div>`;
   }
   renderCoachDetails(state,plan,open=false){
     const squad=plan.squadPlan,extraActions=(plan.actions||[]).slice(2),watch=(plan.watch||[]).slice(0,6);if(!squad&&!extraActions.length&&!watch.length)return'';

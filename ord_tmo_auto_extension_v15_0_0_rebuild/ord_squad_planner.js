@@ -6,7 +6,7 @@ if(root)root.ORDSquadPlanner=api;
 })(typeof window!=='undefined'?window:globalThis,function(C){
 'use strict';
 
-const VERSION='17.8.0';
+const VERSION='17.9.0';
 const DEFAULTS={beamWidth:8,branchWidth:5,branchScan:8,candidateCap:44,maxDepth:14};
 const ROUTE_LABELS={physical:'물딜',dual:'마딜 2상위+토키',singleEnd:'마딜 1상위+단끝'};
 const STUN_OVERSUPPLY_PENALTY=420;

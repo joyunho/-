@@ -1,6 +1,6 @@
 'use strict';
 
-// Real-browser smoke for the v16 one-screen cockpit: eight regions rendered,
+// Real-browser smoke for the one-screen cockpit: seven regions rendered,
 // no horizontal overflow, the grid fills a desktop viewport, and the
 // round-50 replay fixture (open 이감/단일 deficits) shows an actionable next
 // step instead of the silent HOLD recorded in the 2026-07-20 loss log.
@@ -32,7 +32,7 @@ const {chromium}=require('playwright');
   try{
     const context=await browser.newContext({viewport:{width:1920,height:1080}}),page=await context.newPage();
     await page.route('http*://**',route=>route.abort());
-    const REGIONS=['next-action','next-preparation','current-spec','buildable-legends','kill-152','gorosei','upper-info','game-recording'];
+    const REGIONS=['next-action','next-preparation','current-spec','buildable-legends','gorosei','upper-info','game-recording'];
     for(const cfg of [{name:'desktop',width:1920,height:1080},{name:'laptop',width:1440,height:900},{name:'mobile',width:430,height:900}]){
       await page.setViewportSize({width:cfg.width,height:cfg.height});
       await page.goto('file://'+path.resolve(__dirname,'ui_fixture.html'),{waitUntil:'domcontentloaded'});
@@ -48,7 +48,8 @@ const {chromium}=require('playwright');
           hasRecovery:!!(decision.recovery&&decision.recovery.targets&&decision.recovery.targets.length),
           regions:[...document.querySelectorAll('[data-region]')].map(node=>node.dataset.region),
           panelCount:document.querySelectorAll('.v151-panel').length,
-          specCards:document.querySelectorAll('.v151-spec-row').length,
+          specTiles:document.querySelectorAll('.v151-spec-tile').length,
+          specChips:document.querySelectorAll('.v151-spec-chip').length,
           specBars:document.querySelectorAll('.v151-spec-bar').length,
           scrollWidth:document.documentElement.scrollWidth,
           clientWidth:document.documentElement.clientWidth,
@@ -57,12 +58,12 @@ const {chromium}=require('playwright');
           legacyTabs:document.querySelectorAll('.ord-tabs').length
         };
       });
-      assert.strictEqual(metrics.version,'17.8.0');
+      assert.strictEqual(metrics.version,'17.9.0');
       assert.strictEqual(metrics.health.ready,true,`${cfg.name} fixture health blocked`);
       assert.deepStrictEqual(metrics.regions,REGIONS,`${cfg.name} region set/order changed`);
-      assert.strictEqual(metrics.panelCount,8,`${cfg.name} expected exactly eight panels`);
-      assert(metrics.specCards>=4,`${cfg.name} spec rows missing`);
-      assert.strictEqual(metrics.specBars,metrics.specCards,`${cfg.name} spec progress bars missing`);
+      assert.strictEqual(metrics.panelCount,7,`${cfg.name} expected exactly seven panels`);
+      assert(metrics.specTiles+metrics.specChips>=4,`${cfg.name} spec tiles/chips missing`);
+      assert.strictEqual(metrics.specBars,metrics.specTiles,`${cfg.name} deficit tiles must each carry a progress bar`);
       assert(metrics.hasAction||metrics.hasRecovery,`${cfg.name} replay of the recorded stall must show an action or recovery ladder (state=${metrics.decisionState})`);
       assert.strictEqual(metrics.legacyTabs,0,`${cfg.name} legacy tab bar returned`);
       assert(metrics.scrollWidth<=metrics.clientWidth+1,`${cfg.name} horizontal overflow: ${metrics.scrollWidth-metrics.clientWidth}`);

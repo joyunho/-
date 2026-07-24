@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="ord-helper" content="v17.8.0-decision-engine-manual">
+  <meta name="ord-helper" content="v17.9.0-decision-engine-manual">
   <meta name="description" content="현재 패의 정확한 순차 원장과 생존 마감으로 다음 한 행동만 결정하는 원랜디 2.305 악몽 수동 도우미">
-  <title>원랜디 2.305 악몽 실전 판단 코치 v17.8.0 · 수동 모드</title>
+  <title>원랜디 2.305 악몽 실전 판단 코치 v17.9.0 · 수동 모드</title>
   <style data-source="ord_app.css">
 :root{color-scheme:dark;--bg:#060b18;--panel:#0d162a;--panel2:#101d35;--line:#223454;--text:#eef5ff;--muted:#91a2bd;--blue:#4f7cff;--cyan:#25c2e7;--green:#27d17f;--amber:#f3b84b;--red:#ef6262;--violet:#8b67ff;--shadow:0 20px 55px rgba(0,0,0,.28)}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 10% 0,#122a5a 0,#060b18 35%,#040812 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;word-break:keep-all;overflow-wrap:anywhere}button,input,select{font:inherit}button{cursor:pointer}.ord-app{min-height:100vh;padding:18px;max-width:1860px;margin:0 auto}.ord-header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding:22px 24px;border:1px solid rgba(112,154,255,.26);border-radius:24px;background:linear-gradient(135deg,rgba(66,83,222,.34),rgba(17,64,94,.3));box-shadow:var(--shadow)}.ord-kicker{font-size:11px;letter-spacing:.14em;color:#9bb7ff;font-weight:900}.ord-header h1{margin:5px 0 3px;font-size:29px;line-height:1.15}.ord-header p{margin:0;color:var(--muted);font-size:13px}.ord-head-status{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:720px}.ord-head-status>*{border:1px solid var(--line);border-radius:999px;background:rgba(6,11,24,.7);color:#d9e8ff;padding:8px 12px;font-size:12px;font-weight:800;white-space:nowrap}.ord-head-status .good{border-color:rgba(39,209,127,.45);color:#a8f7ce}.ord-head-status .warn{border-color:rgba(243,184,75,.45);color:#ffe1a1}.ord-head-status button{background:#1b2b4d}.ord-tabs{display:flex;gap:8px;margin:14px 0}.ord-tabs button,.purpose-buttons button,.two-button button,.round-box button,.action-buttons button,.prep-list button,.mini-cards button,.ghost,.primary{border:1px solid var(--line);border-radius:11px;background:#111d32;color:#dce9ff;padding:9px 13px;font-weight:850}.ord-tabs button.on,.purpose-buttons button.on,.primary{border-color:transparent;background:linear-gradient(135deg,var(--violet),var(--blue));color:white}.ord-layout{display:grid;grid-template-columns:294px minmax(0,1fr);gap:14px;align-items:start}.ord-side{display:grid;gap:12px;position:sticky;top:10px;max-height:calc(100vh - 20px);overflow:auto;padding-right:3px;min-width:0}.side-card,.ord-panel{border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,rgba(15,26,48,.96),rgba(9,16,31,.96));box-shadow:0 14px 38px rgba(0,0,0,.18);min-width:0}.side-card{padding:14px}.side-card b{font-size:14px}.side-title{display:flex;justify-content:space-between;gap:8px}.side-title span{font-size:11px;color:var(--cyan)}.side-card label{display:grid;gap:5px;color:var(--muted);font-size:11px;margin-top:11px}.side-card input,.side-card select,.form-grid input{width:100%;min-width:0;border:1px solid var(--line);border-radius:10px;background:#071020;color:var(--text);padding:9px}.side-card small{display:block;color:var(--muted);font-size:10.5px;line-height:1.45;margin-top:6px}.round-box{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-top:10px;padding:10px;border:1px solid rgba(37,194,231,.3);border-radius:13px;background:rgba(10,39,62,.35)}.round-box strong{font-size:13px;min-width:0}.round-box div{display:flex;gap:4px}.round-box button{padding:6px 8px;font-size:11px}.side-card details{margin-top:10px}.side-card summary,.detail-modal summary{cursor:pointer;color:#cbd9ef;font-size:11px;font-weight:800}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.two-button{display:flex;gap:6px;margin-top:10px}.two-button button{flex:1;font-size:11px;padding:8px}.two-button .on{border-color:var(--green);color:#c5ffe0;background:rgba(39,209,127,.1)}.two-button .danger.on{border-color:var(--red);color:#ffc1c1;background:rgba(239,98,98,.1)}.stat-row{display:flex;justify-content:space-between;align-items:center}.stat-row b{font-size:24px;color:#ffe7a3}.lock-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.lock-list>span{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(139,103,255,.35);border-radius:999px;padding:5px 8px;background:rgba(139,103,255,.1);font-size:10px}.lock-list button{border:0;background:none;color:#ffaaaa;font-weight:900}.side-card.compact{padding-bottom:10px}.common-line{display:grid;grid-template-columns:8px 1fr auto;gap:7px;align-items:center;margin-top:7px;font-size:11px}.common-line i{width:8px;height:8px;border-radius:50%}.common-line b{font-size:11px}.ord-main{display:grid;gap:13px;min-width:0}.milestone{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:17px 19px;border:1px solid rgba(37,194,231,.4);border-radius:21px;background:linear-gradient(135deg,rgba(6,47,78,.78),rgba(31,25,87,.56));min-width:0}.milestone small{color:#61daf5;font-weight:900}.milestone h2{margin:3px 0 5px;font-size:24px}.milestone p{margin:0;color:#abc0df;font-size:12px}.purpose-buttons{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.purpose-buttons button{font-size:11px}.top-two{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:13px}.ord-panel{padding:17px}.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:13px}.panel-head small{color:#72d8ef;font-size:10px;font-weight:900}.panel-head h2{margin:2px 0 4px;font-size:20px}.panel-head p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.45}.count-pill,.mode-pill,.control-badge{border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:11px;font-weight:900;white-space:nowrap}.mode-pill.physical{color:#ffcb9a;border-color:#e48e45}.mode-pill.magic{color:#a9c9ff;border-color:#5c84d8}.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.profile-grid>div,.spec-grid>div{border:1px solid var(--line);border-radius:13px;background:#091326;padding:11px;min-width:0}.profile-grid small,.spec-grid small{display:block;color:var(--muted);font-size:10px}.profile-grid b{display:block;margin-top:5px;font-size:12px;line-height:1.45}.synergy-line{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.synergy-line small{width:100%;color:var(--muted)}.synergy-line span{border:1px solid rgba(39,209,127,.3);border-radius:999px;padding:5px 8px;font-size:10px;color:#b8f7d5}.upper-focus details{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}.upper-focus details p{color:#aebbd0;font-size:11px}.control-badge.safe{color:#a9f7cc;border-color:rgba(39,209,127,.45)}.control-badge.edge{color:#ffe2a4;border-color:rgba(243,184,75,.45)}.control-badge.danger{color:#ffb4b4;border-color:rgba(239,98,98,.45)}.spec-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.spec-grid b{display:block;font-size:21px;margin:4px 0}.spec-grid span{color:#8193ae;font-size:9.5px}.deficit-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:11px}.deficit-line>b{font-size:11px}.deficit-line span{border:1px solid rgba(243,184,75,.32);border-radius:999px;padding:5px 8px;color:#ffd78d;font-size:10px}.deficit-line .ok{color:#a9f7cc;border-color:rgba(39,209,127,.3)}.state-intro{display:flex;justify-content:space-between;gap:15px;align-items:center}.state-intro h2{margin:4px 0}.state-intro p{color:var(--muted);margin:0;font-size:12px}.control{min-width:260px;border:1px solid var(--line);border-radius:15px;padding:12px}.control b,.control span{display:block}.control span{font-size:10px;color:var(--muted);margin-top:4px}.control.safe{border-color:rgba(39,209,127,.35)}.control.edge{border-color:rgba(243,184,75,.35)}.control.danger{border-color:rgba(239,98,98,.35)}.mini-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.mini-cards article{display:grid;grid-template-columns:38px 1fr auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:10px;background:#091326;min-width:0}.mini-cards img{width:38px;height:38px;border-radius:10px;object-fit:cover}.mini-cards b,.mini-cards span,.mini-cards small{display:block;min-width:0}.mini-cards b{font-size:12px}.mini-cards span{font-size:10px;color:#9fb1ca}.mini-cards small{font-size:9px;color:#7085a4}.mini-cards button{padding:7px;font-size:10px}.action-list{display:grid;gap:8px}.action-row{display:grid;grid-template-columns:42px 48px minmax(0,1fr) 124px auto;gap:11px;align-items:center;border:1px solid rgba(55,84,132,.8);border-radius:16px;padding:11px;background:linear-gradient(90deg,rgba(12,27,50,.95),rgba(8,17,33,.95));min-width:0}.action-row .rank{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--violet),var(--cyan));font-weight:950}.action-row>img{width:46px;height:46px;border-radius:12px;object-fit:cover}.action-main{min-width:0}.unit-title{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.unit-title b{font-size:14px}.unit-title span{font-size:10px;color:#8da1bd}.role-tags{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0}.role-tags>span,.role-tags i{border:1px solid #284266;border-radius:999px;padding:4px 7px;font-size:9.5px;font-style:normal;color:#bcd3f2}.role-tags i{border-color:color-mix(in srgb,var(--pc) 60%,#223454);box-shadow:inset 3px 0 var(--pc)}.action-main p{margin:0;color:#91a6c2;font-size:10.5px}.action-cost{border:1px solid var(--line);border-radius:12px;padding:8px;text-align:center}.action-cost b{display:block;font-size:22px;color:#ffe1a1}.action-cost small{display:block;color:#7f91ab;font-size:9px}.action-cost span{display:block;margin-top:4px;font-size:9px}.action-cost .good{color:#9ff1c5}.action-cost .warn{color:#ffd083}.action-cost .bad{color:#ffaaaa}.action-buttons{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.action-buttons button{font-size:10px;padding:8px}.empty{padding:20px;border:1px dashed #2c4266;border-radius:14px;text-align:center;color:#8193ad}.prep-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}.prep-list>div{display:grid;grid-template-columns:40px minmax(0,1fr) auto auto;gap:9px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:10px;background:#091326;min-width:0}.prep-list img{width:38px;height:38px;border-radius:10px;object-fit:cover}.prep-list b,.prep-list small{display:block}.prep-list b{font-size:12px}.prep-list small{color:#8195b2;font-size:9.5px}.prep-list em{font-style:normal;color:#ffd587;font-size:9.5px}.prep-list button{font-size:9px;padding:6px}.rare-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.rare-columns>div{border:1px solid var(--line);border-radius:14px;padding:11px}.rare-columns h3{margin:0 0 8px;font-size:12px}.rare-columns .use{border-color:rgba(39,209,127,.3)}.rare-columns .hold{border-color:rgba(243,184,75,.3)}.rare-columns .reroll{border-color:rgba(239,98,98,.3)}.rare-columns>div>div{display:grid;grid-template-columns:28px 1fr auto;gap:7px;align-items:center;margin-top:6px;font-size:10px}.rare-columns img{width:28px;height:28px;border-radius:8px}.rare-panel>small{display:block;margin-top:9px;color:#7f91aa;font-size:9.5px}.owned-chips{display:flex;gap:7px;flex-wrap:wrap}.owned-chips button{display:flex;align-items:center;gap:7px;max-width:260px;border:1px solid var(--line);border-radius:12px;background:#091326;color:#dceaff;padding:7px 9px}.owned-chips img{width:30px;height:30px;border-radius:8px}.owned-chips span{font-size:10px;text-align:left}.deck-page,.data-page{display:grid;gap:13px}.raw-ability-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:7px}.raw-ability-grid>div{display:flex;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:12px;padding:9px;background:#091326;font-size:10px}.raw-ability-grid b{color:#d9ecff}.owned-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px}.owned-grid button{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:12px;background:#091326;color:#e3efff;padding:9px;text-align:left}.owned-grid img{width:36px;height:36px;border-radius:9px}.owned-grid span,.owned-grid small{display:block}.owned-grid span{font-size:11px}.owned-grid small{font-size:9px;color:#8296b4}.owned-grid.small button{grid-template-columns:32px 1fr auto}.diag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.diag-grid>div{border:1px solid var(--line);border-radius:12px;padding:10px;background:#091326}.diag-grid small,.diag-grid b{display:block}.diag-grid small{color:#8395b0;font-size:9px}.diag-grid b{font-size:11px;margin-top:4px}.data-page pre{white-space:pre-wrap;max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:12px;background:#050b16;padding:11px;color:#9fb5d0;font-size:10px}.manual-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px}.manual-grid label{display:grid;grid-template-columns:1fr 70px;gap:8px;align-items:center;border:1px solid var(--line);border-radius:11px;padding:7px;font-size:10px}.manual-grid input{width:100%;border:1px solid var(--line);border-radius:8px;background:#050b16;color:white;padding:7px}.modal-back{position:fixed;inset:0;z-index:9999;background:rgba(1,4,12,.8);backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:18px}.detail-modal{width:min(900px,96vw);max-height:92vh;overflow:auto;border:1px solid #30486f;border-radius:24px;background:#081121;padding:20px;box-shadow:0 30px 90px rgba(0,0,0,.65);position:relative}.modal-x{position:absolute;right:15px;top:15px;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;background:#111d31;color:white;font-size:20px}.detail-modal header{display:flex;gap:12px;align-items:center;padding-right:50px}.detail-modal header img{width:54px;height:54px;border-radius:14px}.detail-modal h2{margin:0;font-size:19px}.detail-modal header p{margin:4px 0 0;color:#8ea4c1;font-size:10px}.detail-hero{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:8px;margin:15px 0}.detail-hero>div,.missing-grid>div{border:1px solid var(--line);border-radius:13px;background:#091326;padding:11px}.detail-hero small,.detail-hero b,.detail-hero span{display:block}.detail-hero small{color:#8296b4;font-size:9px}.detail-hero b{margin:4px 0;font-size:16px}.detail-hero span{font-size:10px;color:#a9bad0}.detail-modal section{margin-top:14px}.detail-modal h3{font-size:12px}.direct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:7px}.direct-grid>div{display:flex;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:11px;padding:9px;font-size:10px}.missing-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.missing-grid small,.missing-grid b{display:block}.missing-grid small{color:#8296b4;font-size:9px}.missing-grid b{font-size:10px;line-height:1.55;margin-top:5px}.detail-modal details{margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:10px}.detail-modal details p{font-size:10px;color:#9cb0cb}.detail-modal .close{margin-top:14px}.ord-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:10000;border-radius:14px;padding:11px 16px;background:linear-gradient(135deg,var(--violet),var(--blue));box-shadow:var(--shadow);font-weight:900;font-size:12px}
@@ -596,7 +596,7 @@ textarea{font:inherit}.run-log-quick{display:grid;gap:8px;margin-top:9px;border:
   grid-template-areas:
     "run run run run run run run run run run run run"
     "next next next next next prep prep prep spec spec spec spec"
-    "build build build reward reward reward goro goro upper upper upper upper";
+    "build build build goro goro goro goro upper upper upper upper upper";
   gap:8px;
   align-items:stretch;
   height:calc(100vh - 16px);
@@ -640,8 +640,12 @@ textarea{font:inherit}.run-log-quick{display:grid;gap:8px;margin-top:9px;border:
 .v151-prep{grid-area:prep}
 .v151-spec{grid-area:spec}
 .v151-build{grid-area:build}
-.v151-reward{grid-area:reward;border-color:rgba(139,103,255,.34)}
-.v151-gorosei{grid-area:goro}
+.v151-gorosei{grid-area:goro;overflow-y:auto;scrollbar-width:thin}
+.v151-gorosei>*:not(header){flex:0 0 auto;min-height:auto}
+/* v17.9: 152킬 선택·예측을 오로성 패널 안으로 흡수 */
+.v151-reward-inline{display:grid;gap:5px;margin-top:6px;border-top:1px dashed #3A2E5E;padding-top:6px}
+.v151-reward-inline .v151-forecast-list{max-height:150px;overflow-y:auto;scrollbar-width:thin}
+.v151-reward-idle{color:#8CA2BE;font-size:9px;line-height:1.4}
 .v151-upper{grid-area:upper;border-color:rgba(240,185,78,.32)}
 .v151-run{grid-area:run;display:grid;grid-template-columns:auto auto minmax(0,1fr) auto auto auto;grid-template-areas:"title round record sync actions tools";gap:8px 12px;align-items:center;flex-direction:row;min-height:54px;padding:6px 10px;background:rgba(8,17,32,.97)}
 .v151-run>header{grid-area:title;margin:0;padding-right:10px;border-right:1px solid var(--v15-line-soft)}
@@ -757,8 +761,18 @@ textarea{font:inherit}.run-log-quick{display:grid;gap:8px;margin-top:9px;border:
 
 .v151-prep-list{display:grid;flex:1 1 auto;grid-template-columns:1fr;gap:4px;align-content:start;min-height:0;overflow-y:auto;scrollbar-width:thin}
 .v151-prep-list>button{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:7px;align-items:center;width:100%;min-height:42px;padding:5px 6px;text-align:left}
-.v151-prep-list img,.v151-prep-list i{display:grid;place-items:center;width:32px;height:32px;border-radius:8px;object-fit:cover;background:#142A45;color:#7FDFF1;font-style:normal}
+.v151-prep-list>button>img,.v151-prep-list>button>i{display:grid;place-items:center;width:32px;height:32px;border-radius:8px;object-fit:cover;background:#142A45;color:#7FDFF1;font-style:normal}
 .v151-prep-list span,.v151-prep-list b,.v151-prep-list small{display:block;min-width:0}.v151-prep-list b{overflow:hidden;font-size:10.5px;text-overflow:ellipsis;white-space:nowrap}.v151-prep-list small{overflow:hidden;color:#8CA2BE;font-size:9.5px;text-overflow:ellipsis;white-space:nowrap}.v151-prep-list em{color:#E5CA87;font-size:9.5px;font-style:normal;white-space:nowrap}.v151-prep-list>p{margin:2px 0 0;color:#8095AE;font-size:9.5px}
+/* v17.9: 이름과 스토리 배지를 flex 한 줄로 분리 — 배지가 다음 줄 텍스트를
+   덮던 겹침 제거. 배지는 행 안에서 납작하게. */
+.v151-prep-list .v151-prep-copy{display:grid;gap:1px;min-width:0}
+.v151-prep-list .v151-prep-name{display:flex;gap:5px;align-items:center;min-width:0}
+.v151-prep-list .v151-prep-name>b{flex:0 1 auto}
+.v151-prep-list .v151-prep-name .v151-story{flex:none;margin-left:0;padding:0 6px;font-size:8px;line-height:14px;vertical-align:0}
+.v151-prep-list .v151-ship-group,.v151-ship-group{display:block;margin-top:2px;color:#7E9AB4;font-size:8.5px;font-weight:900;font-style:normal;letter-spacing:.04em}
+.v151-ship-plan>button.recommended{border-color:rgba(110,220,243,.55);background:#0D2136}
+.v151-ship-reco{display:inline-block;margin-right:5px;border:1px solid rgba(110,220,243,.6);border-radius:6px;padding:0 4px;background:rgba(56,198,232,.12);color:#8AE4F5;font-size:8px;font-style:normal;font-weight:900;vertical-align:1px}
+.v151-ship-off{display:inline-block;margin-left:5px;border:1px solid #3A4E67;border-radius:6px;padding:0 4px;color:#8CA2BE;font-size:8px;font-style:normal;font-weight:800;vertical-align:1px}
 
 .v151-spec-head{display:flex;flex:0 0 auto;align-items:center;gap:5px;margin-bottom:6px}.v151-spec-head .damage-mode-switch{display:flex;gap:3px}.v151-spec-head .damage-mode-switch button{min-height:26px;padding:4px 8px}.v151-spec-head .damage-mode-switch button.on{border-color:#41B7DA;background:#153B57;color:#9FE7F7}.v151-spec-head select{min-width:0;flex:1}.v151-spec-head>strong{margin-left:auto;border:1px solid rgba(240,185,78,.3);border-radius:8px;padding:4px 7px;background:rgba(240,185,78,.07);color:#FFE09B;font-size:10.5px;white-space:nowrap}
 /* v17.8: 한눈 밀집 스펙 행 — 심각도 정렬, 4px 바, 암브 환산 주석 */
@@ -767,22 +781,22 @@ textarea{font:inherit}.run-log-quick{display:grid;gap:8px;margin-top:9px;border:
 .v151-spec-summary.ok{border:1px solid rgba(54,213,138,.35);background:rgba(30,158,102,.1)}
 .v151-spec-summary b{font-size:11px}.v151-spec-summary.gap b{color:#FFB1A6}.v151-spec-summary.ok b{color:#6FDBA7}
 .v151-spec-summary span{overflow:hidden;color:#A7BBD0;font-size:9.5px;text-overflow:ellipsis;white-space:nowrap}
-.v151-spec-rows{display:grid;flex:1 1 auto;grid-template-columns:1fr;gap:3px;align-content:start;margin-top:5px;min-height:0;overflow-y:auto;scrollbar-width:thin}
-.v151-spec-row{display:grid;grid-template-columns:16px minmax(64px,auto) auto minmax(30px,1fr) auto;gap:2px 7px;align-items:center;min-width:0;border:1px solid #1E3450;border-radius:8px;padding:3px 7px;background:#091629}
-.v151-spec-row.gap{border-color:rgba(240,145,143,.4)}
-.v151-spec-row.gap.lead{border-color:#F0918F;background:rgba(226,112,79,.14);box-shadow:0 0 0 1px rgba(240,145,143,.25)}
-.v151-spec-row.ok{border-color:rgba(54,213,138,.22);opacity:.92}
-.v151-spec-row.waived{border-style:dashed;border-color:#33517A;opacity:.72}
-.v151-spec-rank{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#E2704F;color:#FFF4EC;font-size:9px;font-style:normal;font-weight:900}
-.v151-spec-row.gap.lead .v151-spec-rank{background:#F0918F;color:#3A0F0D}
-.v151-spec-rank.ok{background:#12324A;color:#6FDBA7}
-.v151-spec-row.waived .v151-spec-rank{background:#22344E;color:#8CA2BE}
-.v151-spec-label{overflow:hidden;color:#C8D8EA;font-size:10px;font-weight:800;text-overflow:ellipsis;white-space:nowrap}
-.v151-spec-val{color:#ECF8FF;font-size:11.5px;white-space:nowrap}.v151-spec-val i{color:#7A92AF;font-size:9px;font-style:normal;font-weight:750}
-.v151-spec-row .v151-spec-bar{height:4px;margin-top:0}
-.v151-spec-row.ok .v151-spec-bar>i{background:linear-gradient(90deg,#1E9E66,#36D58A)}
-.v151-spec-state{color:#F0918F;font-size:9.5px;font-weight:800;font-style:normal;white-space:nowrap}
-.v151-spec-row.ok .v151-spec-state{color:#6FDBA7}.v151-spec-row.waived .v151-spec-state{color:#8CA2BE}
+/* v17.9: 결손 = 큰 타일, 확보·면제 = 칩 한 줄 — 스크롤 없이 전체 노출 */
+.v151-spec-body{display:flex;flex:1 1 auto;flex-direction:column;gap:6px;margin-top:6px;min-height:0;overflow-y:auto;scrollbar-width:thin}
+.v151-spec-tiles{display:grid;flex:0 1 auto;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:6px;align-content:start}
+.v151-spec-tiles.compact{grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:5px}
+.v151-spec-tile{position:relative;display:grid;gap:2px;min-width:0;border:1px solid rgba(240,145,143,.5);border-radius:10px;padding:7px 9px 9px;background:linear-gradient(160deg,rgba(226,112,79,.13),#0B1424 62%)}
+.v151-spec-tile.lead{border-color:#F0918F;box-shadow:0 0 0 1px rgba(240,145,143,.35),0 6px 18px rgba(226,112,79,.12)}
+.v151-spec-tile>small{display:flex;gap:5px;align-items:center;overflow:hidden;color:#D9B8B4;font-size:9.5px;font-weight:900;text-overflow:ellipsis;white-space:nowrap}
+.v151-spec-tile>small>i{display:inline-grid;flex:none;place-items:center;width:14px;height:14px;border-radius:50%;background:#E2704F;color:#FFF4EC;font-size:8.5px;font-style:normal;font-weight:900}
+.v151-spec-tile.lead>small>i{background:#F0918F;color:#3A0F0D}
+.v151-spec-tile>b{color:#FFFFFF;font-size:16px;line-height:1.05;white-space:nowrap}
+.v151-spec-tile>b>i{color:#8AA0BC;font-size:10px;font-style:normal;font-weight:750}
+.v151-spec-tile>em{color:#FFB1A6;font-size:10px;font-weight:900;font-style:normal;white-space:nowrap}
+.v151-spec-tile .v151-spec-bar{height:4px;margin-top:2px}
+.v151-spec-chips{display:flex;flex:0 0 auto;flex-wrap:wrap;gap:4px;align-content:start}
+.v151-spec-chip{display:inline-block;max-width:100%;overflow:hidden;border:1px solid rgba(54,213,138,.3);border-radius:999px;padding:3px 8px;background:rgba(30,158,102,.08);color:#7ADFAD;font-size:9.5px;font-weight:800;text-overflow:ellipsis;white-space:nowrap}
+.v151-spec-chip.waived{border-style:dashed;border-color:#33517A;background:transparent;color:#8CA2BE}
 .v151-ab-note{grid-column:1/-1;overflow:hidden;color:#8FD6FF;font-size:9px;text-overflow:ellipsis;white-space:nowrap}
 .v151-spec-grid{display:grid;flex:1 1 auto;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;align-content:start;min-height:0;overflow-y:auto;scrollbar-width:thin}
 .v151-spec-card{position:relative;display:grid;gap:2px;min-width:0;border:1px solid #223A56;border-radius:9px;padding:6px 7px 8px;background:#091629}
@@ -806,7 +820,7 @@ textarea{font:inherit}.run-log-quick{display:grid;gap:8px;margin-top:9px;border:
 .v151-gorosei-values{display:grid;flex:1 1 auto;grid-template-columns:1fr;gap:4px;align-content:start;margin-top:7px;min-height:0;overflow-y:auto;scrollbar-width:thin}.v151-gorosei-values>span{display:flex;align-items:center;justify-content:space-between;border:1px solid #223A56;border-radius:8px;padding:6px 8px;background:#08172A}.v151-gorosei-values small{color:#8196AF;font-size:9.5px}.v151-gorosei-values b{font-size:12.5px}
 
 .v151-upper-main{display:grid;flex:0 0 auto;grid-template-columns:44px minmax(0,1fr) auto;gap:8px;align-items:center}.v151-upper-main>img,.v151-upper-main>i{width:44px;height:44px;border-radius:10px;object-fit:cover}.v151-upper-main>i{display:grid;place-items:center;background:#172942;color:#778BA4;font-style:normal;font-weight:950}.v151-upper-main span,.v151-upper-main small,.v151-upper-main b,.v151-upper-main em{display:block;min-width:0}.v151-upper-main small{color:#D3B56F;font-size:9.5px}.v151-upper-main b{overflow:hidden;font-size:13px;text-overflow:ellipsis;white-space:nowrap}.v151-upper-main b i{color:#8DA2BA;font-size:9.5px;font-style:normal}.v151-upper-main em{overflow:hidden;color:#8499B2;font-size:9.5px;font-style:normal;text-overflow:ellipsis;white-space:nowrap}
-.v151-upper-candidates{display:grid;flex:1 1 auto;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;align-content:start;margin-top:7px;min-height:0;overflow-y:auto;scrollbar-width:thin}.v151-upper-candidates article{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:5px;align-items:center;min-width:0;border:1px solid #223A56;border-radius:8px;padding:5px 6px;background:#09182B}.v151-upper-candidates article.best{border-color:rgba(56,198,232,.5);box-shadow:inset 2px 0 var(--v15-calc)}.v151-upper-candidates article.selected{box-shadow:inset 3px 0 var(--v15-hold)}.v151-upper-candidates span,.v151-upper-candidates b,.v151-upper-candidates small{display:block;min-width:0}.v151-upper-candidates b,.v151-upper-candidates small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.v151-upper-candidates b{font-size:10px}.v151-upper-candidates small{color:#8297AF;font-size:9.5px}.v151-upper-candidates button{min-height:26px;padding:4px 6px;font-size:9.5px}.v151-upper-note{margin-top:7px;border:1px dashed #304966;border-radius:8px;padding:7px;color:#8095AD;font-size:9.5px}
+.v151-upper-candidates{display:grid;flex:1 1 auto;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;align-content:start;margin-top:7px;min-height:0;overflow-y:auto;scrollbar-width:thin}.v151-upper-candidates article{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:center;min-width:0;border:1px solid #223A56;border-radius:9px;padding:7px 8px;background:#09182B}.v151-upper-candidates article.best{border-color:rgba(56,198,232,.5);box-shadow:inset 2px 0 var(--v15-calc)}.v151-upper-candidates article.selected{box-shadow:inset 3px 0 var(--v15-hold)}.v151-upper-candidates span,.v151-upper-candidates b,.v151-upper-candidates small{display:block;min-width:0}.v151-upper-candidates b,.v151-upper-candidates small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.v151-upper-candidates b{font-size:11.5px}.v151-upper-candidates small{color:#93A9C2;font-size:10px}.v151-upper-candidates button{min-height:26px;padding:4px 6px;font-size:9.5px}.v151-upper-note{margin-top:7px;border:1px dashed #304966;border-radius:8px;padding:7px;color:#8095AD;font-size:9.5px}
 
 .v151-round,.v151-record,.v151-sync{display:flex;align-items:center;gap:7px;min-width:0}.v151-round>strong{font-size:20px;white-space:nowrap}.v151-round>span{color:#8FA3BB;font-size:9.5px;white-space:nowrap}.v151-round>div{display:flex;gap:3px}.v151-round button{min-width:30px;min-height:27px;padding:3px 6px}.v151-record>i{width:8px;height:8px;border-radius:50%;background:#8296AF}.v151-record.on>i{background:#EF6363;box-shadow:0 0 8px rgba(239,99,99,.7)}.v151-record span,.v151-record b,.v151-record small{display:block}.v151-record b{font-size:10px}.v151-record small{color:#8297AF;font-size:9.5px}.v151-record em{color:#D9E8F7;font-style:normal}.v151-sync{justify-self:end}.v151-sync:before{content:'';width:7px;height:7px;border-radius:50%;background:#EF6B6B}.v151-sync.ok:before{background:#36D58A;box-shadow:0 0 7px rgba(54,213,138,.55)}.v151-sync.warn:before{background:#F0B94E}.v151-sync b,.v151-sync span{display:block}.v151-sync b{font-size:9.5px}.v151-sync span{color:#8094AC;font-size:9.5px}.v151-run-actions,.v151-aux-actions{display:flex;gap:5px}.v151-run-actions button,.v151-aux-actions button{min-height:28px;padding:4px 9px;font-size:9.5px;white-space:nowrap}.v151-run-actions .new-game{color:#F0B0AA}.v151-aux-actions{padding-left:8px;border-left:1px solid var(--v15-line-soft)}.v151-aux-actions button{border-style:dashed;color:#B9CCE2}
 
@@ -859,18 +873,18 @@ textarea{font:inherit}.run-log-quick{display:grid;gap:8px;margin-top:9px;border:
   .v151-grid{height:auto;min-height:0;grid-template-rows:auto;grid-template-areas:
     "run run run run run run run run run run run run"
     "next next next next next next next prep prep prep prep prep"
-    "spec spec spec spec build build build build reward reward reward reward"
+    "spec spec spec spec spec spec build build build build build build"
     "goro goro goro goro upper upper upper upper upper upper upper upper"}
   .v151-panel{max-height:520px}
 }
 @media(max-width:1100px){
-  .v151-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"run run" "next prep" "spec build" "reward goro" "upper upper"}
+  .v151-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"run run" "next prep" "spec build" "goro goro" "upper upper"}
   .v151-run{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"round record sync" "actions actions actions" "tools tools tools";min-height:126px}.v151-run>header{display:none}.v151-run-actions,.v151-aux-actions{justify-self:start}.v151-aux-actions{padding:0;border-left:0}
   .v151-upper-candidates{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
 @media(max-width:700px){
-  .ord-app.v151-shell{padding:4px}.v151-grid{grid-template-columns:1fr;grid-template-areas:"run" "next" "prep" "spec" "build" "reward" "goro" "upper"}
+  .ord-app.v151-shell{padding:4px}.v151-grid{grid-template-columns:1fr;grid-template-areas:"run" "next" "prep" "spec" "build" "goro" "upper"}
   .v151-panel{max-height:none}
   .v151-run{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"round record" "actions actions" "tools tools";min-height:140px}.v151-sync{display:none}.v151-run-actions{display:grid;grid-template-columns:repeat(5,1fr);width:100%}.v151-aux-actions{display:grid;grid-template-columns:repeat(3,1fr);width:100%}
   .v151-build-list,.v151-upper-candidates{grid-template-columns:1fr}.v151-action-title{font-size:15px}.v151-action-main{grid-template-columns:40px minmax(0,1fr) auto}
@@ -895,7 +909,7 @@ textarea{font:inherit}.run-log-quick{display:grid;gap:8px;margin-top:9px;border:
 .upper-path-grid>small{grid-column:1/-1;color:#8CA2BE;font-size:9.5px}
 @media (max-width:640px){.upper-path-grid{grid-template-columns:1fr}}
 .v151-nearest-badge{display:inline-block;margin-left:4px;padding:0 4px;border:1px solid #6E86B8;border-radius:6px;color:#9FB6E4;font-size:8px;font-style:normal;font-weight:800;vertical-align:1px}
-.v151-clear-why{display:block;color:#9FB6D4;font-size:9px;line-height:1.35;white-space:normal}
+.v151-clear-why{display:block;color:#C6D9F0;font-size:10px;line-height:1.45;white-space:normal}
 .v151-boss-warn{display:flex;align-items:center;gap:7px;margin-top:7px;border:1px solid rgba(239,107,107,.62);border-radius:11px;padding:7px 10px;background:rgba(92,24,36,.28);color:#ffc1bd;font-size:11px;line-height:1.35}
 .v151-boss-warn i{font-style:normal}
 .v151-boss-warn b{color:#ffd9d6}
@@ -1205,7 +1219,7 @@ if(typeof module==='object'&&module.exports)module.exports=ORD_UPPER_SKILL_DPS;
 (function(global){
 'use strict';
 
-const VERSION='17.8.0';
+const VERSION='17.9.0';
 const WISP_ID='810e';
 const SUPER_KUMA_ID='unit_1767884940750_9880';
 // v17.5: 스토리 10라운드 확정 보상 — 레일리(히든)+해적선 묶음을 다른
@@ -2429,7 +2443,7 @@ if(root)root.ORDSquadPlanner=api;
 })(typeof window!=='undefined'?window:globalThis,function(C){
 'use strict';
 
-const VERSION='17.8.0';
+const VERSION='17.9.0';
 const DEFAULTS={beamWidth:8,branchWidth:5,branchScan:8,candidateCap:44,maxDepth:14};
 const ROUTE_LABELS={physical:'물딜',dual:'마딜 2상위+토키',singleEnd:'마딜 1상위+단끝'};
 const STUN_OVERSUPPLY_PENALTY=420;
@@ -3662,7 +3676,7 @@ if(root)root.ORDV15Model=api;
 })(typeof window!=='undefined'?window:globalThis,function(C){
 'use strict';
 
-const VERSION='17.8.0';
+const VERSION='17.9.0';
 const HAND_TIERS=['rare','special','uncommon','common'];
 
 function num(value){return C&&C.num?C.num(value):(Number(value)||0);}
@@ -3793,7 +3807,7 @@ if(root)root.ORDV15Ledger=api;
 })(typeof window!=='undefined'?window:globalThis,function(C,M){
 'use strict';
 
-const VERSION='17.8.0';
+const VERSION='17.9.0';
 const TIERS=['rare','special','uncommon','common'];
 function num(value){return C&&C.num?C.num(value):(Number(value)||0);}
 function clone(value){return Object.assign({},value||{});}
@@ -3865,7 +3879,7 @@ if(root)root.ORDV15Policy=api;
 })(typeof window!=='undefined'?window:globalThis,function(C,M){
 'use strict';
 
-const VERSION='17.8.0';
+const VERSION='17.9.0';
 const ROUTES=Object.freeze({
   physical:Object.freeze({key:'physical',mode:'physical',label:'물딜 1상위',groups:[['main'],['armor','stunBase'],['slow','bossFrenzy'],['stunFull']],priority:'상위 → 상시 방깎·최소 0.5스턴 → 이감·광보잡 → 1.5스턴'}),
   dual:Object.freeze({key:'dual',mode:'magic',label:'마딜 2상위·토키',groups:[['main','stunBase'],['slow'],['stunFull'],['bossFrenzy','toki']],priority:'상위 2기·최소 0.5스턴 → 이감 → 1.5스턴 → 광보잡·토키'}),
@@ -3977,7 +3991,7 @@ if(root)root.ORDV15Engine=api;
 })(typeof window!=='undefined'?window:globalThis,function(C,M,L,P){
 'use strict';
 
-const VERSION='17.8.0';
+const VERSION='17.9.0';
 const MAX_CANDIDATES=36;
 const BEAM_WIDTH=6;
 const HORIZON=2;
@@ -5393,7 +5407,7 @@ class App{
     },key=[fingerprint(this.state.snapshot),JSON.stringify(strategic)].join('|');
     if(key!==this._v15CacheKey){
       try{this._v15Cache=engine.decide({catalog:this.catalog,snapshot:this.state.snapshot||{},settings,locks:this.state.locks||[]});}
-      catch(error){this._v15Cache={version:'17.8.0',authority:true,state:'SYNC_BLOCKED',label:'판단 엔진 점검 필요',reason:String(error&&error.message||error),action:null,alternatives:[],unknowns:['판단 엔진 오류']};}
+      catch(error){this._v15Cache={version:'17.9.0',authority:true,state:'SYNC_BLOCKED',label:'판단 엔진 점검 필요',reason:String(error&&error.message||error),action:null,alternatives:[],unknowns:['판단 엔진 오류']};}
       this._v15CacheKey=key;
     }
     const base=this._v15Cache;if(!base)return null;
@@ -5678,8 +5692,8 @@ class App{
     }
   }
   renderUnsafe(){
-    // The eight-panel coach remains the default live screen. Focused auxiliary
-    // pages are reachable from panel 8 without reviving the legacy tab bar.
+    // The seven-panel coach remains the default live screen. Focused auxiliary
+    // pages are reachable from panel 7 without reviving the legacy tab bar.
     if(!REACHABLE_TABS.has(this.state.tab))this.state.tab='coach';
     const pack=this.plan(),state=pack.state,plan=pack.plan,settings=pack.settings,phase=phaseForPurpose(plan,settings.currentRound),clock=C.roundClock(settings,Date.now()),health=this.health();this._renderedRound=settings.currentRound;this._renderedHealthKey=health.key;this._deferredExternalRender=false;this.captureRunDecision(pack);
     const savedScroll=this.captureScrollPositions();
@@ -5703,7 +5717,7 @@ class App{
   // A live TMO snapshot rebuilds the whole screen; without this, every
   // rebuild snapped the page and each scrolled panel back to the top —
   // the reported up-and-down jumping while the clock/hand refreshed.
-  scrollableSelector(){return'.v151-scroll,.v151-action,.v151-prep-list,.v151-build-list,.v151-spec-grid,.v151-forecast-list,.v151-upper-candidates,.v151-gorosei-values,.v151-runlog-page,.detail-modal';}
+  scrollableSelector(){return'.v151-scroll,.v151-action,.v151-prep-list,.v151-build-list,.v151-spec-grid,.v151-spec-body,.v151-forecast-list,.v151-upper-candidates,.v151-gorosei,.v151-gorosei-values,.v151-runlog-page,.detail-modal';}
   captureScrollPositions(){
     try{
       const doc=typeof document!=='undefined'&&(document.scrollingElement||document.documentElement);
@@ -5789,7 +5803,7 @@ class App{
       // 후보를 바로 이 자리에서 확정할 수 있게 한다.
       const quick=(decision.routeCandidates||[]).slice(0,2),canConfirm=this.actualRound()>=25;
       const quickHtml=quick.length?`<div class="v151-route-quick">${quick.map((row,index)=>`<div><span><b>${index+1}. ${C.esc(row.name)}</b><small>${C.esc(row.routeLabel||'')} · TMO ${fmt(row.completion)}% · 선위 ${C.num(row.wispCost)}${C.num(row.wispGap)>0?` (부족 ${C.num(row.wispGap)})`:''}</small></span><button class="primary" data-act="choose-direction" data-key="${C.esc(row.routeKey)}" data-id="${C.esc(row.id)}" ${canConfirm?'':'disabled'}>${canConfirm?'확정':'25라 이후'}</button></div>`).join('')}</div>`:'';
-      return`<div class="v151-action choice"><span class="v151-state">상위 선택 필요</span><b class="v151-action-title">${C.esc(decision.label||'메인 상위 방향 선택')}</b><p>${C.esc(decision.reason||'아래 상위 정보에서 현재 패 후보를 비교하세요.')} 선택 전에는 제작·리롤이 잠깁니다.</p>${quickHtml}<span class="v151-jump-note">⑦ 상위 정보에서 전체 6개 후보를 비교할 수 있습니다.</span>${this.v151ActionFacts(state,decision)}</div>`;
+      return`<div class="v151-action choice"><span class="v151-state">상위 선택 필요</span><b class="v151-action-title">${C.esc(decision.label||'메인 상위 방향 선택')}</b><p>${C.esc(decision.reason||'아래 상위 정보에서 현재 패 후보를 비교하세요.')} 선택 전에는 제작·리롤이 잠깁니다.</p>${quickHtml}<span class="v151-jump-note">⑥ 상위 정보에서 전체 6개 후보를 비교할 수 있습니다.</span>${this.v151ActionFacts(state,decision)}</div>`;
     }
     const shown=decision.action||decision.blockedAction||null,reroll=decision.rare&&decision.rare.safeReroll,unit=shown&&shown.unit||reroll&&reroll.unit||null,target=status==='REROLL_ONE'&&reroll?`${reroll.name} 1장 리롤`:shown&&shown.name||decision.label||'현재 패 소비 보류',waivedKeys=new Set(((decision.assessment||{}).requirements||[]).filter(row=>row.waived).map(row=>row.key)),deltas=(shown&&shown.deltas||[]).filter(row=>!waivedKeys.has(row.key)&&(Math.abs(C.num(row.delta))>.001||row.closed)).slice(0,3),cost=shown?C.num(shown.wispCost):0,after=shown&&shown.wispAfter!=null?C.num(shown.wispAfter):C.num(state.wisp),button=status==='ACT_NOW'&&decision.action?`<button class="primary" data-act="mark-made" data-step="0" data-id="${C.esc(decision.action.id)}">제작함 · TMO 확인</button>`:status==='REROLL_ONE'&&reroll?`<button class="primary danger" data-act="reroll-confirmed" data-id="${C.esc(reroll.id)}">1장 리롤함</button>`:status==='SYNC_BLOCKED'?`<button data-act="connection">TMO 다시 읽기</button>${this.state.pendingTransaction?'<button data-act="dismiss-transaction">거래 취소 · TMO 현재값 사용</button>':''}`:'<button disabled>지금은 재료 보존</button>',stop=shown&&shown.stopCondition?shown.stopCondition:status==='PREPARE'?'재료나 선위가 달라지면 실행하지 않습니다.':'패가 바뀌면 먼저 다시 읽습니다.';
     return`<div class="v151-action ${C.esc(status.toLowerCase())}" data-state="${C.esc(status)}"><div class="v151-action-main">${unit&&unit.image?`<img src="${C.esc(unit.image)}" alt="">`:'<i>→</i>'}<div><span class="v151-state">${C.esc({ACT_NOW:'지금 실행',PREPARE:'재료 보호',HOLD:'소비 보류',REROLL_ONE:'안전 리롤',SYNC_BLOCKED:'확인 대기'}[status]||'다음 판단')}</span><b class="v151-action-title">${C.esc(target)}${this.v151StoryTag(unit)}</b><p>${C.esc(decision.reason||'현재 패에서 안전한 다음 행동을 기다립니다.')}</p></div>${shown?`<div class="v151-cost"><small>선위</small><b>${cost}</b><span>${status==='PREPARE'?'필요':`후 ${after}`}</span></div>`:''}</div>${deltas.length?`<div class="v151-deltas">${deltas.map(row=>`<span>${C.esc(row.label)} <b>${fmt(row.before)}→${fmt(row.after)}</b></span>`).join('')}</div>`:''}${decision.upperReserve?`<div class="v151-upper-guard"><i>🔒</i>확정 상위 <b>${C.esc(decision.upperReserve.name)}</b> 트리 재료 ${C.num(decision.upperReserve.reservedUnits)}개 잠금 · 선위 ${C.num(decision.upperReserve.wispCost)} 필요(부족 ${C.num(decision.upperReserve.wispShort)}) — 잠긴 재료를 빼고 추천 중${decision.upperReserve.storyRewardNeeded?' · 스토리 10 보상에서 레일리+해적선을 선택해야 열립니다':''}</div>`:''}${(()=>{
@@ -5840,6 +5854,7 @@ class App{
     if(shipCount<=0)return null;
     const products=db.units.filter(u=>(u.stuffs||[]).some(s=>s.id===C.PIRATE_SHIP_ID));
     if(!products.length)return null;
+    const mode=(this.state&&this.state.mode)||this.v151FamilyIntent(state)||'';
     const rows=products.map(unit=>{
       const missing=[];
       for(const s of unit.stuffs||[]){
@@ -5848,9 +5863,20 @@ class App{
         const mat=db.byId.get(s.id);
         missing.push({id:s.id,name:mat?C.nameOf(mat):String(s.id),need:C.num(s.count)-owned,rare:!!(mat&&C.isRare(mat))});
       }
-      return{unit,feasible:!missing.length,missing,missingRares:missing.filter(m=>m.rare)};
-    }).sort((a,b)=>Number(b.feasible)-Number(a.feasible)||a.missing.length-b.missing.length||C.nameOf(a.unit).localeCompare(C.nameOf(b.unit),'ko'));
-    return{shipCount,rows};
+      const family=C.familyOf(unit);
+      // v17.9(사용자 요청 1): 전설급 완성체(방주맥심 등)와 상위(제한됨,
+      // 에넬 등)는 쓰임이 다르다 — 구분하고 현재 계통 적합도로 추천한다.
+      const kind=C.isUpper(unit)?'upper':'legend';
+      const familyFit=!mode||family===mode||family==='neutral';
+      return{unit,kind,family,familyFit,feasible:!missing.length,missing,missingRares:missing.filter(m=>m.rare)};
+    });
+    const order=(a,b)=>Number(b.familyFit)-Number(a.familyFit)||Number(b.feasible)-Number(a.feasible)||a.missing.length-b.missing.length||C.nameOf(a.unit).localeCompare(C.nameOf(b.unit),'ko');
+    const legendRows=rows.filter(row=>row.kind==='legend').sort(order);
+    const upperRows=rows.filter(row=>row.kind==='upper').sort(order);
+    const upperCommitted=!!(this.state&&((this.upperLock&&this.upperLock())||this.state.directionUpperId));
+    const pool=upperCommitted&&legendRows.length?legendRows:[...legendRows,...upperRows];
+    const recommended=pool.slice().sort(order)[0]||null;
+    return{shipCount,legendRows,upperRows,recommendedId:recommended?recommended.unit.id:''};
   }
 
   renderV151Preparation(state,plan){
@@ -5870,8 +5896,11 @@ class App{
     const rerollRows=decision.rare&&!decision.rare.conflict?(decision.rare.reroll||[]).filter(row=>C.num(row.reroll)>0).slice(0,2):[];
     const rerollHint=rerollRows.length&&decision.state!=='REROLL_ONE'?`<div class="v151-reroll-hint"><small>리롤 권장</small>${rerollRows.map(row=>`<button data-act="detail" data-id="${C.esc(row.id)}"><b>${C.esc(row.name)}${C.num(row.reroll)>1?` ×${C.num(row.reroll)}`:''}</b><span>확정 상위·보조 경로에 사용처 없음 · 1장씩 리롤 후 다시 동기화 · 원하는 1종 확률 1/41(2.4%)/회</span></button>`).join('')}</div>`:'';
     const shipPlan=this.v151ShipPlan(state);
-    const shipHint=shipPlan?`<div class="v151-ship-plan"><small>해적선 활용 · ${shipPlan.shipCount}척 보유</small>${shipPlan.rows.map(row=>`<button data-act="detail" data-id="${C.esc(row.unit.id)}"><b>${C.esc(displayNameOf(row.unit))}</b><span>${row.feasible?'지금 제작 가능 — 배 사용처로 최우선 검토':`부족: ${row.missing.map(m=>`${C.esc(m.name)}${m.need>1?`×${m.need}`:''}`).join(' · ')}${row.missingRares.length?' — 부족 희귀는 리롤·152킬 목표로':''}`}</span></button>`).join('')}</div>`:'';
-    return items.length||rerollHint||shipHint?`<div class="v151-prep-list">${items.slice(0,5).map((item,index)=>{const unit=state.db&&state.db.byId.get(item.id);return`<button data-act="detail" data-id="${C.esc(item.id)}">${unit&&unit.image?`<img src="${C.esc(unit.image)}" alt="">`:`<i>${index+1}</i>`}<span><b>${C.esc(item.name)}${this.v151StoryTag(unit)}</b><small>${C.esc(item.note)}</small></span><em>선위 ${C.num(item.wispCost)}</em></button>`;}).join('')}${shipHint}${rerollHint}<p>미리 준비만 하며, 실제 다음 행동은 TMO 패 변화 뒤 다시 확정합니다.</p></div>`:`<div class="v151-empty"><b>현재 행동만 확정</b><span>다음 행동은 지금 미리 고정하지 않고 TMO 변화 뒤 계산합니다.</span></div>`;
+    // v17.9(사용자 요청 1): 전설급 완성체와 상위(제한됨)를 나눠 표기하고
+    // 현재 계통 적합 + 재료 근접 순으로 추천 1개를 명시한다.
+    const shipRow=row=>{const recommended=shipPlan.recommendedId===row.unit.id;return`<button data-act="detail" data-id="${C.esc(row.unit.id)}" class="${recommended?'recommended':''}"><b>${recommended?'<i class="v151-ship-reco">추천</i>':''}${C.esc(displayNameOf(row.unit))}${row.familyFit?'':'<i class="v151-ship-off">타계통</i>'}</b><span>${row.feasible?'지금 제작 가능 — 배 사용처로 최우선 검토':`부족: ${row.missing.map(m=>`${C.esc(m.name)}${m.need>1?`×${m.need}`:''}`).join(' · ')}${row.missingRares.length?' — 부족 희귀는 리롤·152킬 목표로':''}`}</span></button>`;};
+    const shipHint=shipPlan?`<div class="v151-ship-plan"><small>해적선 활용 · ${shipPlan.shipCount}척 보유</small>${shipPlan.legendRows.length?`<em class="v151-ship-group">전설급 완성체</em>${shipPlan.legendRows.map(shipRow).join('')}`:''}${shipPlan.upperRows.length?`<em class="v151-ship-group">상위 (제한됨) — 메인 상위 자리 소모</em>${shipPlan.upperRows.map(shipRow).join('')}`:''}</div>`:'';
+    return items.length||rerollHint||shipHint?`<div class="v151-prep-list">${items.slice(0,5).map((item,index)=>{const unit=state.db&&state.db.byId.get(item.id);return`<button data-act="detail" data-id="${C.esc(item.id)}">${unit&&unit.image?`<img src="${C.esc(unit.image)}" alt="">`:`<i>${index+1}</i>`}<span class="v151-prep-copy"><span class="v151-prep-name"><b>${C.esc(item.name)}</b>${this.v151StoryTag(unit)}</span><small>${C.esc(item.note)}</small></span><em>선위 ${C.num(item.wispCost)}</em></button>`;}).join('')}${shipHint}${rerollHint}<p>미리 준비만 하며, 실제 다음 행동은 TMO 패 변화 뒤 다시 확정합니다.</p></div>`:`<div class="v151-empty"><b>현재 행동만 확정</b><span>다음 행동은 지금 미리 고정하지 않고 TMO 변화 뒤 계산합니다.</span></div>`;
   }
 
   renderV151CurrentSpec(state,plan){
@@ -5886,18 +5915,26 @@ class App{
     const preview=C.bossPreview?C.bossPreview(this.actualRound(),this.state.gorosei):null;
     const armorSource=rows.find(row=>row.key==='armor');
     const abModel=armorSource&&C.armorBreakModel?C.armorBreakModel(plan.spec||{},{bossArmor:preview&&preview.bossArmor!=null?preview.bossArmor:null,armorReduce:C.num(armorSource.current)}):null;
-    const line=(row,cls,rank)=>{const pct=Math.max(0,Math.min(100,C.num(row.target)>0?100*C.num(row.current)/C.num(row.target):C.num(row.gap)<=0?100:0));
+    // v17.9(사용자 요청 3): 결손만 큰 타일로, 확보·면제는 한 줄 칩으로 —
+    // 스크롤 없이 전체가 들어오고 시선은 결손 타일에만 간다.
+    const tile=(row,rank)=>{const pct=Math.max(0,Math.min(100,C.num(row.target)>0?100*C.num(row.current)/C.num(row.target):0));
       const abNote=row.key==='armor'&&abModel&&abModel.stacks>0?`<small class="v151-ab-note">+ 암브 ${C.num(abModel.units)}기 환산 ${C.num(abModel.stacks)}(정착 추정) = 유효 ${fmt(C.num(row.current)+abModel.stacks)}${abModel.gainPercent?` · 피해 +${fmt(abModel.gainPercent)}%`:''} — 제작 목표는 정적 기준 유지</small>`:'';
-      return`<div class="v151-spec-row ${cls}${rank===0?' lead':''}">${rank!=null?`<i class="v151-spec-rank">${rank+1}</i>`:'<i class="v151-spec-rank ok">✓</i>'}<span class="v151-spec-label">${C.esc(row.label)}</span><b class="v151-spec-val">${fmt(row.current)}<i>/${fmt(row.target)}</i></b><span class="v151-spec-bar"><i style="--pct:${Math.round(pct)}%"></i></span><em class="v151-spec-state">${row.waived?'요구 없음':C.num(row.gap)<=0?'확보':`부족 ${fmt(row.gap)}`}</em>${abNote}</div>`;};
-    const body=[open.map((row,index)=>line(row,'gap',index)).join(''),closed.map(row=>line(row,'ok',null)).join(''),waived.map(row=>line(row,'waived',null)).join('')].join('');
+      return`<div class="v151-spec-tile${rank===0?' lead':''}"><small><i>${rank+1}</i>${C.esc(row.label)}</small><b>${fmt(row.current)}<i> / ${fmt(row.target)}</i></b><em>부족 ${fmt(row.gap)}</em><span class="v151-spec-bar"><i style="--pct:${Math.round(pct)}%"></i></span>${abNote}</div>`;};
+    const chips=closed.map(row=>{
+      const abChip=row.key==='armor'&&abModel&&abModel.stacks>0?` (+암브 ${C.num(abModel.stacks)})`:'';
+      return`<span class="v151-spec-chip ok" title="목표 ${fmt(row.target)}">✓ ${C.esc(row.label)} ${fmt(row.current)}${abChip}</span>`;
+    }).concat(waived.map(row=>`<span class="v151-spec-chip waived" title="이 상위는 요구하지 않음">${C.esc(row.label)} 면제</span>`)).join('');
+    const armorInOpen=open.some(row=>row.key==='armor');
+    const tiles=open.map((row,index)=>tile(row,index)).join('');
     const summary=open.length?`<div class="v151-spec-summary gap"><b>필수 결손 ${open.length}개</b><span>최우선: ${C.esc(open[0].label)} 부족 ${fmt(open[0].gap)}</span></div>`:rows.length?`<div class="v151-spec-summary ok"><b>필수 역할 전부 확보</b><span>보스 화력은 별도 미검증</span></div>`:'';
-    return`<div class="v151-spec-head"><div class="damage-mode-switch" role="group" aria-label="딜 계통 선택"><button class="${!this.state.mode?'on':''}" data-act="mode" data-value="">자동</button><button class="${this.state.mode==='physical'?'on':''}" data-act="mode" data-value="physical">물딜</button><button class="${magic?'on':''}" data-act="mode" data-value="magic">마딜</button></div>${magic?`<select data-opt="magicRoute" aria-label="마딜 경로"><option value="auto" ${route==='auto'?'selected':''}>자동 경로</option><option value="dual" ${route==='dual'?'selected':''}>2상위·토키</option><option value="singleEnd" ${route==='singleEnd'?'selected':''}>1상위·단끝</option></select>`:''}<strong>선위 ${C.num(state.wisp)}</strong></div>${(()=>{const lab=this.state.labResearch||{},box=(key,label)=>`<label><input type="checkbox" data-upg="${key}" ${lab[key]?'checked':''}><span>${label}</span></label>`;return`<div class="v151-upg-row"><small>연구소(1회 구매) <i>구매한 것만 체크</i></small>${box('attack','공업+12%')}${box('slow','이감+10')}${box('hpRegen','체젠+0.45')}${box('mpRegen','마젠+0.8')}<label class="v151-upg-level"><span>등급 공업 Lv</span><input type="number" min="1" data-upg="upperLevel" value="${C.num(this.state.upperResearchLevel)||1}"></label></div>`;})()}${summary}<div class="v151-spec-rows">${body||'<div class="v151-empty"><b>스펙 계산 대기</b><span>첫 제작 뒤 역할 수치를 표시합니다.</span></div>'}</div>`;
+    const body=rows.length?`${tiles?`<div class="v151-spec-tiles${armorInOpen?'':' compact'}">${tiles}</div>`:''}${chips?`<div class="v151-spec-chips">${chips}</div>`:''}`:'<div class="v151-empty"><b>스펙 계산 대기</b><span>첫 제작 뒤 역할 수치를 표시합니다.</span></div>';
+    return`<div class="v151-spec-head"><div class="damage-mode-switch" role="group" aria-label="딜 계통 선택"><button class="${!this.state.mode?'on':''}" data-act="mode" data-value="">자동</button><button class="${this.state.mode==='physical'?'on':''}" data-act="mode" data-value="physical">물딜</button><button class="${magic?'on':''}" data-act="mode" data-value="magic">마딜</button></div>${magic?`<select data-opt="magicRoute" aria-label="마딜 경로"><option value="auto" ${route==='auto'?'selected':''}>자동 경로</option><option value="dual" ${route==='dual'?'selected':''}>2상위·토키</option><option value="singleEnd" ${route==='singleEnd'?'selected':''}>1상위·단끝</option></select>`:''}<strong>선위 ${C.num(state.wisp)}</strong></div>${(()=>{const lab=this.state.labResearch||{},box=(key,label)=>`<label><input type="checkbox" data-upg="${key}" ${lab[key]?'checked':''}><span>${label}</span></label>`;return`<div class="v151-upg-row"><small>연구소(1회 구매) <i>구매한 것만 체크</i></small>${box('attack','공업+12%')}${box('slow','이감+10')}${box('hpRegen','체젠+0.45')}${box('mpRegen','마젠+0.8')}<label class="v151-upg-level"><span>등급 공업 Lv</span><input type="number" min="1" data-upg="upperLevel" value="${C.num(this.state.upperResearchLevel)||1}"></label></div>`;})()}${summary}<div class="v151-spec-body">${body}</div>`;
   }
 
   // v16.7: 자동 모드에서는 첫 전설(보유 비상위 전설·히든)의 계열이 이후
   // 전설급 추천 방향을 정한다.  명시 선택(물딜/마딜)이 있으면 그것이 우선.
   v151FamilyIntent(state){
-    const mode=this.state.mode;
+    const mode=this.state&&this.state.mode;
     if(mode==='physical'||mode==='magic')return mode;
     if(!state||!state.db||!Array.isArray(state.db.legendish))return'';
     let physical=0,magic=0;
@@ -5950,7 +5987,7 @@ class App{
 
   renderV151RewardForecast(state,plan){
     const id=String(this.state.virtualSpecialId||''),options=(C.eligible152Specials?C.eligible152Specials(state.db):state.db&&state.db.specials||[]).map(unit=>`<option value="${C.esc(unit.id)}" ${id===unit.id?'selected':''}>${C.esc(displayNameOf(unit))}</option>`).join(''),forecast=this.v151VirtualSpecialForecast(state,plan);
-    return`<label class="v151-reward-select"><span>152킬 특별함</span><select data-opt="virtualSpecialId"><option value="">받은 유닛 선택</option>${options}</select></label>${forecast.special?`<div class="v151-forecast-head">${forecast.special.image?`<img src="${C.esc(forecast.special.image)}" alt="">`:''}<span><b>${C.esc(displayNameOf(forecast.special))}</b><small>TMO 원본과 152 포함 예상값을 분리 표시</small></span></div><div class="v151-forecast-list">${forecast.rows.map(row=>`<div class="${row.isProjected?'projected':'observed'}"><b>${C.esc(displayNameOf(row.unit))}</b><span>원 TMO ${fmt(row.current)}% → <strong>${row.isProjected?'예상 ':''}${fmt(row.predicted)}%</strong></span><em>${row.delta>0?`+${fmt(row.delta)}`:'변화 없음'}</em></div>`).join('')||'<small>이 특별함을 쓰는 희귀 조합이 없습니다.</small>'}</div>`:`<div class="v151-empty"><b>152킬 보상은 시작 시 이미 정해져 있습니다</b><span>특별함 32종 중 1종 균등 추첨(각 1/32 = 3.125% · 압살롬 제외). 보상을 확인하면 위에서 선택해 잠그세요.</span></div>`}<small class="v151-estimate-note">보상은 게임 시작 시 고정 추첨(1/32)이며, 예상값은 v15 레시피 반사실 계산으로 TMO 원본 수치를 덮어쓰지 않습니다.</small>`;
+    return`<label class="v151-reward-select"><span>152킬 특별함</span><select data-opt="virtualSpecialId"><option value="">받은 유닛 선택</option>${options}</select></label>${forecast.special?`<div class="v151-forecast-head">${forecast.special.image?`<img src="${C.esc(forecast.special.image)}" alt="">`:''}<span><b>${C.esc(displayNameOf(forecast.special))}</b><small>TMO 원본과 152 포함 예상값을 분리 표시</small></span></div><div class="v151-forecast-list">${forecast.rows.map(row=>`<div class="${row.isProjected?'projected':'observed'}"><b>${C.esc(displayNameOf(row.unit))}</b><span>원 TMO ${fmt(row.current)}% → <strong>${row.isProjected?'예상 ':''}${fmt(row.predicted)}%</strong></span><em>${row.delta>0?`+${fmt(row.delta)}`:'변화 없음'}</em></div>`).join('')||'<small>이 특별함을 쓰는 희귀 조합이 없습니다.</small>'}</div>`:`<small class="v151-reward-idle">보상은 시작 시 1종 고정 추첨(각 1/32 · 압살롬 제외) — 확인하면 위에서 선택해 잠그세요.</small>`}<small class="v151-estimate-note">예상값은 v15 레시피 반사실 계산으로 TMO 원본 수치를 덮어쓰지 않습니다.</small>`;
   }
 
   renderV151Gorosei(state,plan){
@@ -5991,7 +6028,7 @@ class App{
       return`<div class="v151-boss-preview">${rows.join('')}</div>`;
     })():'';
     const story10=this.state.story10Reward,story10Options=[['','미정 (레일리 경로 후보 유지)'],['rayleigh','레일리+해적선 선택'],['kuma','초월 쿠마 선택'],['chest','유니크·상자 선택']];
-    return`<label class="v151-gorosei-select"><span>이번 판 오로성</span><select data-opt="gorosei">${Object.values(C.GOROSEI).map(item=>`<option value="${item.key}" ${selected.key===item.key?'selected':''}>${C.esc(item.name)}</option>`).join('')}</select></label><label class="v151-gorosei-select v151-story10-select"><span>스토리 10 보상</span><select data-opt="story10Reward">${story10Options.map(([value,label])=>`<option value="${value}" ${story10===value?'selected':''}>${C.esc(label)}</option>`).join('')}</select></label><div class="v151-gorosei-values"><span><small>이감 목표·상한</small><b>${slow}</b></span><span><small>물딜 방깎 실전·풀</small><b>${C.num(selected.armorSoft)}·${C.num(selected.armorSafe)}</b></span><span><small>스턴 운용·안정</small><b>1.0·${fmtStun(selected.stun)}</b></span></div>${bossHtml}`;
+    return`<label class="v151-gorosei-select"><span>이번 판 오로성</span><select data-opt="gorosei">${Object.values(C.GOROSEI).map(item=>`<option value="${item.key}" ${selected.key===item.key?'selected':''}>${C.esc(item.name)}</option>`).join('')}</select></label><label class="v151-gorosei-select v151-story10-select"><span>스토리 10 보상</span><select data-opt="story10Reward">${story10Options.map(([value,label])=>`<option value="${value}" ${story10===value?'selected':''}>${C.esc(label)}</option>`).join('')}</select></label><div class="v151-gorosei-values"><span><small>이감 목표·상한</small><b>${slow}</b></span><span><small>물딜 방깎 실전·풀</small><b>${C.num(selected.armorSoft)}·${C.num(selected.armorSafe)}</b></span><span><small>스턴 운용·안정</small><b>1.0·${fmtStun(selected.stun)}</b></span></div>${bossHtml}<div class="v151-reward-inline">${this.renderV151RewardForecast(state,plan)}</div>`;
   }
 
   // v17.4(사용자 요청): 후보 순위의 내부 판단 이유를 문장으로.  각 축의
@@ -6008,20 +6045,21 @@ class App{
     const slowTotal=C.num(kit.slow)+C.num(kit.triggerSlow);if(slowTotal>0)kitBits.push(`이감${Math.round(slowTotal)}`);
     const armorTotal=C.num(kit.armor)+C.num(kit.triggerArmor);if(armorTotal>0)kitBits.push(`깍${Math.round(armorTotal)}`);
     const dpsPct=Math.round(C.num(value.dpsCover)*100);
+    // v17.9(사용자 요청 2): 내부 점수 용어 대신 사람이 읽는 문장으로.
     const axes=[
-      {key:'story',weight:.3,score:C.num(value.story),strong:grade&&grade.leagueRanked?`스토리 ${grade.leagueTier}리그 ${grade.leagueRank}위/${grade.leagueSize}`:`스토리 ${grade?grade.tier:'?'}(${grade&&grade.measured?'실측':'추정'})`,weak:grade&&grade.leagueRanked?`스토리 ${grade.leagueTier}리그 ${grade.leagueRank}위 그침`:`스토리 ${grade?grade.tier:'?'} 추정(순위 외)`},
-      {key:'dps',weight:.3,score:C.num(value.dpsCover),strong:`60라 보스 요구 DPS의 ${dpsPct}%를 정적 하한으로 충족`,weak:`화력 하한 ${dpsPct}%뿐(수동스킬 미집계) — 단일·끝딜 보강 필수`},
-      {key:'line',weight:.15,score:C.num(value.line),strong:C.num(value.line)>=1?'라인 자립(보조딜 부담 없음)':'라인 보조딜 확보됨',weak:C.num(value.line)<=.2?'라인딜 약함 · 보조딜 미확보':'라인 자립도 미확인'},
-      {key:'rare',weight:.12,score:C.num(value.rareUtil),strong:`보유 희귀 ${C.num(row.tiers&&row.tiers.rare)}/${C.num(row.tierAvailable&&row.tierAvailable.rare)}장 활용`,weak:`보유 희귀 ${C.num(row.tiers&&row.tiers.rare)}/${C.num(row.tierAvailable&&row.tierAvailable.rare)}장만 사용`},
-      {key:'util',weight:.13,score:C.num(value.utility),strong:kitBits.length?`유틸 ${kitBits.join('·')}`:'유틸 킷',weak:'유틸(스턴·이감·깍) 없음'}
+      {key:'story',weight:.3,score:C.num(value.story),strong:grade&&grade.leagueRanked?`스토리 철거가 빠릅니다(리그 ${grade.leagueRank}위·${grade.leagueTier})`:`스토리 속도 ${grade?grade.tier:'?'}등급(추정)`,weak:'스토리 철거 속도가 느린 편'},
+      {key:'dps',weight:.3,score:C.num(value.dpsCover),strong:`후반 보스 화력 기본기가 좋습니다(필요치의 ${dpsPct}% 하한 확보)`,weak:`보스 화력 하한이 ${dpsPct}%뿐 — 단일·끝딜 보강 필요`},
+      {key:'line',weight:.15,score:C.num(value.line),strong:'라인 정리를 혼자 감당합니다',weak:'라인딜이 약해 보조딜러가 필요'},
+      {key:'rare',weight:.12,score:C.num(value.rareUtil),strong:`지금 손의 희귀 ${C.num(row.tiers&&row.tiers.rare)}장을 그대로 씁니다`,weak:'보유 희귀를 거의 쓰지 못함'},
+      {key:'util',weight:.13,score:C.num(value.utility),strong:kitBits.length?`유틸까지 겸비(${kitBits.join('·')})`:'유틸 겸비',weak:'스턴·이감·깍 유틸 없음'}
     ].map(axis=>Object.assign(axis,{contribution:axis.weight*axis.score}));
     const byContribution=axes.slice().sort((a,b)=>b.contribution-a.contribution);
     const strengths=byContribution.slice(0,2).filter(axis=>axis.score>.05).map(axis=>axis.strong);
     const weakest=byContribution[byContribution.length-1];
-    const eta=row.feasible?'지금 완성 가능':`~${C.num(value.roundsToGo)}라 뒤 완성${C.num(value.deadlineFactor)<1?` · 마감 할인 ×${value.deadlineFactor}`:''}`;
+    const eta=row.feasible?'지금 완성 가능':`약 ${C.num(value.roundsToGo)}라 뒤 완성`;
     const lineNote=strategy.lineSelf==='support'&&C.num(value.line)<=.2?' · 보조딜러 필요':'';
-    const storyNote=row.storyReward?' · 스토리 10 보상(레일리+해적선) 선택 전제 — 초월쿠마·상자 포기':'';
-    return`<small class="v151-clear-why">왜: ${C.esc(strengths.join(' · ')||'상대 우위 없음')}${weakest&&weakest.score<.35?` — 약점: ${C.esc(weakest.weak)}`:''} · ${C.esc(eta)}${lineNote}${storyNote}</small>`;
+    const storyNote=row.storyReward?' · 스토리 10 보상(레일리+해적선) 선택 전제':'';
+    return`<small class="v151-clear-why">추천 이유: ${C.esc(strengths.join(', ')||'뚜렷한 우위 없음')}${weakest&&weakest.score<.35?`. 약점은 ${C.esc(weakest.weak)}`:''}. ${C.esc(eta)}${lineNote}${storyNote}</small>`;
   }
 
   // v17.8(사용자 요청 5): 상위까지 남은 희귀를 이름으로 보여준다.
@@ -6081,9 +6119,8 @@ class App{
       return`<div class="v151-upper-path">${parts.join('')}</div>`;
     })();
     const cards=candidates.map((row,index)=>{const selected=this.state.directionKey===row.routeKey&&C.canonicalUpperId(this.state.directionUpperId)===C.canonicalUpperId(row.id),status=row.locked?'경로 선택':row.feasible?'지금 제작 가능':`선위 ${C.num(row.wispGap)} 부족`;
-      // v17.3: 클리어 가치 근거를 카드에 그대로 노출 — 직감이 감사할 수
-      // 있어야 가중치를 보정할 수 있다.
-      const value=row.clearValue,valueLine=value?`<small class="v151-clear-line">가치 ${Math.round(C.num(value.value)*100)} · DPS ${Math.round(C.num(value.dpsCover)*100)}% · 스토리 ${Math.round(C.num(value.story)*100)} · 라인 ${Math.round(C.num(value.line)*100)} · 희귀활용 ${Math.round(C.num(value.rareUtil)*100)}%${value.roundsToGo?` · ~${C.num(value.roundsToGo)}라 뒤`:' · 지금'}</small>`:'';
+      // v17.9(사용자 요청 2): 내부 점수 나열(가치·DPS%·스토리 …)은 카드에서
+      // 제거 — 부분점수는 판단 녹화(routeCandidates.clearValue)에만 남긴다.
       const nearestBadge=row.nearestBuild?'<i class="v151-nearest-badge">최단 완성</i>':'';
       const storyBadge=row.storyReward?'<i class="v151-story10-badge">스토리10 보상 필요</i>':'';
       const whyLine=this.v151ClearWhy(row);
@@ -6091,7 +6128,7 @@ class App{
       // 직접 명시한다 — "선위 N 부족"만으로는 준비 목표가 안 보였다.
       const missingRares=row.locked?[]:this.v151MissingRares(state,row.id).slice(0,3);
       const costLine=row.locked?'':`<small class="v151-cost-line">필요 선위 <b>${C.num(row.wispCost)}</b>${C.num(row.wispGap)>0?` · 현재 부족 <b>${C.num(row.wispGap)}</b>`:' · 지금 충당 가능'}${missingRares.length?` · 부족 희귀: ${missingRares.map(item=>`${C.esc(item.name)}${item.short>1?`×${item.short}`:''}`).join(' · ')}`:' · 희귀 재료 충족'}</small>`;
-      return`<article class="${index===0?'best':''} ${selected?'selected':''}"><span><b>${index+1}. ${C.esc(row.name)}${nearestBadge}${storyBadge}</b><small>${C.esc(row.routeLabel||'')} · TMO ${fmt(row.completion)}% · ${C.esc(status)}</small>${costLine}${valueLine}${whyLine}</span><button data-act="detail" data-id="${C.esc(row.id)}">재료</button><button class="primary" data-act="choose-direction" data-key="${C.esc(row.routeKey)}" data-id="${C.esc(row.id)}" ${canConfirm?'':'disabled'}>${canConfirm?(selected?'유지':'확정'):'25라'}</button></article>`;}).join('');
+      return`<article class="${index===0?'best':''} ${selected?'selected':''}"><span><b>${index+1}. ${C.esc(row.name)}${nearestBadge}${storyBadge}</b><small>${C.esc(row.routeLabel||'')} · TMO ${fmt(row.completion)}% · ${C.esc(status)}</small>${costLine}${whyLine}</span><button data-act="detail" data-id="${C.esc(row.id)}">재료</button><button class="primary" data-act="choose-direction" data-key="${C.esc(row.routeKey)}" data-id="${C.esc(row.id)}" ${canConfirm?'':'disabled'}>${canConfirm?(selected?'유지':'확정'):'25라'}</button></article>`;}).join('');
     const strategicKeys=new Set(['single','end','toki','singleEndExpected','magicSupport','attack']),strategic=(decision.assessment&&decision.assessment.requirements||[]).filter(row=>strategicKeys.has(row.key)),needs=upper&&strategic.length?`<div class="v151-upper-needs"><small>이 상위의 조합 필수 역할</small>${strategic.map(row=>`<span class="${C.num(row.gap)<=0?'ok':'gap'}"><b>${C.esc(row.label)}</b><i>${fmt(row.current)}/${fmt(row.target)}</i>${C.num(row.gap)>0?`<em>부족 ${fmt(row.gap)}</em>`:'<em>확보</em>'}</span>`).join('')}</div>`:'';
     return`${main}${lockedPath}${dpsLine}${needs}${cards?`<div class="v151-upper-candidates">${cards}</div>`:`<div class="v151-upper-note">${upper?'확정 상위 중심으로 다음 행동을 계속 계산합니다. 패가 바뀔 때마다 아래 필수 역할 충족을 다시 검사합니다.':'상위 선택 단계가 되면 최대 6개 후보가 여기에 표시됩니다.'}</div>`}`;
   }
@@ -6102,7 +6139,9 @@ class App{
   }
 
   renderCoach(state,plan,phase,clock,health){
-    return`<div class="v151-screen"><div class="v151-grid"><section class="v151-panel v151-next" data-region="next-action"><header><small>1</small><h2>다음 행동</h2></header>${this.renderV151NextAction(state,plan,health)}</section><section class="v151-panel v151-prep" data-region="next-preparation"><header><small>2</small><h2>다음 행동 미리 준비</h2></header>${this.renderV151Preparation(state,plan)}</section><section class="v151-panel v151-spec" data-region="current-spec"><header><small>3</small><h2>현재 스펙</h2></header>${this.renderV151CurrentSpec(state,plan)}</section><section class="v151-panel v151-build" data-region="buildable-legends"><header><small>4</small><h2>보유 희귀로 만들 수 있는 전설급</h2><span>개별 제작 가능 · 완성도순</span></header>${this.renderV151BuildableLegends(state,plan)}</section><section class="v151-panel v151-reward" data-region="kill-152"><header><small>5</small><h2>TMO 152킬 선택·희귀 예측</h2></header>${this.renderV151RewardForecast(state,plan)}</section><section class="v151-panel v151-gorosei" data-region="gorosei"><header><small>6</small><h2>오로성 선택</h2></header>${this.renderV151Gorosei(state,plan)}</section><section class="v151-panel v151-upper" data-region="upper-info"><header><small>7</small><h2>상위 정보</h2><span>후보 최대 6개</span></header>${this.renderV151UpperInfo(state,plan)}</section><section class="v151-panel v151-run" data-region="game-recording"><header><small>8</small><h2>현재 라운드 + 녹화</h2></header>${this.renderV151RunHeader(state,clock,health)}</section></div></div>`;
+    // v17.9(사용자 요청 4): 152킬 패널은 선택 전 거대한 빈 칸이었다 —
+    // 선택창·예측을 5번 오로성 패널 안으로 옮기고 7패널로 재배치한다.
+    return`<div class="v151-screen"><div class="v151-grid"><section class="v151-panel v151-next" data-region="next-action"><header><small>1</small><h2>다음 행동</h2></header>${this.renderV151NextAction(state,plan,health)}</section><section class="v151-panel v151-prep" data-region="next-preparation"><header><small>2</small><h2>다음 행동 미리 준비</h2></header>${this.renderV151Preparation(state,plan)}</section><section class="v151-panel v151-spec" data-region="current-spec"><header><small>3</small><h2>현재 스펙</h2></header>${this.renderV151CurrentSpec(state,plan)}</section><section class="v151-panel v151-build" data-region="buildable-legends"><header><small>4</small><h2>보유 희귀로 만들 수 있는 전설급</h2><span>개별 제작 가능 · 완성도순</span></header>${this.renderV151BuildableLegends(state,plan)}</section><section class="v151-panel v151-gorosei" data-region="gorosei"><header><small>5</small><h2>오로성 · 152킬 선택</h2></header>${this.renderV151Gorosei(state,plan)}</section><section class="v151-panel v151-upper" data-region="upper-info"><header><small>6</small><h2>상위 정보</h2><span>후보 최대 6개</span></header>${this.renderV151UpperInfo(state,plan)}</section><section class="v151-panel v151-run" data-region="game-recording"><header><small>7</small><h2>현재 라운드 + 녹화</h2></header>${this.renderV151RunHeader(state,clock,health)}</section></div></div>`;
   }
   renderCoachDetails(state,plan,open=false){
     const squad=plan.squadPlan,extraActions=(plan.actions||[]).slice(2),watch=(plan.watch||[]).slice(0,6);if(!squad&&!extraActions.length&&!watch.length)return'';

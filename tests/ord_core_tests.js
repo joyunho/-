@@ -23,7 +23,7 @@ function countsFor(predicate,n=5){const out={[C.WISP_ID]:90};for(const candidate
 function plan(state,locks,settings){return C.recommendationPlan(state,locks,baseSettings(settings),ORD_UPPER_MEMO,ORD_SYNERGY_MEMO);}
 
 test('v13 catalog and core exports are coherent',()=>{
-  assert.strictEqual(C.VERSION,'17.8.0');
+  assert.strictEqual(C.VERSION,'17.9.0');
   assert(units.length>=300);
   assert.strictEqual(new Set(units.map(candidate=>candidate.id)).size,units.length);
   assert.strictEqual(typeof C.gameFlow,'function');

@@ -33,9 +33,9 @@ function input({counts={},percent={},settings={},abilities={}}={}){
   return{catalog,snapshot:{source:'fixture',sessionId:'v15-test',seq:1,at:1000,dataChangedAt:1000,wispCountFound:true,wispCount:Number(counts[C.WISP_ID]||0),counts:Object.assign({},counts),currentAbilities:abilities,units:rows},settings:Object.assign({currentRound:25,mode:'physical',magicRoute:'physical',postLegendRoute:'',manualCounts:{},superKumaOwned:false,wispOverride:'',virtualSpecialId:'',gorosei:'none'},settings),locks:[]};
 }
 
-assert.strictEqual(M.VERSION,'17.8.0');
-assert.strictEqual(L.VERSION,'17.8.0');
-assert.strictEqual(P.VERSION,'17.8.0');
+assert.strictEqual(M.VERSION,'17.9.0');
+assert.strictEqual(L.VERSION,'17.9.0');
+assert.strictEqual(P.VERSION,'17.9.0');
 assert.strictEqual(E.AUTHORITY,'ord-v15-decision-engine');
 
 // Observed TMO counts remain immutable evidence; user corrections live only in

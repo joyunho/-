@@ -6,7 +6,7 @@ if(root)root.ORDV15Policy=api;
 })(typeof window!=='undefined'?window:globalThis,function(C,M){
 'use strict';
 
-const VERSION='17.8.0';
+const VERSION='17.9.0';
 const ROUTES=Object.freeze({
   physical:Object.freeze({key:'physical',mode:'physical',label:'물딜 1상위',groups:[['main'],['armor','stunBase'],['slow','bossFrenzy'],['stunFull']],priority:'상위 → 상시 방깎·최소 0.5스턴 → 이감·광보잡 → 1.5스턴'}),
   dual:Object.freeze({key:'dual',mode:'magic',label:'마딜 2상위·토키',groups:[['main','stunBase'],['slow'],['stunFull'],['bossFrenzy','toki']],priority:'상위 2기·최소 0.5스턴 → 이감 → 1.5스턴 → 광보잡·토키'}),

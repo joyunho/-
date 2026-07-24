@@ -21,7 +21,7 @@ for(const removed of ['ord_ai_advisor.js'])assert(!fs.existsSync(path.join(ext,r
 const read=file=>fs.readFileSync(path.join(ext,file),'utf8');
 const manifest=JSON.parse(read('manifest.json'));
 assert.strictEqual(manifest.manifest_version,3);
-assert.strictEqual(manifest.version,'17.8.0');
+assert.strictEqual(manifest.version,'17.9.0');
 assert.deepStrictEqual(manifest.background,{service_worker:'background.js'});
 assert.deepStrictEqual(new Set(manifest.permissions),new Set(['storage','tabs','scripting']));
 assert(manifest.host_permissions.length>0,'build-helper permissions are missing');
@@ -40,7 +40,7 @@ for(const file of ['background.js','content-tmo.js','ord_story_nonupper_data.js'
 }
 const helper=read('ord_helper.html'),popup=read('popup.html');
 assert(!/\son\w+\s*=/.test(helper+popup),'inline event handler violates MV3 CSP');
-assert(/<meta name="ord-helper" content="v17\.8\.0-decision-engine">/.test(helper),'v17.8.0 helper marker missing');
+assert(/<meta name="ord-helper" content="v17\.9\.0-decision-engine">/.test(helper),'v17.9.0 helper marker missing');
 assert(helper.indexOf('ord_data_patch.js')<helper.indexOf('ord_story_nonupper_data.js'),'data patch must load before measured story data');
 assert(helper.indexOf('ord_story_nonupper_data.js')<helper.indexOf('ord_story_upper_data.js'),'non-upper story data must load before upper story data');
 assert(helper.indexOf('ord_story_upper_data.js')<helper.indexOf('ord_core.js'),'measured story data must load before core');
@@ -56,10 +56,10 @@ for(const file of ['ord_units_data.js','ord_upper_memo.js','ord_synergy_memo.js'
   vm.runInContext(read(file),context,{filename:file});
 }
 const units=context.ORD_TMO_UNITS,C=context.ORDCore,planner=context.ORDSquadPlanner;
-assert.strictEqual(C.VERSION,'17.8.0');
-assert.strictEqual(planner.VERSION,'17.8.0');
+assert.strictEqual(C.VERSION,'17.9.0');
+assert.strictEqual(planner.VERSION,'17.9.0');
 assert.strictEqual(typeof planner.planFinalSquad,'function');
-assert.strictEqual(context.ORDV15Engine.VERSION,'17.8.0');
+assert.strictEqual(context.ORDV15Engine.VERSION,'17.9.0');
 assert.strictEqual(typeof C.storyLeagueRows,'function','story league API missing');
 assert.strictEqual(context.OrdAiAdvisor,undefined,'OpenAI runtime remains globally exposed');
 assert(units.length>=300,'catalog unexpectedly incomplete');
@@ -107,11 +107,11 @@ const compactSnapshot={
 const payloadBytes=Buffer.byteLength(JSON.stringify(compactSnapshot));
 assert(payloadBytes<160000,`snapshot payload too large: ${payloadBytes}`);
 
-const manualPath=path.resolve(ext,'../ord_2305_nightmare_helper_v17_8_0_manual.html');
+const manualPath=path.resolve(ext,'../ord_2305_nightmare_helper_v17_9_0_manual.html');
 assert(fs.existsSync(manualPath),'standalone v15 manual bundle missing');
 assert(!fs.existsSync(path.resolve(ext,'../ord_2305_nightmare_helper_v14_2_0_manual.html')),'stale v14 manual remains in the v15 package');
 const manual=fs.readFileSync(manualPath,'utf8');
-assert(/<meta name="ord-helper" content="v17\.8\.0-decision-engine-manual">/.test(manual),'manual build marker missing');
+assert(/<meta name="ord-helper" content="v17\.9\.0-decision-engine-manual">/.test(manual),'manual build marker missing');
 assert(/source:\s*['\"]standalone-manual['\"]/.test(manual),'standalone manual boot missing');
 assert(!/openai|ord_ai_advisor|127\.0\.0\.1:38766/i.test(manual),'OpenAI surface remains in manual');
 let manualScripts=0;const embeddedScripts=new Map();

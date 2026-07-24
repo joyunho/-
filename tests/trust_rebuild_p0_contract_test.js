@@ -206,7 +206,7 @@ test('v15 trust UI exposes evidence boundaries and never paints advice as clear 
   assert(coach.includes('renderV151NextAction(state,plan,health)'));
   assert(coach.includes('renderV151CurrentSpec(state,plan)'));
   assert(!coach.includes('renderV15RareBoard('));
-  assert.strictEqual((coach.match(/data-region=/g)||[]).length,8);
+  assert.strictEqual((coach.match(/data-region=/g)||[]).length,7);
   assert(css.includes('--v15-calc:#38c6e8'),'계산 조언의 청록색 근거 범례가 사라짐');
   assert(css.includes('--v15-observed:#36d58a'),'TMO 관측의 녹색 근거 범례가 사라짐');
   assert(css.includes('.v151-sync.ok:before'),'TMO 관측 상태의 시각 구분이 사라짐');

@@ -6,7 +6,7 @@ if(root)root.ORDV15Engine=api;
 })(typeof window!=='undefined'?window:globalThis,function(C,M,L,P){
 'use strict';
 
-const VERSION='17.8.0';
+const VERSION='17.9.0';
 const MAX_CANDIDATES=36;
 const BEAM_WIDTH=6;
 const HORIZON=2;
