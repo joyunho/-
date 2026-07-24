@@ -341,7 +341,7 @@ class App{
     },key=[fingerprint(this.state.snapshot),JSON.stringify(strategic)].join('|');
     if(key!==this._v15CacheKey){
       try{this._v15Cache=engine.decide({catalog:this.catalog,snapshot:this.state.snapshot||{},settings,locks:this.state.locks||[]});}
-      catch(error){this._v15Cache={version:'17.10.0',authority:true,state:'SYNC_BLOCKED',label:'판단 엔진 점검 필요',reason:String(error&&error.message||error),action:null,alternatives:[],unknowns:['판단 엔진 오류']};}
+      catch(error){this._v15Cache={version:'17.11.0',authority:true,state:'SYNC_BLOCKED',label:'판단 엔진 점검 필요',reason:String(error&&error.message||error),action:null,alternatives:[],unknowns:['판단 엔진 오류']};}
       this._v15CacheKey=key;
     }
     const base=this._v15Cache;if(!base)return null;
@@ -829,12 +829,15 @@ class App{
     // 않는 희귀는 다음 행동과 무관하게 리롤을 권장한다(한 번에 1장 원칙).
     const rerollRows=decision.rare&&!decision.rare.conflict?(decision.rare.reroll||[]).filter(row=>C.num(row.reroll)>0).slice(0,2):[];
     const rerollHint=rerollRows.length&&decision.state!=='REROLL_ONE'?`<div class="v151-reroll-hint"><small>리롤 권장</small>${rerollRows.map(row=>`<button data-act="detail" data-id="${C.esc(row.id)}"><b>${C.esc(row.name)}${C.num(row.reroll)>1?` ×${C.num(row.reroll)}`:''}</b><span>확정 상위·보조 경로에 사용처 없음 · 1장씩 리롤 후 다시 동기화 · 원하는 1종 확률 1/41(2.4%)/회</span></button>`).join('')}</div>`:'';
+    // v17.11(사용자 요청): 리롤로 노릴 희귀 목표 + 적중 확률.
+    const rerollTargets=this.v151RerollTargets(state,plan,decision);
+    const targetsHtml=rerollTargets?`<div class="v151-reroll-targets"><small>리롤 목표 ${rerollTargets.kinds}종 · 남은 리롤 ${rerollTargets.rerollLeft}/2</small><div class="v151-reroll-target-chips">${rerollTargets.list.map(row=>`<button data-act="detail" data-id="${C.esc(row.id)}"><b>${C.esc(row.name)}${row.need>1?`×${row.need}`:''}</b><span>${row.sources.map(source=>C.esc(source)).join('·')}</span></button>`).join('')}</div><em>1회당 목표 적중 ${rerollTargets.kinds}/41 = ${rerollTargets.perRollPercent}%${rerollTargets.rerollLeft?` · 남은 ${rerollTargets.rerollLeft}회 안에 1개 이상 ${rerollTargets.anyHitPercent}%`:' · 리롤 소진'}</em>${rerollTargets.rollAway.length?`<span class="v151-reroll-fuel">돌릴 후보(사용처 없음): ${rerollTargets.rollAway.map(row=>C.esc(row.name)).join(' · ')}</span>`:'<span class="v151-reroll-fuel">지금 돌릴 무용 희귀 없음 — 무용 희귀가 잡히면 위 목표를 노리세요</span>'}</div>`:'';
     const shipPlan=this.v151ShipPlan(state);
     // v17.9(사용자 요청 1): 전설급 완성체와 상위(제한됨)를 나눠 표기하고
     // 현재 계통 적합 + 재료 근접 순으로 추천 1개를 명시한다.
     const shipRow=row=>{const recommended=shipPlan.recommendedId===row.unit.id;return`<button data-act="detail" data-id="${C.esc(row.unit.id)}" class="${recommended?'recommended':''}"><b>${recommended?'<i class="v151-ship-reco">추천</i>':''}${C.esc(displayNameOf(row.unit))}${row.familyFit?'':'<i class="v151-ship-off">타계통</i>'}</b><span>${row.feasible?'지금 제작 가능 — 배 사용처로 최우선 검토':`부족: ${row.missing.map(m=>`${C.esc(m.name)}${m.need>1?`×${m.need}`:''}`).join(' · ')}${row.missingRares.length?' — 부족 희귀는 리롤·152킬 목표로':''}`}</span></button>`;};
     const shipHint=shipPlan?`<div class="v151-ship-plan"><small>해적선 활용 · ${shipPlan.shipCount}척 보유</small>${shipPlan.legendRows.length?`<em class="v151-ship-group">전설급 완성체</em>${shipPlan.legendRows.map(shipRow).join('')}`:''}${shipPlan.upperRows.length?`<em class="v151-ship-group">상위 (제한됨) — 메인 상위 자리 소모</em>${shipPlan.upperRows.map(shipRow).join('')}`:''}</div>`:'';
-    return items.length||rerollHint||shipHint?`<div class="v151-prep-list">${items.slice(0,5).map((item,index)=>{const unit=state.db&&state.db.byId.get(item.id);return`<button data-act="detail" data-id="${C.esc(item.id)}">${unit&&unit.image?`<img src="${C.esc(unit.image)}" alt="">`:`<i>${index+1}</i>`}<span class="v151-prep-copy"><span class="v151-prep-name"><b>${C.esc(item.name)}</b>${this.v151StoryTag(unit)}</span><small>${C.esc(item.note)}</small></span><em>선위 ${C.num(item.wispCost)}</em></button>`;}).join('')}${shipHint}${rerollHint}<p>미리 준비만 하며, 실제 다음 행동은 TMO 패 변화 뒤 다시 확정합니다.</p></div>`:`<div class="v151-empty"><b>현재 행동만 확정</b><span>다음 행동은 지금 미리 고정하지 않고 TMO 변화 뒤 계산합니다.</span></div>`;
+    return items.length||rerollHint||shipHint||targetsHtml?`<div class="v151-prep-list">${items.slice(0,5).map((item,index)=>{const unit=state.db&&state.db.byId.get(item.id);return`<button data-act="detail" data-id="${C.esc(item.id)}">${unit&&unit.image?`<img src="${C.esc(unit.image)}" alt="">`:`<i>${index+1}</i>`}<span class="v151-prep-copy"><span class="v151-prep-name"><b>${C.esc(item.name)}</b>${this.v151StoryTag(unit)}</span><small>${C.esc(item.note)}</small></span><em>선위 ${C.num(item.wispCost)}</em></button>`;}).join('')}${targetsHtml}${shipHint}${rerollHint}<p>미리 준비만 하며, 실제 다음 행동은 TMO 패 변화 뒤 다시 확정합니다.</p></div>`:`<div class="v151-empty"><b>현재 행동만 확정</b><span>다음 행동은 지금 미리 고정하지 않고 TMO 변화 뒤 계산합니다.</span></div>`;
   }
 
   renderV151CurrentSpec(state,plan){
@@ -996,6 +999,95 @@ class App{
     return`<small class="v151-clear-why">추천 이유: ${C.esc(strengths.join(', ')||'뚜렷한 우위 없음')}${weakest&&weakest.score<.35?`. 약점은 ${C.esc(weakest.weak)}`:''}. ${C.esc(eta)}${lineNote}${storyNote}</small>`;
   }
 
+  // v17.11(사용자 요청): 선택한 상위 기준, 내 패 + 50라까지 위습 수입을
+  // 전제한 클리어 파티(9환산, 여유 시 11환산 확장)를 시간표로 보여준다.
+  //  · 선택 위습(제작 통화): 실측 0.6/라 수입으로 각 제작의 충당 라운드 계산
+  //  · 랜덤 위습(유닛): 2/라(맵 사실) — 부족 흔함의 기대 도착 라운드 계산
+  //  · 희귀 부족은 수입으로 못 채우므로 리롤 목표로 연결
+  // 파티 확정 게이트(현재 패 순차 장부)는 그대로 — 이 화면은 참고 계획이다.
+  v151ClearParty(state,plan){
+    const squad=plan.squadPlan;
+    if(!squad||squad.error||!Array.isArray(squad.finalLineup)||!squad.finalLineup.length)return null;
+    const lock=this.upperLock(),upperId=lock&&lock.id||this.state.upperPreviewId||this.state.directionUpperId;
+    if(!upperId)return null;
+    const roundNow=this.actualRound(),income=C.wispIncomeProjection(roundNow,50);
+    const available=C.num(state.wisp);
+    // 유닛별 부족 재료(현재 패 기준): futurePending을 유닛으로 묶는다.
+    const pendingByUnit=new Map();
+    for(const item of squad.handFit&&squad.handFit.futurePending||[]){
+      const key=String(item.unitId||'');
+      if(!pendingByUnit.has(key))pendingByUnit.set(key,[]);
+      pendingByUnit.get(key).push(item);
+    }
+    // 제작 순서 시간표: 누적 선위 필요량이 (보유 + 0.6/라 수입)으로 충당되는 라운드.
+    let cumulative=0;const arrivalByUnit=new Map();
+    for(const action of squad.actions||[]){
+      cumulative+=C.num(action.wispCost);
+      const short=Math.max(0,cumulative-available);
+      arrivalByUnit.set(String(action.id),short<=0?roundNow:roundNow+Math.ceil(short/Math.max(.1,income.selectionPerRound)));
+    }
+    const rows=squad.finalLineup.map(item=>{
+      const id=String(item.id||item.unit&&item.unit.id||''),unit=state.db.byId.get(id);
+      const owned=C.num(state.counts[id])>0;
+      const pending=pendingByUnit.get(id)||[];
+      const rareGaps=pending.filter(gap=>gap.tier==='rare');
+      const commonGaps=pending.filter(gap=>gap.tier==='common');
+      const otherGaps=pending.filter(gap=>!['rare','common'].includes(gap.tier));
+      let badge,tone;
+      if(owned){badge='보유';tone='own';}
+      else if(rareGaps.length){badge=`희귀 필요: ${rareGaps.map(gap=>`${gap.name}${gap.count>1?`×${gap.count}`:''}`).join('·')}`;tone='rare';}
+      else if(otherGaps.length){badge=`재료 준비: ${otherGaps.slice(0,2).map(gap=>gap.name).join('·')}`;tone='mat';}
+      else if(commonGaps.length){
+        // 특정 흔함 k개 기대 도착: 랜덤 위습 2/라 × (1/9종) — 균등 가정.
+        // 표시용 반올림 값(0.22) 대신 정확식 k×9/2로 계산한다.
+        const worst=Math.max(...commonGaps.map(gap=>C.num(gap.count)));
+        const waitRounds=Math.ceil(worst*C.COMMON_KIND_COUNT/Math.max(.01,income.randomPerRound));
+        badge=`~${roundNow+waitRounds}라 (랜덤 위습 기대)`;tone='wait';
+      }else{
+        const arrival=arrivalByUnit.get(id);
+        if(arrival==null||arrival<=roundNow){badge='지금 제작 가능';tone='now';}
+        else{badge=`~${Math.min(65,arrival)}라 (선위 수입 대기)`;tone='wait';}
+      }
+      return{id,unit,name:item.name||(unit?displayNameOf(unit):id),isUpper:unit?C.isUpper(unit):false,badge,tone};
+    });
+    // 요약: 총 필요 선위 vs 보유 + 50라까지 수입.
+    const totalNeed=cumulative,projected=available+income.selectionTotal;
+    const funded=projected>=totalNeed;
+    // 11환산 확장: 파티 밖 제작 가능 전설급 상위 2개(스토리 등급 우선).
+    const lineupIds=new Set(rows.map(row=>row.id));
+    const stretch=(plan.rows||[]).filter(row=>row.unit&&C.isLegendish(row.unit)&&!lineupIds.has(row.unit.id)&&row.solve&&row.solve.wispCost!=null).slice(0,8)
+      .sort((a,b)=>C.num(C.storyGrade(b.unit).score)-C.num(C.storyGrade(a.unit).score)).slice(0,2)
+      .map(row=>({id:row.unit.id,name:displayNameOf(row.unit),wispCost:C.num(row.solve.wispCost)}));
+    return{upperId,rows,totalNeed,available,income,projected:Math.floor(projected),funded,plannedCount:C.num(squad.plannedCount),targetCount:C.num(squad.targetCount),stretch};
+  }
+  renderV151ClearParty(state,plan){
+    const party=this.v151ClearParty(state,plan);
+    if(!party)return'';
+    const rows=party.rows.map((row,index)=>`<button data-act="detail" data-id="${C.esc(row.id)}" class="v151-party-row ${C.esc(row.tone)}">${row.unit&&row.unit.image?`<img src="${C.esc(row.unit.image)}" alt="">`:`<i>${index+1}</i>`}<span><b>${C.esc(row.name)}${row.isUpper?' <em>(상위 · 3환산)</em>':''}</b><small>${C.esc(row.badge)}</small></span></button>`).join('');
+    const stretchHtml=party.stretch.length?`<div class="v151-party-stretch"><small>여유 확장(11환산 후보)</small>${party.stretch.map(row=>`<button data-act="detail" data-id="${C.esc(row.id)}"><b>${C.esc(row.name)}</b><span>선위 ${C.num(row.wispCost)}</span></button>`).join('')}</div>`:'';
+    return`<div class="v151-clear-party"><header><b>클리어 파티 참고안 · ${C.num(party.plannedCount)}/${C.num(party.targetCount)}환산</b><em class="${party.funded?'ok':'gap'}">필요 선위 ${C.num(party.totalNeed)} vs 보유 ${C.num(party.available)}+50라까지 수입 ~${C.num(Math.floor(party.income.selectionTotal))} = ${C.num(party.projected)} ${party.funded?'충당 가능':'부족'}</em></header><div class="v151-party-rows">${rows}</div>${stretchHtml}<small class="v151-party-note">수입 가정: 선택 위습 ${party.income.selectionPerRound}/라(로그 실측) · 랜덤 위습 ${C.num(party.income.randomPerRound)}/라(흔함 9종 균등 기대). 참고 계획이며 파티 확정은 현재 패 검증만 사용합니다.</small></div>`;
+  }
+  // v17.11(사용자 요청): 리롤로 노릴 희귀 목표를 확률과 함께 안내한다.
+  v151RerollTargets(state,plan,decision){
+    const targets=new Map();
+    const add=(id,name,need,source)=>{
+      if(!id)return;
+      const entry=targets.get(id)||{id,name,need:0,sources:new Set()};
+      entry.need=Math.max(entry.need,C.num(need)||1);entry.sources.add(source);
+      targets.set(id,entry);
+    };
+    const lock=this.upperLock(),upperId=lock&&lock.id||this.state.upperPreviewId||this.state.directionUpperId;
+    if(upperId)for(const row of this.v151MissingRares(state,upperId))add(row.id,row.name,row.short,'상위');
+    for(const item of plan.squadPlan&&plan.squadPlan.handFit&&plan.squadPlan.handFit.futurePending||[])if(item.tier==='rare')add(item.id,item.name,item.count,'파티');
+    const shipPlan=this.v151ShipPlan(state);
+    if(shipPlan)for(const row of[...shipPlan.legendRows,...shipPlan.upperRows])for(const missing of row.missingRares)add(missing.id,missing.name,missing.need,'해적선');
+    if(!targets.size)return null;
+    const list=[...targets.values()].map(entry=>Object.assign(entry,{sources:[...entry.sources]})).sort((a,b)=>b.sources.length-a.sources.length||b.need-a.need).slice(0,6);
+    const kinds=targets.size,rerollLeft=Math.max(0,2-C.num(this.state.rerollsUsed));
+    const perRoll=kinds/41,anyHit=rerollLeft>0?1-Math.pow(1-perRoll,rerollLeft):0;
+    const rollAway=(decision&&decision.rare&&!decision.rare.conflict?decision.rare.reroll||[]:[]).filter(row=>C.num(row.reroll)>0);
+    return{list,kinds,rerollLeft,perRollPercent:Math.round(perRoll*1000)/10,anyHitPercent:Math.round(anyHit*1000)/10,rollAway};
+  }
   // v17.8(사용자 요청 5): 상위까지 남은 희귀를 이름으로 보여준다.
   v151MissingRares(state,targetId){
     if(!C.rareNeedsForTarget)return[];
@@ -1064,7 +1156,7 @@ class App{
       const costLine=row.locked?'':`<small class="v151-cost-line">필요 선위 <b>${C.num(row.wispCost)}</b>${C.num(row.wispGap)>0?` · 현재 부족 <b>${C.num(row.wispGap)}</b>`:' · 지금 충당 가능'}${missingRares.length?` · 부족 희귀: ${missingRares.map(item=>`${C.esc(item.name)}${item.short>1?`×${item.short}`:''}`).join(' · ')}`:' · 희귀 재료 충족'}</small>`;
       return`<article class="${index===0?'best':''} ${selected?'selected':''}"><span><b>${index+1}. ${C.esc(row.name)}${nearestBadge}${storyBadge}</b><small>${C.esc(row.routeLabel||'')} · TMO ${fmt(row.completion)}% · ${C.esc(status)}</small>${costLine}${whyLine}</span><button data-act="detail" data-id="${C.esc(row.id)}">재료</button><button class="primary" data-act="choose-direction" data-key="${C.esc(row.routeKey)}" data-id="${C.esc(row.id)}" ${canConfirm?'':'disabled'}>${canConfirm?(selected?'유지':'확정'):'25라'}</button></article>`;}).join('');
     const strategicKeys=new Set(['single','end','toki','singleEndExpected','magicSupport','attack']),strategic=(decision.assessment&&decision.assessment.requirements||[]).filter(row=>strategicKeys.has(row.key)),needs=upper&&strategic.length?`<div class="v151-upper-needs"><small>이 상위의 조합 필수 역할</small>${strategic.map(row=>`<span class="${C.num(row.gap)<=0?'ok':'gap'}"><b>${C.esc(row.label)}</b><i>${fmt(row.current)}/${fmt(row.target)}</i>${C.num(row.gap)>0?`<em>부족 ${fmt(row.gap)}</em>`:'<em>확보</em>'}</span>`).join('')}</div>`:'';
-    return`${main}${lockedPath}${dpsLine}${needs}${cards?`<div class="v151-upper-candidates">${cards}</div>`:`<div class="v151-upper-note">${upper?'확정 상위 중심으로 다음 행동을 계속 계산합니다. 패가 바뀔 때마다 아래 필수 역할 충족을 다시 검사합니다.':'상위 선택 단계가 되면 최대 6개 후보가 여기에 표시됩니다.'}</div>`}`;
+    return`${main}${lockedPath}${dpsLine}${needs}${this.renderV151ClearParty(state,plan)}${cards?`<div class="v151-upper-candidates">${cards}</div>`:`<div class="v151-upper-note">${upper?'확정 상위 중심으로 다음 행동을 계속 계산합니다. 패가 바뀔 때마다 아래 필수 역할 충족을 다시 검사합니다.':'상위 선택 단계가 되면 최대 6개 후보가 여기에 표시됩니다.'}</div>`}`;
   }
 
   renderV151RunHeader(state,clock,health){
