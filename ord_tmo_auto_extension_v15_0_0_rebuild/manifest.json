@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "원랜디 2.305 악몽 실전 판단 코치 v17.9.0",
-  "version": "17.9.0",
+  "name": "원랜디 2.305 악몽 실전 판단 코치 v17.10.0",
+  "version": "17.10.0",
   "description": "현재 패의 정확한 순차 원장과 생존 마감으로 다음 한 행동만 결정하는 원랜디 2.305 악몽 코치입니다.",
   "permissions": ["storage", "tabs", "scripting"],
   "host_permissions": [
@@ -16,7 +16,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "ORD 악몽 실전 판단 코치 v17.9.0"
+    "default_title": "ORD 악몽 실전 판단 코치 v17.10.0"
   },
   "background": {"service_worker": "background.js"},
   "content_scripts": [{

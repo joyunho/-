@@ -102,11 +102,13 @@ function compactSnapshot(snapshot,previousBaseline){
   return{record,baseline:next,digest:next.digest,duplicate};
 }
 function applyPatch(base,patch){const out=Object.assign({},base||{});for(const [key,value] of Object.entries(patch||{})){if(value==null)delete out[key];else out[key]=rounded(value);}return sortObject(out);}
-function applySnapshotRecord(previousBaseline,record){
+function applySnapshotRecord(previousBaseline,record,options){
   if(!record||record.schema!==SNAPSHOT_SCHEMA||!['full','delta'].includes(record.kind))throw new TypeError('Compact ORD snapshot record is required');
   if(record.kind==='delta'&&!previousBaseline)throw new TypeError('A baseline is required before a snapshot delta');
   const prior=record.kind==='full'?{counts:{},progress:{},currentAbilities:{}}:normalizeBaseline(previousBaseline),body={counts:applyPatch(record.kind==='full'?{}:prior.counts,record.counts),progress:applyPatch(record.kind==='full'?{}:prior.progress,record.progress),currentAbilities:applyPatch(record.kind==='full'?{}:prior.currentAbilities,record.currentAbilities)};
-  return Object.assign(body,{digest:stableDigest(body)});
+  // digest는 중복 판정용 — 재구성 전용 소비자(verdictReport)는 생략해
+  // 레코드당 stableDigest 비용을 아낀다.
+  return options&&options.digest===false?body:Object.assign(body,{digest:stableDigest(body)});
 }
 function reconstructSnapshots(records){const states=[];let baseline=null;for(const record of records||[]){baseline=applySnapshotRecord(baseline,record);states.push(baseline);}return states;}
 
@@ -252,10 +254,112 @@ function compactDecision(input){
   return Object.assign(body,{digest:stableDigest(body)});
 }
 
+// v17.10(사용자 승인 1단계): 판정-결과 자동 대조 리포트.
+// 한 판의 이벤트 스트림에서 "엔진 판정과 실제 실행이 어긋난 지점"을
+// 자동 집계한다 — 미실행 ACT_NOW 연속 구간, 필수 결손 개방 라운드,
+// 선택 대기 비용, 리롤 활용, 종료 시점 스냅샷. 성공·실패를 추정하지
+// 않으며(사용자 입력·전멸 감지만 종료 신호로 사용) 계산 근거는 전부
+// 기록에 이미 있는 값이다.
+function verdictReport(events){
+  const list=Array.isArray(events)?events:[];
+  const asNum=value=>{const parsed=Number(value);return Number.isFinite(parsed)?parsed:0;};
+  let cut=list.length,wipe=null,outcome=null;
+  for(let index=0;index<list.length;index++){
+    const event=list[index];
+    if(event.type==='user-action'&&event.payload&&event.payload.action==='suspected-terminal-wipe'){wipe={round:asNum(event.payload.round)||asNum(event.round),lastLiveBoard:asNum(event.payload.lastLiveBoard)};cut=index+1;break;}
+    if(event.type==='outcome'&&event.payload&&event.payload.kind&&event.payload.kind!=='r50_killed'){outcome={kind:String(event.payload.kind),round:asNum(event.payload.round)||asNum(event.round)};cut=index+1;break;}
+  }
+  const span=list.slice(0,cut);
+  const decisions=[];
+  for(let index=0;index<span.length;index++){
+    const event=span[index];
+    if(event.type!=='decision'||!event.payload||!event.payload.v15)continue;
+    const v15=event.payload.v15;
+    decisions.push({index,round:asNum(event.payload.round)||asNum(event.round),state:String(v15.state||''),action:v15.action&&v15.action.id?{id:String(v15.action.id),name:String(v15.action.name||v15.action.id)}:null,requirements:(v15.assessment&&v15.assessment.requirements||[]).filter(row=>row&&row.required!==false&&!row.waived)});
+  }
+  if(!decisions.length)return null;
+  // 실행 확인은 두 경로: (a) 앱의 제작 확인(build-confirmed) 이벤트,
+  // (b) 앱 확인 없이 게임에서만 제작한 경우 — TMO 스냅샷에서 해당
+  // 유닛 수량이 실제로 늘었는지 재구성해 본다(전량 스냅샷 재구성).
+  const snapshotCounts=[];{
+    let baseline=null;
+    for(let index=0;index<span.length;index++){
+      const event=span[index];
+      if(event.type!=='snapshot'||!event.payload)continue;
+      try{baseline=applySnapshotRecord(baseline,event.payload,{digest:false});snapshotCounts.push({index,counts:baseline&&baseline.counts||{}});}catch(_){/* 선두 트림·손상으로 체인이 끊긴 레코드는 건너뜀 */}
+    }
+  }
+  // 선두가 잘린 로그(head-trim)는 첫 full 스냅샷 전 구간에 수량 증거가
+  // 없다 — 그 구간의 스트릭은 실행 여부를 단정할 수 없으므로 미실행으로
+  // 보고하지 않는다(보수적 억제).
+  const evidenceStart=snapshotCounts.length?snapshotCounts[0].index:Infinity;
+  const countAtIndex=(id,eventIndex)=>{let value=0;for(const snap of snapshotCounts){if(snap.index>eventIndex)break;value=asNum(snap.counts[id]);}return value;};
+  const builtBetween=(id,fromIndex,toIndex)=>{
+    if(span.some((event,index)=>index>=fromIndex&&index<=toIndex&&event.type==='user-action'&&event.payload&&event.payload.action==='build-confirmed'&&(event.payload.steps||[]).some(step=>String(step.id||'')===id)))return true;
+    // 스냅샷 수량 증가 = 게임 내 실행. 스트릭 종료 직후 3이벤트까지 여유.
+    const before=countAtIndex(id,fromIndex),after=(()=>{let value=before;for(const snap of snapshotCounts){if(snap.index<fromIndex)continue;if(snap.index>toIndex+3)break;value=Math.max(value,asNum(snap.counts[id]));}return value;})();
+    return after>before;
+  };
+  // 1) 미실행 ACT_NOW 연속 구간(3라운드 이상 같은 추천이 실행 없이 반복).
+  const unexecuted=[];let streak=null;
+  const closeStreak=endIndex=>{
+    if(!streak)return;
+    const roundSpan=streak.toRound-streak.fromRound+1;
+    const provable=streak.startIndex>=evidenceStart;
+    if(roundSpan>=3&&provable&&!builtBetween(streak.id,streak.startIndex,endIndex))unexecuted.push({id:streak.id,name:streak.name,fromRound:streak.fromRound,toRound:streak.toRound,rounds:roundSpan});
+    streak=null;
+  };
+  for(const decision of decisions){
+    if(decision.state==='ACT_NOW'&&decision.action){
+      if(streak&&streak.id===decision.action.id){streak.toRound=Math.max(streak.toRound,decision.round);continue;}
+      closeStreak(decision.index);
+      streak={id:decision.action.id,name:decision.action.name,fromRound:decision.round,toRound:decision.round,startIndex:decision.index};
+    }else closeStreak(decision.index);
+  }
+  closeStreak(span.length-1);
+  unexecuted.sort((a,b)=>b.rounds-a.rounds);
+  // 2) 필수 결손 개방 구간(라운드별 마지막 판정 기준).
+  const lastByRound=new Map();
+  for(const decision of decisions)lastByRound.set(decision.round,decision);
+  const deficitMap=new Map();
+  for(const decision of lastByRound.values())for(const row of decision.requirements){
+    if(asNum(row.gap)<=0)continue;
+    const key=String(row.key||'');
+    const entry=deficitMap.get(key)||{key,label:String(row.label||key),openRounds:0,firstOpen:decision.round,lastOpen:decision.round,maxGap:0};
+    entry.openRounds+=1;entry.firstOpen=Math.min(entry.firstOpen,decision.round);entry.lastOpen=Math.max(entry.lastOpen,decision.round);entry.maxGap=Math.max(entry.maxGap,asNum(row.gap));
+    deficitMap.set(key,entry);
+  }
+  const lastDecision=decisions[decisions.length-1];
+  const finalDeficits=lastDecision.requirements.filter(row=>asNum(row.gap)>0).map(row=>({key:String(row.key||''),label:String(row.label||row.key||''),gap:Math.round(asNum(row.gap)*100)/100}));
+  const finalKeys=new Set(finalDeficits.map(row=>row.key));
+  const deficits=[...deficitMap.values()].map(entry=>Object.assign(entry,{maxGap:Math.round(entry.maxGap*100)/100,openAtEnd:finalKeys.has(entry.key)})).sort((a,b)=>Number(b.openAtEnd)-Number(a.openAtEnd)||b.openRounds-a.openRounds).slice(0,6);
+  // 3) 대기 비용(라운드별 마지막 판정 상태 기준 라운드 수).
+  const waitCost={routeChoice:0,hold:0,syncBlocked:0,rerollSuggested:0};
+  for(const decision of lastByRound.values()){
+    if(decision.state==='ROUTE_CHOICE')waitCost.routeChoice+=1;
+    else if(decision.state==='HOLD')waitCost.hold+=1;
+    else if(decision.state==='SYNC_BLOCKED')waitCost.syncBlocked+=1;
+    else if(decision.state==='REROLL_ONE')waitCost.rerollSuggested+=1;
+  }
+  // 4) 리롤 활용.
+  const rerollUsed=span.filter(event=>event.type==='user-action'&&event.payload&&event.payload.action==='rare-reroll-confirmed').length;
+  const rerollSuggestionRounds=new Set(decisions.filter(decision=>decision.state==='REROLL_ONE').map(decision=>decision.round));
+  const rounds={first:decisions[0].round,last:lastDecision.round};
+  const endRound=wipe?wipe.round:outcome&&outcome.round?outcome.round:rounds.last;
+  const advice=[];
+  if(unexecuted[0])advice.push(`${unexecuted[0].name} 제작 추천이 ${unexecuted[0].fromRound}~${unexecuted[0].toRound}라 ${unexecuted[0].rounds}라운드 동안 실행되지 않았습니다.`);
+  const worstDeficit=deficits.find(entry=>entry.openAtEnd)||deficits[0];
+  if(worstDeficit&&worstDeficit.openRounds>=5)advice.push(`${worstDeficit.label} 결손이 ${worstDeficit.firstOpen}라부터 ${worstDeficit.openAtEnd?'끝까지':`${worstDeficit.lastOpen}라까지`} ${worstDeficit.openRounds}라운드 열려 있었습니다(최대 부족 ${worstDeficit.maxGap}).`);
+  if(waitCost.routeChoice>=5)advice.push(`상위 방향 선택 대기가 ${waitCost.routeChoice}라운드였습니다 — 대기 중에는 제작·리롤이 잠깁니다.`);
+  if(rerollSuggestionRounds.size>0&&rerollUsed===0)advice.push(`리롤 제안이 ${rerollSuggestionRounds.size}라운드 있었지만 한 번도 쓰지 않았습니다(2회 무료).`);
+  if(!advice.length)advice.push('엔진 판정과 실행이 크게 어긋난 구간이 없습니다.');
+  return{version:1,endRound,endState:wipe?'wiped':outcome?`result:${outcome.kind}`:'active',rounds,wipe,outcome,unexecuted:unexecuted.slice(0,5),deficits,finalDeficits:finalDeficits.slice(0,6),waitCost,reroll:{used:rerollUsed,suggestedRounds:rerollSuggestionRounds.size},advice:advice.slice(0,4)};
+}
+
 return{
   VERSION,SNAPSHOT_SCHEMA,DECISION_SCHEMA,TIERS,LIMITS,
   compactSnapshot,applySnapshotRecord,reconstructSnapshots,compactDecision,compactDirectionBoard,compactV15,
-  stableStringify,stableDigest,dedupe,
-  _test:{text,numericMap,baselineOf,mapDelta,unitRef,groupTier,tierCountsFromConsumed,compactCompletion,compactAction,compactDeficits,compactTimeline,compactRare,currentHand,compactV15RouteCandidate}
+  stableStringify,stableDigest,dedupe,verdictReport,
+  _test:{text,numericMap,baselineOf,mapDelta,unitRef,groupTier,tierCountsFromConsumed,compactCompletion,compactAction,compactDeficits,compactTimeline,compactRare,currentHand,compactV15RouteCandidate,verdictReport}
 };
 });

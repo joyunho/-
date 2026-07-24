@@ -11,7 +11,7 @@ const path = require('path');
 
 const extensionDir = path.resolve(__dirname, '..');
 const repoDir = path.resolve(extensionDir, '..');
-const outputPath = path.join(repoDir, '스토리_등급표_v17_9.md');
+const outputPath = path.join(repoDir, '스토리_등급표_v17_10.md');
 
 global.window = global;
 const originalWarn = console.warn;

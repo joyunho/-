@@ -1,7 +1,7 @@
 (function(global){
 'use strict';
 
-const VERSION='17.9.0';
+const VERSION='17.10.0';
 const WISP_ID='810e';
 const SUPER_KUMA_ID='unit_1767884940750_9880';
 // v17.5: 스토리 10라운드 확정 보상 — 레일리(히든)+해적선 묶음을 다른
