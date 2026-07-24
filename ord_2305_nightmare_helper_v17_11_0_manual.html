@@ -1441,16 +1441,16 @@ const ATTACK_TYPE_VS_BOSS={pierce:1.25,normal:1,siege:.75,hero:1.05};
 // v17.11: 위습 수입 예측 — 두 스트림을 구분한다.
 //  · 선택 위습(제작 통화): 실전 로그 2판 스냅샷 재구성 실측 ~0.6/라
 //    (양의 증가분 합/라운드 — 소비에 가려진 수입이 있어 하한에 가깝다).
-//  · 랜덤 위습(유닛 수입): 라운드마다 2개(사용자 확인 맵 사실) — 무작위
-//    유닛이 손에 들어온다. 특정 흔함 1종 기대 도착은 흔함 9종 균등
-//    가정으로 2/9개/라. 이 예측은 참고 계획 전용이며 확정 게이트(현재
+//  · 랜덤 위습(유닛 수입): 라운드마다 2개, 흔함만 준다(둘 다 사용자
+//    확인 맵 사실). 특정 흔함 1종 기대 도착은 9종 균등 가정 2/9개/라.
+//    안흔함 이상은 랜덤 위습으로 직접 오지 않으므로 조합으로만 채운다. 이 예측은 참고 계획 전용이며 확정 게이트(현재
 //    패 순차 장부)는 그대로 유지한다.
 const SELECTION_WISP_INCOME_PER_ROUND=.6;
 const RANDOM_WISP_PER_ROUND=2;
 const COMMON_KIND_COUNT=9;
 function wispIncomeProjection(currentRound,targetRound){
   const from=Math.max(1,Math.round(num(currentRound)||1)),to=Math.max(from,Math.round(num(targetRound)||50)),rounds=Math.max(0,to-from);
-  return{fromRound:from,toRound:to,rounds,selectionPerRound:SELECTION_WISP_INCOME_PER_ROUND,selectionTotal:round2(rounds*SELECTION_WISP_INCOME_PER_ROUND),randomPerRound:RANDOM_WISP_PER_ROUND,randomTotal:rounds*RANDOM_WISP_PER_ROUND,commonKindPerRound:round2(RANDOM_WISP_PER_ROUND/COMMON_KIND_COUNT),basis:'selection-measured-logs-2games·random-2-per-round-user-confirmed',measured:{selection:true,random:false}};
+  return{fromRound:from,toRound:to,rounds,selectionPerRound:SELECTION_WISP_INCOME_PER_ROUND,selectionTotal:round2(rounds*SELECTION_WISP_INCOME_PER_ROUND),randomPerRound:RANDOM_WISP_PER_ROUND,randomTotal:rounds*RANDOM_WISP_PER_ROUND,commonKindPerRound:round2(RANDOM_WISP_PER_ROUND/COMMON_KIND_COUNT),basis:'selection-measured-logs-2games·random-2-commons-only-user-confirmed',measured:{selection:true,random:false}};
 }
 const ARMOR_BREAK_CAP=75;
 function armorBreakStacks(weight){const w=Math.max(0,num(weight));return w<=0?0:Math.round(ARMOR_BREAK_CAP*(1-Math.pow(.5,w)));}
@@ -6289,7 +6289,7 @@ class App{
     if(!party)return'';
     const rows=party.rows.map((row,index)=>`<button data-act="detail" data-id="${C.esc(row.id)}" class="v151-party-row ${C.esc(row.tone)}">${row.unit&&row.unit.image?`<img src="${C.esc(row.unit.image)}" alt="">`:`<i>${index+1}</i>`}<span><b>${C.esc(row.name)}${row.isUpper?' <em>(상위 · 3환산)</em>':''}</b><small>${C.esc(row.badge)}</small></span></button>`).join('');
     const stretchHtml=party.stretch.length?`<div class="v151-party-stretch"><small>여유 확장(11환산 후보)</small>${party.stretch.map(row=>`<button data-act="detail" data-id="${C.esc(row.id)}"><b>${C.esc(row.name)}</b><span>선위 ${C.num(row.wispCost)}</span></button>`).join('')}</div>`:'';
-    return`<div class="v151-clear-party"><header><b>클리어 파티 참고안 · ${C.num(party.plannedCount)}/${C.num(party.targetCount)}환산</b><em class="${party.funded?'ok':'gap'}">필요 선위 ${C.num(party.totalNeed)} vs 보유 ${C.num(party.available)}+50라까지 수입 ~${C.num(Math.floor(party.income.selectionTotal))} = ${C.num(party.projected)} ${party.funded?'충당 가능':'부족'}</em></header><div class="v151-party-rows">${rows}</div>${stretchHtml}<small class="v151-party-note">수입 가정: 선택 위습 ${party.income.selectionPerRound}/라(로그 실측) · 랜덤 위습 ${C.num(party.income.randomPerRound)}/라(흔함 9종 균등 기대). 참고 계획이며 파티 확정은 현재 패 검증만 사용합니다.</small></div>`;
+    return`<div class="v151-clear-party"><header><b>클리어 파티 참고안 · ${C.num(party.plannedCount)}/${C.num(party.targetCount)}환산</b><em class="${party.funded?'ok':'gap'}">필요 선위 ${C.num(party.totalNeed)} vs 보유 ${C.num(party.available)}+50라까지 수입 ~${C.num(Math.floor(party.income.selectionTotal))} = ${C.num(party.projected)} ${party.funded?'충당 가능':'부족'}</em></header><div class="v151-party-rows">${rows}</div>${stretchHtml}<small class="v151-party-note">수입 근거: 선택 위습 ${party.income.selectionPerRound}/라(로그 실측) · 랜덤 위습 ${C.num(party.income.randomPerRound)}/라 흔함만(확인됨 · 9종 균등 기대). 참고 계획이며 파티 확정은 현재 패 검증만 사용합니다.</small></div>`;
   }
   // v17.11(사용자 요청): 리롤로 노릴 희귀 목표를 확률과 함께 안내한다.
   v151RerollTargets(state,plan,decision){
